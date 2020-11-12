@@ -27,6 +27,7 @@ Hardware & Software
 This project features a MicroChip PIC18F24J11 MCU. The software can be compiled using Microchip's MPLAB IDE and the XC8 compiler. You can get those free for private use. To flash the controller I used a PICKIT™3 unit. You still get those units second hand or NOS but you can also use a more recent one.
 
 ![Module Image](p3_odin.png)
+![PCB Image](pulsar_pcb.png)
 
 Important
 ==========
@@ -56,13 +57,14 @@ The watch currently draws about 13 µA (0.013 mA) of current, if the display is 
 Setting the Time & Date of the Replacement Module
 =================================================
 
-To forward the hours, place the magnet in the HOURS recess. To forward the minutes, place the magnet in the MINUTES recess. Keep in mind that the watch will stop counting the time, if you have forwarded the minutes, until you will press the first time the readout TIME button. This gives you an easy way to set the watch second-accurate, by setting the watch one minute into the future and then wait until the reference clock wraps to that very minute. If you press the TIME button in that moment, the watch will continue counting the time, having set the seconds to zero. To forward the month hold the DATE button pressed and place the magnet in the HOUR recess. To forward the day hold the DATE and TIME buttons pressed at the same time and place the magnet in the HOUR recess. This replacement module adds the weekday and the year to the watch. Refer to the next chapter for setting them.
+To forward the hours, place the magnet in the HOURS recess. To forward the minutes, place the magnet in the MINUTES recess. Keep in mind that the watch will stop counting the time, if you have forwarded the minutes, until you will press the first time the readout TIME button. This gives you an easy way to set the watch second-accurate, by setting the watch one minute into the future and then wait until the reference clock wraps to that very minute. If you press the TIME button in that moment, the watch will continue counting the time, having set the seconds to zero. To forward the month hold the DATE button pressed and place the magnet in the HOUR recess. To forward the day hold the DATE and TIME buttons pressed at the same time and place the magnet in the HOUR recess. This replacement module adds the weekday, the year and the light sensor read-out to the watch. Refer to the next chapter for setting them.
 
 Settings the Extra Features of the Firmware not included in the original P3
 ===========================================================================
 
-The firmware for this replacement module adds two additional functions to the watch.
-It adds the weekday and the year. To set the weekday hold the DATE button pressed and
-forward the weekday by putting the magnet into the MIN recess. To set the year hold
-the DATE and TIME button pressed and forward the year by putting the magnet into
-the MIN recess as well.
+The firmware for this replacement module adds two additional functions to the watch. It adds the weekday and the year. To set the weekday hold the DATE button pressed and forward the weekday by putting the magnet into the MIN recess. To set the year hold the DATE and TIME button pressed and forward the year by putting the magnet into the MIN recess as well.
+
+Light Sensor Readout
+====================
+
+If you hold the DATE button pressed for more than a second, the watch will show the weekday and then, if you still keep the button pressed, the year. If you keep the button even longer pressed, a number will appear, that reflects the light sensor value. On normal daylight, that value shall be between two and four. On strong sun light five to six. If you are in dim light, the watch shall show one or zero. This readout is meant to make it easy to check, if the light sensor is working correctly.
