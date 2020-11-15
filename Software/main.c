@@ -2358,7 +2358,7 @@ void Display_Digits(void)
 
                     ucPlex = 255;
                     
-                    /* Turn all common cathodes off by setting the outputs to tri-state
+                    /* Turn all common pins off by setting the outputs to tri-state
                      * high impedance by making inputs out of them. */
 
                     /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
@@ -2369,10 +2369,16 @@ void Display_Digits(void)
 
                     TRISC = 0x0C;
 
-                    /* Turn all outputs (anodes) off. */
+                    /* Turn all segment outputs off. */
 
-                    PORTC &= 0;
-                    PORTB &= 1;
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+                        LED_DATE_DOT = 1;
+                 #else
+                        PORTC &= 0;
+                        PORTB &= 1;
+                 #endif
                 }
             }
             else // if (g_ucDimmingCnt)
@@ -2381,7 +2387,7 @@ void Display_Digits(void)
 
                 g_ucDimmingCnt = 100;
                 
-                /* Turn all common cathodes off by setting the outputs to tri-state
+                /* Turn all common pins off by setting the outputs to tri-state
                  * high impedance by making inputs out of them. */
 
                 /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
@@ -2392,10 +2398,16 @@ void Display_Digits(void)
 
                 TRISC = 0x0C;
 
-                /* Turn all outputs (anodes) off. */
+                /* Turn all segment outputs off. */
 
+            #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                PORTC |= 0xF0;
+                PORTB |= 0x2C;
+                LED_DATE_DOT = 1;
+            #else
                 PORTC &= 0;
                 PORTB &= 1;
+            #endif
 
                 /* Turn on RA6 to power up the light sensor. */
 
@@ -2771,7 +2783,7 @@ void Display_Digits(void)
                     {
                         ucTemp = *(pb + (g_mod10[g_ucLeftVal]));
 
-                        /* Turn all common cathodes off by setting the outputs
+                        /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
                          * them. */
                         
@@ -2784,10 +2796,16 @@ void Display_Digits(void)
 
                         TRISC = 0x0C;
 
-                        /* Turn all outputs off. */
+                        /* Turn all segment outputs off. */
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+                        LED_DATE_DOT = 1;
+                 #else
                         PORTC &= 0;
                         PORTB &= 1;
+                 #endif
 
                         // segment a
                         if (ucTemp & 1)
@@ -2898,7 +2916,7 @@ void Display_Digits(void)
                     }
                     else if (ucPlex == 3)
                     {
-                        /* Turn all common cathodes off by setting the outputs
+                        /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
                          * them. */
 
@@ -2911,10 +2929,16 @@ void Display_Digits(void)
 
                         TRISC = 0x0C;
 
-                        /* Turn all outputs off. */
+                        /* Turn all segment outputs off. */
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+                        LED_DATE_DOT = 1;
+                 #else
                         PORTC &= 0;
                         PORTB &= 1;
+                 #endif
 
                  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
                     
@@ -3091,7 +3115,7 @@ void Display_Digits(void)
                 }
                 else // if (g_ucLeftVal != 255)
                 {
-                   /* Turn all common cathodes off by setting the outputs to tri-state
+                   /* Turn all common pins off by setting the outputs to tri-state
                     * high impedance by making inputs out of them. */
 
                    /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
@@ -3102,10 +3126,16 @@ void Display_Digits(void)
 
                    TRISC = 0x0C;
 
-                   /* Turn all outputs off. */
+                   /* Turn all segment outputs off. */
 
-                   PORTC &= 0;
-                   PORTB &= 1;
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                    PORTC |= 0xF0;
+                    PORTB |= 0x2C;
+                    LED_DATE_DOT = 1;
+                 #else
+                    PORTC &= 0;
+                    PORTB &= 1;
+                 #endif
                 }
             }
             else // if (ucPlex >= 2)
@@ -3127,7 +3157,7 @@ void Display_Digits(void)
                             ucTemp = *(pb + (g_mod10[g_ucRightVal]));
                         }
                         
-                        /* Turn all common cathodes off by setting the outputs
+                        /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
                          * them. */
 
@@ -3139,10 +3169,16 @@ void Display_Digits(void)
 
                         TRISC = 0x0C;
 
-                        /* Turn all outputs off. */
+                        /* Turn all segment outputs off. */
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+                        LED_DATE_DOT = 1;
+                 #else
                         PORTC &= 0;
                         PORTB &= 1;
+                 #endif
 
                         // segment a
                         if (ucTemp & 1)
@@ -3289,7 +3325,7 @@ void Display_Digits(void)
                  #endif
                         }
                         
-                        /* Turn all common cathodes off by setting the outputs to tri-state
+                        /* Turn all common pins off by setting the outputs to tri-state
                          * high impedance by making inputs out of them. */
 
                         /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
@@ -3300,10 +3336,16 @@ void Display_Digits(void)
 
                         TRISC = 0x0C;
 
-                        /* Turn all outputs off. */
+                        /* Turn all segment outputs off. */
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+                        LED_DATE_DOT = 1;
+                 #else
                         PORTC &= 0;
                         PORTB &= 1;
+                 #endif
 
            #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
@@ -3418,7 +3460,7 @@ void Display_Digits(void)
                 }
                 else // if (g_ucRightVal != 255)
                 {
-                    /* Turn all common cathodes off by setting the outputs to
+                    /* Turn all common pins off by setting the outputs to
                      * tri-state high impedance by making inputs out of them. */
 
                     /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
@@ -3429,10 +3471,16 @@ void Display_Digits(void)
 
                     TRISC = 0x0C;
 
-                    /* Turn all outputs off. */
+                    /* Turn all segment outputs off. */
 
-                    PORTC &= 0;
-                    PORTB &= 1;
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+                        LED_DATE_DOT = 1;
+                 #else
+                        PORTC &= 0;
+                        PORTB &= 1;
+                 #endif
                 }
             }
 
@@ -3669,7 +3717,7 @@ void main(void)
         {
             /* Enter sleep again? */
             
-            /* Turn all common cathodes off by setting the outputs to tri-state
+            /* Turn all common pins off by setting the outputs to tri-state
              * high impedance by making inputs out of them. */
 
             /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
@@ -3680,7 +3728,7 @@ void main(void)
 
             TRISC = 0x0C;
 
-            /* Turn all outputs off. */
+            /* Turn all segment outputs off. */
 
             PORTC &= 0x00;
             PORTB &= 0x01;
