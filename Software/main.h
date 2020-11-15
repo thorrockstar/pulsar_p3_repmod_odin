@@ -49,8 +49,9 @@
  */
  
 #define APP_PULSAR_WRIST_WATCH_12H_NON_AUTO        0 // Pulsar P3 Odin module.
-#define APP_PROTOTYPE_PCB_WATCH                    1 // Just my breadboard.
-#define APP_TABLE_WATCH                            2 // VFD watch project.
+#define APP_PULSAR_WRIST_WATCH_24H_NON_AUTO        1 // Pulsar P3 Loki module.
+#define APP_PROTOTYPE_PCB_WATCH                    2 // Just my breadboard.
+#define APP_TABLE_WATCH                            3 // VFD watch project.
 
 /**
  * Define to turn on display dimming via a LDR.
@@ -127,7 +128,8 @@ typedef void(*ButtonHandlerType)(void);
 /**
 * Button port definitions */
 
-#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
 // Pulsar P2/3
 

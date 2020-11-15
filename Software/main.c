@@ -734,7 +734,8 @@ inline void enterSleep(void)
     
     RPINR1 = 0;
 
-#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
     
     /* Map INT2 to RP1/RA1 (MIN) input for wake-up. */
     
@@ -1450,8 +1451,9 @@ void PressPB0(void)
          * the time button can be pressed together with the DATE button,
          * when setting the day of month. */
 
-      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
-        
+      #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+           (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+
         if ((istate == DISP_STATE_DATE) || (istate == DISP_STATE_SET_MONTH))
         {
             g_sDSGPR1.dispState = DISP_STATE_SET_DAY;
@@ -1461,7 +1463,7 @@ void PressPB0(void)
             g_sDSGPR1.dispState = DISP_STATE_SET_YEAR;
         }
         
-      #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+      #endif
     }
 }
 
@@ -1492,7 +1494,8 @@ void HoldPB0(void)
 
 void ReleasePB0(void)
 {
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
     const int istate = g_sDSGPR1.dispState;
     
@@ -1515,7 +1518,7 @@ void ReleasePB0(void)
         g_ucTimer2Usage = 0;
     }
     
-  #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 }
 
 /**
@@ -1533,14 +1536,15 @@ void PressPB1(void)
         pb->dispState = DISP_STATE_DATE;
     }
 
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
     
     else if (pb->dispState == DISP_STATE_TIME)
     {
         pb->dispState = DISP_STATE_DATE;
     }
     
-  #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 }
 
 /**
@@ -1617,7 +1621,8 @@ void PressPB2(void)
             /* If time and date button have been pressed and the HOUR
              * button is pressed as well, forward the day of month.*/
              
-          #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+          #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
             
             if (g_ucPB1DATEState >= PB_STATE_SHORT_PRESS)
             {
@@ -1635,7 +1640,7 @@ void PressPB2(void)
 
             pb->dispState = DISP_STATE_SET_MONTH;
 
-          #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+          #endif
         }
         else
         {
@@ -1647,7 +1652,8 @@ void PressPB2(void)
                 pb->dispState = DISP_STATE_SET_HOURS;
             }
         
-          #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+          #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
             else
             {
@@ -1918,7 +1924,8 @@ void HoldPB2(void)
 
 void ReleasePB2(void)
 {
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
     /* Turn timer 2 off. */
 
@@ -1928,7 +1935,7 @@ void ReleasePB2(void)
     
     g_ucTimer2Usage = 0;
 
-  #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 }
 
 /**
@@ -1957,7 +1964,8 @@ void PressPB3(void)
         }
         else
         {
-          #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+          #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
             
             if (((ust == DISP_STATE_DATE) || (ust == DISP_STATE_YEAR) || \
                  (ust == DISP_STATE_WEEKDAY)))
@@ -1994,7 +2002,7 @@ void PressPB3(void)
                 g_sDSGPR1.dispState = DISP_STATE_SET_SECONDS;
             }
             
-          #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+          #endif
         }
     }
 
@@ -2058,14 +2066,15 @@ void HoldPB3(void)
         
         RTCVALL = 0; // Zero the second when forwarding the minute.
         
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
         
         /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
          * until the time readout button has been pressed the first time. */
         
         g_sDSGPR1.stallState = 1;
 
-  #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #else
         
         /* Enable the RTC operation again.*/
 
@@ -2075,7 +2084,7 @@ void HoldPB3(void)
 
         Lock_RTCC();
 
-  #endif // #else#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 
         /* Keep the RTC disabled and the seconds zero, until the user
          * pressed a readout button. */
@@ -2169,7 +2178,8 @@ void HoldPB3(void)
         Lock_RTCC();
     }
     
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
     else if (ust == DISP_STATE_SET_DAY)
     {
@@ -2269,7 +2279,7 @@ void HoldPB3(void)
         Lock_RTCC();
     }
 
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 }
 
 /**
@@ -2278,7 +2288,8 @@ void HoldPB3(void)
 
 void ReleasePB3(void)
 {
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
     /* Turn timer 2 off. */
 
@@ -2288,7 +2299,7 @@ void ReleasePB3(void)
     
     g_ucTimer2Usage = 0;
 
-  #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 }
 
 /**
@@ -2570,11 +2581,11 @@ void Display_Digits(void)
 
                         /* 24h -> 12h system */
 
-                    #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
                         g_ucLeftVal = g_24_to_12_hours[g_ucLeftVal];
 
-                    #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #endif
 
                         /* Minutes */
 
@@ -2587,11 +2598,11 @@ void Display_Digits(void)
                             g_ucRightVal = 0;
                         }
 
-                     #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
                         g_ucDots = 3; // Show both dots.
 
-                     #endif
+                 #endif
                     break;
 
                     case DISP_STATE_SECONDS:
@@ -2860,58 +2871,6 @@ void Display_Digits(void)
                         LED_AB_TD = (g_ucDots & 1) ? 1 : 0;
                         LED_AC_LD = (g_ucDots & 2) ? 1 : 0;
 
-                 #else // not a pulsar watch
-                        
-                        /* Ten hour digit */
-
-                        ucTemp = g_div10[g_ucLeftVal];
-                        ucTemp = *(pb + ucTemp);
-
-                        // segment a
-                        if (ucTemp & 1)
-                        {
-                            LED_AA_B = 1;
-                        }
-                        // segment b
-                        if (ucTemp & 2)
-                        {
-                            LED_AB_TD = 1;
-                        }
-
-                        // segment c
-                        if (ucTemp & 4)
-                        {
-                            LED_AC_LD = 1;
-                        }
-
-                        // segment d
-                        if (ucTemp & 8)
-                        {
-                            LED_AD_C = 1;
-                        }
-
-                        // segment e
-                        if (ucTemp & 16)
-                        {
-                            LED_AE = 1;
-                        }
-
-                        // segment f
-                        if (ucTemp & 32)
-                        {
-                            LED_AF = 1;
-                        }
-
-                        // segment g
-                        if (ucTemp & 64)
-                        {
-                            LED_AG = 1;
-                        }
-                    
-                 #endif
-
-                 #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
-
                         /* Turn the common cathode on. */
 
                         LED_10H = 0;
@@ -2920,15 +2879,112 @@ void Display_Digits(void)
 
                         TRISB = 0x13;
 
-                 #else
+                 #else // not a 12h system watch
+                        
+                        /* Ten hour digit */
+
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+                        if (g_ucLeftVal < 10)
+                        {
+                            switch(g_sDSGPR1.dispState)
+                            {
+                                case DISP_STATE_DATE:
+                                case DISP_STATE_SET_MONTH:
+                                case DISP_STATE_SET_DAY:
+                                    ucTemp = 0;
+                                    break;
+
+                                    /* No break - Fall thru! */
+
+                                default:
+                                    ucTemp = *pb; // '0'
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            ucTemp = g_div10[g_ucLeftVal];
+                            ucTemp = *(pb + ucTemp);
+                        }
+                            
+                 #else // No Pulsar wrist watch.
+
+                        ucTemp = g_div10[g_ucLeftVal];
+                        ucTemp = *(pb + ucTemp);
+
+                 #endif
+
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        if (ucTemp)
+                        {
+                 #endif
+                            // segment a
+                            if (ucTemp & 1)
+                            {
+                                LED_AA_B = 1;
+                            }
+                            // segment b
+                            if (ucTemp & 2)
+                            {
+                                LED_AB_TD = 1;
+                            }
+
+                            // segment c
+                            if (ucTemp & 4)
+                            {
+                                LED_AC_LD = 1;
+                            }
+
+                            // segment d
+                            if (ucTemp & 8)
+                            {
+                                LED_AD_C = 1;
+                            }
+
+                            // segment e
+                            if (ucTemp & 16)
+                            {
+                                LED_AE = 1;
+                            }
+
+                            // segment f
+                            if (ucTemp & 32)
+                            {
+                                LED_AF = 1;
+                            }
+
+                            // segment g
+                            if (ucTemp & 64)
+                            {
+                                LED_AG = 1;
+                            }
+
+                     #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+
+                            /* Turn the common cathode on. */
+
+                            LED_10H = 0;
+
+                            /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
+
+                            TRISB = 0x13;
+
+                    #else
                 
-                        /* Turn the common cathode on. */
+                            /* Turn the common cathode on. */
 
-                        LED_1M = 0;
+                            LED_1M = 0;
 
-                        /* Set RC0/1/3/4/5..7 to output and RC2(AN11) as input. */
+                            /* Set RC0/1/3/4/5..7 output and RC2(AN11) as input. */
 
-                        TRISC = 0x04;
+                            TRISC = 0x04;
+
+                    #endif
+
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                        }
+                 #endif
 
                  #endif
                     }
@@ -3064,7 +3120,8 @@ void Display_Digits(void)
                         else
                         {
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
                             if (g_ucRightVal < 10)
                             {
@@ -3113,10 +3170,11 @@ void Display_Digits(void)
                         PORTC &= 0;
                         PORTB &= 1;
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
                         if (ucTemp)
                         {
-                 #endif
+           #endif
                             // segment a
                             if (ucTemp & 1)
                             {
@@ -3181,7 +3239,8 @@ void Display_Digits(void)
 
                         #endif
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
                         }
                  #endif
                     }
@@ -3289,7 +3348,8 @@ void main(void)
 
         /* Turn the 'stay awake' timer off again. */
 
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
         TMR2 = 0;               // Zero the timer.
         T2CONbits.TMR2ON = 1;   // Turn timer 2 on.
@@ -3299,13 +3359,13 @@ void main(void)
         
         g_sDSGPR1.dispState = DISP_STATE_TIME;
 
-  #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #else
 
         /* Set the display state back to blank. */
         
         g_sDSGPR1.dispState = DISP_STATE_BLANK;
 
-  #endif // #else#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif
 
         /* Store the two state variable in non-volatile
          * registers, that will survive deep sleep. */
