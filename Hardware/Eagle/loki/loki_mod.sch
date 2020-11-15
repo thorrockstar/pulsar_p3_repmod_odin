@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
@@ -9443,6 +9443,8 @@ This is public domain.</text>
 <pinref part="10M" gate="G$1" pin="K2"/>
 <wire x1="-20.32" y1="-41.91" x2="7.62" y2="-41.91" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="-41.91" x2="7.62" y2="-45.72" width="0.1524" layer="91"/>
+<pinref part="10M" gate="G$1" pin="K1"/>
+<wire x1="5.08" y1="-45.72" x2="7.62" y2="-45.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="RC3/LED_M4" class="0">
@@ -9458,6 +9460,8 @@ This is public domain.</text>
 <pinref part="1M" gate="G$1" pin="K1"/>
 <wire x1="-21.59" y1="-73.66" x2="5.08" y2="-73.66" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="-73.66" x2="5.08" y2="-76.2" width="0.1524" layer="91"/>
+<pinref part="1M" gate="G$1" pin="K2"/>
+<wire x1="5.08" y1="-76.2" x2="7.62" y2="-76.2" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="RC4/LED_M3" class="0">
@@ -9533,6 +9537,8 @@ This is public domain.</text>
 <pinref part="10H" gate="G$1" pin="K2"/>
 <wire x1="-36.83" y1="24.13" x2="7.62" y2="24.13" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="24.13" x2="7.62" y2="15.24" width="0.1524" layer="91"/>
+<pinref part="10H" gate="G$1" pin="K1"/>
+<wire x1="5.08" y1="15.24" x2="7.62" y2="15.24" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="17.78" x2="-106.68" y2="17.78" width="0.1524" layer="91"/>
@@ -9598,6 +9604,8 @@ This is public domain.</text>
 <pinref part="1H" gate="G$1" pin="K1"/>
 <wire x1="-15.24" y1="-10.16" x2="5.08" y2="-10.16" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="-10.16" x2="5.08" y2="-15.24" width="0.1524" layer="91"/>
+<pinref part="1H" gate="G$1" pin="K2"/>
+<wire x1="5.08" y1="-15.24" x2="7.62" y2="-15.24" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="RA1/SW3" class="0">
@@ -9634,6 +9642,12 @@ This is public domain.</text>
 <pinref part="U$1" gate="A" pin="OSC2/CLKO/RA6"/>
 <wire x1="27.94" y1="111.76" x2="40.64" y2="111.76" width="0.1524" layer="91"/>
 <label x="30.48" y="111.76" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="1H" gate="G$1" pin="H"/>
+<wire x1="2.54" y1="-15.24" x2="2.54" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="-12.7" x2="33.02" y2="-12.7" width="0.1524" layer="91"/>
+<label x="30.48" y="-12.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="RA5/SW4" class="0">

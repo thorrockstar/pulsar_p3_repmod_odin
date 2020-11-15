@@ -5,10 +5,15 @@
  *
  *  Implementation of the Pulsar P3 internal watch logic.
  *
- *  Project:            Pulsar Replacement module 'Odin'.
+ *  Project:            Pulsar Replacement module 'Odin' & 'Loki'.
+ *                      The 'Odin' module is featuring the original
+ *                      Litronix made dotty display, while the 'Loki'
+ *                      module is featuring an USSR made L104G display
+ *                      in the case the original display is corroded
+ *                      beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        29.09.2020
+ *  Last Change:        15.11.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -51,20 +56,22 @@
  * RA0 - Minute set button
  * RA1 - Date readout button on the right side of the watch.
  * 
- * Anodes segments:
- * RC4 anode 'A' regulary but 'B' for the 10x digit of the hours.
- * RC5 anode 'B' regulary but 'top dot' in the middle of the display.
- * RC6 anode 'C' regulary but 'lower dot' in the middle of the display.
- * RC7 anode 'E'
- * RB2 anode 'G'
- * RB3 anode 'D' regulary but 'C' for the 10x digit of the hours.
- * RB5 anode 'F'
+ * Segments:
+ * For Odin mods it will be anodes and for Loki mods it will be cathodes.
+ * RC4 'A' regulary but 'B' for the 10x digit of the hours.
+ * RC5 'B' regulary but 'top dot' in the middle of the display.
+ * RC6 'C' regulary but 'lower dot' in the middle of the display.
+ * RC7 'E'
+ * RB2 'G'
+ * RB3 'D' regulary but 'C' for the 10x digit of the hours.
+ * RB5 'F'
  *
- * Common cathodes:
- * RC3 cathode for '1' minute
- * RB4 cathode for '10' minute and dots
- * RB1 cathode for '1' hour
- * RB6 cathode for '10' hour
+ * Common:
+ * For Odin mods it will be cathodes and for Loki mods it will be anodes.
+ * RC3 for '1' minute
+ * RB4 for '10' minute and dots
+ * RB1 for '1' hour
+ * RB6 for '10' hour
  *
  * Light sensor
  * RA6 provides power to the light sensor, when measuring
@@ -293,7 +300,8 @@ unsigned char g_ucRightVal = 255;
 
 const unsigned char *g_pDigits;
 
-#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
 unsigned char g_ucDots = 0;
 
@@ -366,7 +374,7 @@ inline void Configure_Inputs_Outputs(void)
 {
     /* Setup A/D converter for light sensor. */
 
-    CTMUCONH = 0x00; // make sure CTMU is disabled
+    CTMUCONH = 0x00; // Make sure CTMU is disabled.
     CTMUCONL = 0x90; // Edge 1/2 programmed for a positive edge response
     CTMUICON = 0x01; // 0.55uA, Nominal - No Adjustment
 
@@ -2397,7 +2405,7 @@ void Display_Digits(void)
 
               #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
-                /* Measure the voltage across the sensor. */
+                /* Measure the voltage across the resistor. */
 
                 CTMUCONHbits.CTMUEN = 1;    // Enable the CTMU
                 CTMUCONLbits.EDG1STAT = 0;  // Set Edge status bits to zero
@@ -2510,7 +2518,8 @@ void Display_Digits(void)
                 g_ucLeftVal = 255;
                 g_ucRightVal = 255;
 
-              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+                   (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
                 g_ucDots = 0;
 
@@ -2677,6 +2686,12 @@ void Display_Digits(void)
 
                  #endif
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+                        g_ucDots = 1;
+                        
+                 #endif
+
                     break;
 
                     case DISP_STATE_YEAR:
@@ -2756,14 +2771,16 @@ void Display_Digits(void)
                     {
                         ucTemp = *(pb + (g_mod10[g_ucLeftVal]));
 
-                        /* Turn all common cathodes off by setting the outputs to tri-state
-                         * high impedance by making inputs out of them. */
-
+                        /* Turn all common cathodes off by setting the outputs
+                         * to tri-state high impedance by making inputs out of
+                         * them. */
+                        
                         /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
 
                         TRISB = 0x53;
 
-                        /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
+                        /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                         * as input. */
 
                         TRISC = 0x0C;
 
@@ -2775,56 +2792,99 @@ void Display_Digits(void)
                         // segment a
                         if (ucTemp & 1)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AA_B = 0;
+                 #else
                             LED_AA_B = 1;
+                 #endif
                         }
 
                         // segment b
                         if (ucTemp & 2)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AB_TD = 0;
+                 #else
                             LED_AB_TD = 1;
+                 #endif
                         }
 
                         // segment c
                         if (ucTemp & 4)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AC_LD = 0;
+                 #else
                             LED_AC_LD = 1;
+                 #endif
                         }
 
                         // segment d
                         if (ucTemp & 8)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AD_C = 0;
+                 #else
                             LED_AD_C = 1;
+                 #endif
                         }
 
                         // segment e
                         if (ucTemp & 16)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AE = 0;
+                 #else
                             LED_AE = 1;
+                 #endif
                         }
 
                         // segment f
                         if (ucTemp & 32)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AF = 0;
+                 #else
                             LED_AF = 1;
+                 #endif
                         }
 
                         // segment g
                         if (ucTemp & 64)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AG = 0;
+                 #else
                             LED_AG = 1;
+                 #endif
                         }
 
-                    #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
 
+                        LED_DATE_DOT = (g_ucDots) ? 1 : 0;
+
+                 #endif
+
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+                        /* Turn the common anode on. */
+
+                        LED_1H = 1;
+
+                 #else
                         /* Turn the common cathode on. */
 
                         LED_1H = 0;
+
+                 #endif
 
                         /* Set RB0/4/6 to input, keep RB1/2/3/5/7 as output. */
 
                         TRISB = 0x51;
 
-                    #else
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
                 
                         /* Turn the common cathode on. */
 
@@ -2834,18 +2894,20 @@ void Display_Digits(void)
 
                         TRISB = 0x43;
 
-                    #endif
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
                     }
                     else if (ucPlex == 3)
                     {
-                        /* Turn all common cathodes off by setting the outputs to tri-state
-                         * high impedance by making inputs out of them. */
+                        /* Turn all common cathodes off by setting the outputs
+                         * to tri-state high impedance by making inputs out of
+                         * them. */
 
                         /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
 
                         TRISB = 0x53;
 
-                        /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
+                        /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                         * as input. */
 
                         TRISC = 0x0C;
 
@@ -2892,6 +2954,9 @@ void Display_Digits(void)
                                 case DISP_STATE_DATE:
                                 case DISP_STATE_SET_MONTH:
                                 case DISP_STATE_SET_DAY:
+                                case DISP_STATE_TIME:
+                                case DISP_STATE_SET_HOURS:
+                                case DISP_STATE_SET_MINUTES:
                                     ucTemp = 0;
                                     break;
 
@@ -2922,55 +2987,90 @@ void Display_Digits(void)
                             // segment a
                             if (ucTemp & 1)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AA_B = 0;
+                 #else
                                 LED_AA_B = 1;
+                 #endif
                             }
                             // segment b
                             if (ucTemp & 2)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AB_TD = 0;
+                 #else
                                 LED_AB_TD = 1;
+                 #endif
                             }
 
                             // segment c
                             if (ucTemp & 4)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AC_LD = 0;
+                 #else
                                 LED_AC_LD = 1;
+                 #endif
                             }
 
                             // segment d
                             if (ucTemp & 8)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AD_C = 0;
+                 #else
                                 LED_AD_C = 1;
+                 #endif
                             }
 
                             // segment e
                             if (ucTemp & 16)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AE = 0;
+                 #else
                                 LED_AE = 1;
+                 #endif
                             }
 
                             // segment f
                             if (ucTemp & 32)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AF = 0;
+                 #else
                                 LED_AF = 1;
+                 #endif
                             }
 
                             // segment g
                             if (ucTemp & 64)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AG = 0;
+                 #else
                                 LED_AG = 1;
+                 #endif
                             }
 
-                     #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+                            /* Turn the common anode on. */
+
+                            LED_10H = 1;
+                 #else
                             /* Turn the common cathode on. */
 
                             LED_10H = 0;
+                 #endif
 
                             /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
 
                             TRISB = 0x13;
 
-                    #else
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
                 
                             /* Turn the common cathode on. */
 
@@ -2980,7 +3080,7 @@ void Display_Digits(void)
 
                             TRISC = 0x04;
 
-                    #endif
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
                  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
                         }
@@ -3047,56 +3147,91 @@ void Display_Digits(void)
                         // segment a
                         if (ucTemp & 1)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AA_B = 0;
+                 #else
                             LED_AA_B = 1;
+                 #endif
                         }
 
                         // segment b
                         if (ucTemp & 2)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AB_TD = 0;
+                 #else
                             LED_AB_TD = 1;
+                 #endif
                         }
 
                         // segment c
                         if (ucTemp & 4)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AC_LD = 0;
+                 #else
                             LED_AC_LD = 1;
+                 #endif
                         }
 
                         // segment d
                         if (ucTemp & 8)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AD_C = 0;
+                 #else
                             LED_AD_C = 1;
+                 #endif
                         }
 
                         // segment e
                         if (ucTemp & 16)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AE = 0;
+                 #else
                             LED_AE = 1;
+                 #endif
                         }
 
                         // segment f
                         if (ucTemp & 32)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AF = 0;
+                 #else
                             LED_AF = 1;
+                 #endif
                         }
 
                         // segment g
                         if (ucTemp & 64)
                         {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                            LED_AG = 0;
+                 #else
                             LED_AG = 1;
+                 #endif
                         }
 
-                    #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+                        /* Turn the common anodes on. */
+
+                        LED_1M = 1;
+                 #else
                         /* Turn the common cathode on. */
 
                         LED_1M = 0;
+                 #endif
 
                         /* Set RC0/1/3/4/5..7 to output and RC2(AN11) input. */
 
                         TRISC = 0x04;
 
-                    #else
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
                 
                         /* Turn the common cathode on. */
 
@@ -3106,7 +3241,7 @@ void Display_Digits(void)
 
                         TRISB = 0x13;
 
-                    #endif
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
                     }
                     else if (ucPlex == 1)
@@ -3178,56 +3313,92 @@ void Display_Digits(void)
                             // segment a
                             if (ucTemp & 1)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AA_B = 0;
+                 #else
                                 LED_AA_B = 1;
+                 #endif
                             }
 
                             // segment b
                             if (ucTemp & 2)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AB_TD = 0;
+                 #else
                                 LED_AB_TD = 1;
+                 #endif
                             }
 
                             // segment c
                             if (ucTemp & 4)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AC_LD = 0;
+                 #else
                                 LED_AC_LD = 1;
+                 #endif
                             }
 
                             // segment d
                             if (ucTemp & 8)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AD_C = 0;
+                 #else
                                 LED_AD_C = 1;
+                 #endif
                             }
 
                             // segment e
                             if (ucTemp & 16)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AE = 0;
+                 #else
                                 LED_AE = 1;
+                 #endif
                             }
 
                             // segment f
                             if (ucTemp & 32)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AF = 0;
+                 #else
                                 LED_AF = 1;
+                 #endif
                             }
 
                             // segment g
                             if (ucTemp & 64)
                             {
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                                LED_AG = 0;
+                 #else
                                 LED_AG = 1;
+                 #endif
                             }
 
-                        #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+
+                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+                            /* Turn the common anode on. */
+
+                            LED_10M = 1;
+                 #else
 
                             /* Turn the common cathode on. */
 
                             LED_10M = 0;
+                 #endif
 
                             /* Set RB0/1/6 to input, keep RB2/3/4/5/7 as output. */
 
                             TRISB = 0x43;
 
-                        #else
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
                             /* Turn the common cathode on. */
 
@@ -3237,7 +3408,7 @@ void Display_Digits(void)
 
                             TRISB = 0x51;
 
-                        #endif
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
            #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))

@@ -47,24 +47,33 @@
 /**
  * Define the possible watch types, supported by this WatchApp.
  */
- 
+
+// Original Litronix display using common cathodes.
 #define APP_PULSAR_WRIST_WATCH_12H_NON_AUTO        0 // Pulsar P3 Odin module.
+// USSR made L104G display using common anodes.
 #define APP_PULSAR_WRIST_WATCH_24H_NON_AUTO        1 // Pulsar P3 Loki module.
+// Using Litronix/Siemens bubble display.
 #define APP_PROTOTYPE_PCB_WATCH                    2 // Just my breadboard.
+// Using VFD tubes.
 #define APP_TABLE_WATCH                            3 // VFD watch project.
-
-/**
- * Define to turn on display dimming via a LDR.
- */
-
-#define APP_LIGHT_SENSOR_USAGE                     1
-#define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
 
 /**
  * Define watch types, that shall be build.
  */
  
 #define APP_WATCH_TYPE_BUILD    APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+
+/**
+ * Define to turn on display dimming via a LDR.
+ */
+
+#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+  #define APP_LIGHT_SENSOR_USAGE                     0
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
+#else
+  #define APP_LIGHT_SENSOR_USAGE                     1
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
+#endif
 
 /**
 * Defining the prototype of a handler called
@@ -211,6 +220,9 @@ typedef void(*ButtonHandlerType)(void);
 
 // Light sensor power
 #define PWR_LGTH_SENSOR PORTAbits.RA6
+
+// Optional date dot for the 24h Loki mod. Conflicts with the light sensor.
+#define LED_DATE_DOT    PORTAbits.RA6
 
 /* Debounce and hold times for the buttons. */
 
