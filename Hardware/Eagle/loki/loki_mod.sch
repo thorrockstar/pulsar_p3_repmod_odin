@@ -9209,6 +9209,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="1H" library="l104g" deviceset="L104G" device=""/>
 <part name="10M" library="l104g" deviceset="L104G" device=""/>
 <part name="1M" library="l104g" deviceset="L104G" device=""/>
+<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
 </parts>
 <sheets>
 <sheet>
@@ -9271,6 +9272,7 @@ This is public domain.</text>
 <instance part="1H" gate="G$1" x="12.7" y="-2.54" rot="R90"/>
 <instance part="10M" gate="G$1" x="12.7" y="-33.02" rot="R90"/>
 <instance part="1M" gate="G$1" x="12.7" y="-63.5" rot="R90"/>
+<instance part="R9" gate="G$1" x="22.86" y="-7.62" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -9644,10 +9646,9 @@ This is public domain.</text>
 <label x="30.48" y="111.76" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="1H" gate="G$1" pin="H"/>
-<wire x1="2.54" y1="-15.24" x2="2.54" y2="-12.7" width="0.1524" layer="91"/>
-<wire x1="2.54" y1="-12.7" x2="33.02" y2="-12.7" width="0.1524" layer="91"/>
-<label x="30.48" y="-12.7" size="1.778" layer="95"/>
+<pinref part="R9" gate="G$1" pin="2"/>
+<wire x1="22.86" y1="-2.54" x2="22.86" y2="12.7" width="0.1524" layer="91"/>
+<label x="22.86" y="12.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="RA5/SW4" class="0">
@@ -9840,6 +9841,14 @@ This is public domain.</text>
 <wire x1="-13.97" y1="-3.81" x2="-13.97" y2="-15.24" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="-13.97" y1="-15.24" x2="-48.26" y2="-15.24" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="1H" gate="G$1" pin="H"/>
+<wire x1="2.54" y1="-15.24" x2="2.54" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="-12.7" x2="22.86" y2="-12.7" width="0.1524" layer="91"/>
+<pinref part="R9" gate="G$1" pin="1"/>
 </segment>
 </net>
 </nets>
