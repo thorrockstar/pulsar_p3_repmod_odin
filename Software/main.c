@@ -93,6 +93,8 @@
  * 24 hour to 12 hour system conversion.
  */
 
+#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
 const unsigned char g_24_to_12_hours[] = { /* AM */12, 1, 2, 3, 4, 5, 6, \
                                                     7, 8, 9, 10, 11, \
                                            /* PM */12, 1, 2, 3, 4, 5, 6, \
@@ -106,6 +108,8 @@ const unsigned char g_24_to_AMPM[] = { /* AM */ 1, 1, 1, 1, 1, 1, 1, \
                                                 1, 1, 1, 1, 1, \
                                        /* PM */ 2, 2, 2, 2, 2, 2, 2, \
                                                 2, 2, 2, 2, 2 };
+
+#endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
 /**
  * 7-segment numerical encoding table
@@ -299,6 +303,10 @@ unsigned char g_ucRightVal = 255;
  * Table to the 7-segment digits, can be set to numerical or character table. */
 
 const unsigned char *g_pDigits;
+
+/**
+ * Variable, reflecting the state of the Dot-LED's on the display,
+ * in between month and day or hour and minute. */
 
 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
      (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
@@ -763,7 +771,7 @@ inline void enterSleep(void)
     DSCONHbits.DSULPEN = 0; // ULPWU module is disabled in Deep Sleep
     DSCONLbits.ULPWDIS = 1; // ULPWU wake-up source is disabled.
 
-    /* Applications needing  to save a small amount of data throughout a
+    /* Applications needing to save a small amount of data throughout a
      * Deep Sleep cycle can save the data to thegeneral purpose DSGPR0
      * and DSGPR1 registers. */
 
@@ -1791,9 +1799,9 @@ void HoldPB2(void)
 
         RTCCFGbits.RTCEN = 0;
 
-        ucExtra = 1;
-        
       #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+        ucExtra = 1;
 
         /* On every second cycle change betwen AM and PM and otherwise
          * forward the day. */
@@ -1826,10 +1834,9 @@ void HoldPB2(void)
             ucTemp = g_decimal_bcd[ucValue];
             RTCVALL = ucTemp;
         }
-        
-      #endif
 
         if (ucExtra)
+      #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
         {
             /* Forward the day of month. */
 
@@ -2186,8 +2193,8 @@ void HoldPB3(void)
         Lock_RTCC();
     }
     
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if ((APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) && \
+       (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
     else if (ust == DISP_STATE_SET_DAY)
     {
@@ -2530,12 +2537,12 @@ void Display_Digits(void)
                 g_ucLeftVal = 255;
                 g_ucRightVal = 255;
 
-              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                   (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
                 g_ucDots = 0;
 
-              #endif
+           #endif
 
                 /* Check what shall be displayed. */
                 
@@ -2940,7 +2947,7 @@ void Display_Digits(void)
                         PORTB &= 1;
                  #endif
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+             #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
                     
                         /* Ten hour digit and dots */
 
@@ -2965,7 +2972,7 @@ void Display_Digits(void)
 
                         TRISB = 0x13;
 
-                 #else // not a 12h system watch
+             #else // Not a 12h system watch.
                         
                         /* Ten hour digit */
 
@@ -2983,8 +2990,6 @@ void Display_Digits(void)
                                 case DISP_STATE_SET_MINUTES:
                                     ucTemp = 0;
                                     break;
-
-                                    /* No break - Fall thru! */
 
                                 default:
                                     ucTemp = *pb; // '0'
@@ -3106,11 +3111,11 @@ void Display_Digits(void)
 
              #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+             #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
                         }
-                 #endif
+             #endif
 
-                 #endif
+             #endif // A 24 h based watch.
                     }
                 }
                 else // if (g_ucLeftVal != 255)
