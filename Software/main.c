@@ -2378,7 +2378,7 @@ void Display_Digits(void)
 
                     /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
                         LED_DATE_DOT = 1;
@@ -2407,7 +2407,7 @@ void Display_Digits(void)
 
                 /* Turn all segment outputs off. */
 
-            #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+            #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                 PORTC |= 0xF0;
                 PORTB |= 0x2C;
                 LED_DATE_DOT = 1;
@@ -2464,7 +2464,7 @@ void Display_Digits(void)
 
                 if (uv)  // If the resitor would be missing.
                 {
-                  #if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_PCB_WATCH)
+                  #if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
 
                     /* Normal daylight */
 
@@ -2477,7 +2477,7 @@ void Display_Digits(void)
                         uv = 15 - (uv >> 6);
                     }
 
-                  #else  // #if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_PCB_WATCH)
+                  #else  // #if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
 
                     /* Normal daylight */
 
@@ -2490,7 +2490,7 @@ void Display_Digits(void)
                         uv = 2 - (uv >> 6);
                     }
 
-                  #endif // #else#if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_PCB_WATCH)
+                  #endif // #else#if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
 
                     g_ucDimming = (unsigned char)uv;
                     g_ucDimmingRef = (unsigned char)uv;
@@ -2805,7 +2805,7 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
                         LED_DATE_DOT = 1;
@@ -2817,7 +2817,7 @@ void Display_Digits(void)
                         // segment a
                         if (ucTemp & 1)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AA_B = 0;
                  #else
                             LED_AA_B = 1;
@@ -2827,7 +2827,7 @@ void Display_Digits(void)
                         // segment b
                         if (ucTemp & 2)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AB_TD = 0;
                  #else
                             LED_AB_TD = 1;
@@ -2837,7 +2837,7 @@ void Display_Digits(void)
                         // segment c
                         if (ucTemp & 4)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AC_LD = 0;
                  #else
                             LED_AC_LD = 1;
@@ -2847,7 +2847,7 @@ void Display_Digits(void)
                         // segment d
                         if (ucTemp & 8)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AD_C = 0;
                  #else
                             LED_AD_C = 1;
@@ -2857,7 +2857,7 @@ void Display_Digits(void)
                         // segment e
                         if (ucTemp & 16)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AE = 0;
                  #else
                             LED_AE = 1;
@@ -2867,7 +2867,7 @@ void Display_Digits(void)
                         // segment f
                         if (ucTemp & 32)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AF = 0;
                  #else
                             LED_AF = 1;
@@ -2877,7 +2877,7 @@ void Display_Digits(void)
                         // segment g
                         if (ucTemp & 64)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AG = 0;
                  #else
                             LED_AG = 1;
@@ -2890,9 +2890,9 @@ void Display_Digits(void)
 
                  #endif
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
 
                         /* Turn the common anode on. */
 
@@ -2909,7 +2909,7 @@ void Display_Digits(void)
 
                         TRISB = 0x51;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
                 
                         /* Turn the common cathode on. */
 
@@ -2919,7 +2919,7 @@ void Display_Digits(void)
 
                         TRISB = 0x43;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
                     }
                     else if (ucPlex == 3)
                     {
@@ -2938,7 +2938,7 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
                         LED_DATE_DOT = 1;
@@ -3016,7 +3016,7 @@ void Display_Digits(void)
                             // segment a
                             if (ucTemp & 1)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AA_B = 0;
                  #else
                                 LED_AA_B = 1;
@@ -3025,7 +3025,7 @@ void Display_Digits(void)
                             // segment b
                             if (ucTemp & 2)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AB_TD = 0;
                  #else
                                 LED_AB_TD = 1;
@@ -3035,7 +3035,7 @@ void Display_Digits(void)
                             // segment c
                             if (ucTemp & 4)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AC_LD = 0;
                  #else
                                 LED_AC_LD = 1;
@@ -3045,7 +3045,7 @@ void Display_Digits(void)
                             // segment d
                             if (ucTemp & 8)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AD_C = 0;
                  #else
                                 LED_AD_C = 1;
@@ -3055,7 +3055,7 @@ void Display_Digits(void)
                             // segment e
                             if (ucTemp & 16)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AE = 0;
                  #else
                                 LED_AE = 1;
@@ -3065,7 +3065,7 @@ void Display_Digits(void)
                             // segment f
                             if (ucTemp & 32)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AF = 0;
                  #else
                                 LED_AF = 1;
@@ -3075,16 +3075,16 @@ void Display_Digits(void)
                             // segment g
                             if (ucTemp & 64)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AG = 0;
                  #else
                                 LED_AG = 1;
                  #endif
                             }
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
 
                             /* Turn the common anode on. */
 
@@ -3099,7 +3099,7 @@ void Display_Digits(void)
 
                             TRISB = 0x13;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
                 
                             /* Turn the common cathode on. */
 
@@ -3109,7 +3109,7 @@ void Display_Digits(void)
 
                             TRISC = 0x04;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
                         }
@@ -3133,7 +3133,7 @@ void Display_Digits(void)
 
                    /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                     PORTC |= 0xF0;
                     PORTB |= 0x2C;
                     LED_DATE_DOT = 1;
@@ -3176,7 +3176,7 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
                         LED_DATE_DOT = 1;
@@ -3188,7 +3188,7 @@ void Display_Digits(void)
                         // segment a
                         if (ucTemp & 1)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AA_B = 0;
                  #else
                             LED_AA_B = 1;
@@ -3198,7 +3198,7 @@ void Display_Digits(void)
                         // segment b
                         if (ucTemp & 2)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AB_TD = 0;
                  #else
                             LED_AB_TD = 1;
@@ -3208,7 +3208,7 @@ void Display_Digits(void)
                         // segment c
                         if (ucTemp & 4)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AC_LD = 0;
                  #else
                             LED_AC_LD = 1;
@@ -3218,7 +3218,7 @@ void Display_Digits(void)
                         // segment d
                         if (ucTemp & 8)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AD_C = 0;
                  #else
                             LED_AD_C = 1;
@@ -3228,7 +3228,7 @@ void Display_Digits(void)
                         // segment e
                         if (ucTemp & 16)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AE = 0;
                  #else
                             LED_AE = 1;
@@ -3238,7 +3238,7 @@ void Display_Digits(void)
                         // segment f
                         if (ucTemp & 32)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AF = 0;
                  #else
                             LED_AF = 1;
@@ -3248,16 +3248,16 @@ void Display_Digits(void)
                         // segment g
                         if (ucTemp & 64)
                         {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                             LED_AG = 0;
                  #else
                             LED_AG = 1;
                  #endif
                         }
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
 
                         /* Turn the common anodes on. */
 
@@ -3272,7 +3272,7 @@ void Display_Digits(void)
 
                         TRISC = 0x04;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
                 
                         /* Turn the common cathode on. */
 
@@ -3282,7 +3282,7 @@ void Display_Digits(void)
 
                         TRISB = 0x13;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                     }
                     else if (ucPlex == 1)
@@ -3343,7 +3343,7 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
                         LED_DATE_DOT = 1;
@@ -3360,7 +3360,7 @@ void Display_Digits(void)
                             // segment a
                             if (ucTemp & 1)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AA_B = 0;
                  #else
                                 LED_AA_B = 1;
@@ -3370,7 +3370,7 @@ void Display_Digits(void)
                             // segment b
                             if (ucTemp & 2)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AB_TD = 0;
                  #else
                                 LED_AB_TD = 1;
@@ -3380,7 +3380,7 @@ void Display_Digits(void)
                             // segment c
                             if (ucTemp & 4)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AC_LD = 0;
                  #else
                                 LED_AC_LD = 1;
@@ -3390,7 +3390,7 @@ void Display_Digits(void)
                             // segment d
                             if (ucTemp & 8)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AD_C = 0;
                  #else
                                 LED_AD_C = 1;
@@ -3400,7 +3400,7 @@ void Display_Digits(void)
                             // segment e
                             if (ucTemp & 16)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AE = 0;
                  #else
                                 LED_AE = 1;
@@ -3410,7 +3410,7 @@ void Display_Digits(void)
                             // segment f
                             if (ucTemp & 32)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AF = 0;
                  #else
                                 LED_AF = 1;
@@ -3420,16 +3420,16 @@ void Display_Digits(void)
                             // segment g
                             if (ucTemp & 64)
                             {
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                                 LED_AG = 0;
                  #else
                                 LED_AG = 1;
                  #endif
                             }
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
 
                             /* Turn the common anode on. */
 
@@ -3445,7 +3445,7 @@ void Display_Digits(void)
 
                             TRISB = 0x43;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                             /* Turn the common cathode on. */
 
@@ -3455,7 +3455,7 @@ void Display_Digits(void)
 
                             TRISB = 0x51;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_PCB_WATCH)
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
            #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
@@ -3478,7 +3478,7 @@ void Display_Digits(void)
 
                     /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
                         LED_DATE_DOT = 1;

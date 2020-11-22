@@ -53,7 +53,7 @@
 // USSR made L104G display using common anodes.
 #define APP_PULSAR_WRIST_WATCH_24H_NON_AUTO        1 // Pulsar P3 Loki module.
 // Using Litronix/Siemens bubble display.
-#define APP_PROTOTYPE_PCB_WATCH                    2 // Just my breadboard.
+#define APP_PROTOTYPE_BREAD_BOARD                  2 // Just my breadboard.
 // Using VFD tubes.
 #define APP_TABLE_WATCH                            3 // VFD watch project.
 
@@ -62,6 +62,28 @@
  */
  
 #define APP_WATCH_TYPE_BUILD    APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+
+/**
+ * Define if the LED display has common cathode or anode. Basically
+ * it is only the Loki module, were we have to manually set this as
+ * we are using USSR made replacement displays with common cathode
+ * or anode. The original Litronix displays were all common cathode.
+ */
+
+#define APP_WATCH_COMMON_CATHODE    0
+#define APP_WATCH_COMMON_ANODE      1
+
+#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+     (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD) || \
+     (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+
+    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
+
+#else
+
+    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_ANODE
+
+#endif
 
 /**
  * Define to turn on display dimming via a LDR.
@@ -172,7 +194,7 @@ typedef void(*ButtonHandlerType)(void);
     #define PB3_PORT_BITS   PORTAbits
     #define PB3_PIN         RA5
 
-#elif APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_PCB_WATCH
+#elif APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD
 
 // Prototype PCB
 
