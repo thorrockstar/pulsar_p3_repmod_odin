@@ -9217,7 +9217,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <plain>
 <text x="-120.904" y="143.002" size="1.778" layer="94">You might use a classical Xtal or a Low Power oscillator chip here.
 In the case of using an oscillator chip, connect its output to the OSI and leave OSO open.</text>
-<text x="-76.2" y="-76.2" size="1.778" layer="94">Pulsar P3 Replacement module 'Odin'.
+<text x="-76.2" y="-76.2" size="1.778" layer="94">Pulsar P3 Replacement module 'Loki'.
 Created by Roy Schneider 2020.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 RepMOD</text>
