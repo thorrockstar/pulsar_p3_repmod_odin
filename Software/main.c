@@ -321,7 +321,7 @@ unsigned char g_ucDots = 0;
 
 #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
-const unsigned short g_ucAlarm;
+unsigned short g_ucAlarm;
 
 #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
@@ -853,6 +853,8 @@ inline void enterSleep(void)
  * This function will turn the alarm buzzer on again.
  */
 
+#if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
 void Turn_Buzzer_On(void)
 {
     /* TODO: Activate the PWM output. */
@@ -876,6 +878,8 @@ void Turn_Buzzer_Off(void)
 {
     /* TODO: Deactivate the PWM output. */
 }
+
+#endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
 /**
  * This function will read and debounce the push buttons.
@@ -1657,11 +1661,10 @@ void PressPB1(void)
 
                 /* Toggle the alarm bit. */
 
-                ALCFGRPTbits.AMASK = 0x06; // Alarm repeats every day.
+                ALRMCFGbits.AMASK = 0x06; // Alarm repeats every day.
 
-                ival = ALCFGRPTbits.ALRMEN;
-                ival = ival ? 0 : 1;
-                ALCFGRPTbits.ALRMEN = ival;  // Alarm enable
+                ival = ALRMCFGbits.ALRMEN ? 0 : 1;
+                ALRMCFGbits.ALRMEN = ival ? 1 : 0;  // Alarm enable
 
                 /* Set Alarm repeat */
 
@@ -1669,7 +1672,7 @@ void PressPB1(void)
 
                 /* Enable the Alarm interrupt, if the alarm had been enabled. */
 
-                PIE3bits.RTCCIE = ival;
+                PIE3bits.RTCCIE = ival ? 1 : 0;
 
                 /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
 
@@ -2115,8 +2118,8 @@ void HoldPB2(void)
 
         /* Forward the alarm hour. */
 
-        ALCFGRPTbits.ALRMPTR0 = 1;
-        ALCFGRPTbits.ALRMPTR1 = 0;
+        ALRMCFGbits.ALRMPTR0 = 1;
+        ALRMCFGbits.ALRMPTR1 = 0;
 
         ucTemp = ALRMVALL;
         ucValue = 1 + g_bcd_decimal[ucTemp];
@@ -2416,8 +2419,8 @@ void HoldPB3(void)
 
   #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
-    else if ((ustate == DISP_STATE_ALARM) || \
-             (ustate == DISP_STATE_TOGGLE_ALARM))
+    else if ((ust == DISP_STATE_ALARM) || \
+             (ust == DISP_STATE_TOGGLE_ALARM))
     {
         /* Unlock write access to the RTC and disable the clock. */
 
@@ -2433,8 +2436,8 @@ void HoldPB3(void)
 
         /* Forward the alarm minute. */
 
-        ALCFGRPTbits.ALRMPTR0 = 0;
-        ALCFGRPTbits.ALRMPTR1 = 0;
+        ALRMCFGbits.ALRMPTR0 = 0;
+        ALRMCFGbits.ALRMPTR1 = 0;
 
         ucTemp = ALRMVALH;
         ucValue = 1 + g_bcd_decimal[ucTemp];
@@ -3055,8 +3058,8 @@ void Display_Digits(void)
 
                         /* Alarm Hours */
 
-                        ALCFGRPTbits.ALRMPTR0 = 1;
-                        ALCFGRPTbits.ALRMPTR1 = 0;
+                        ALRMCFGbits.ALRMPTR0 = 1;
+                        ALRMCFGbits.ALRMPTR1 = 0;
 
                         ucTemp = ALRMVALL;   // read alarm hours
                         g_ucLeftVal = g_bcd_decimal[ucTemp];
@@ -3082,7 +3085,7 @@ void Display_Digits(void)
                       #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
                            (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
 
-                        g_ucDots = ALCFGRPTbits.ALRMEN;
+                        g_ucDots = ALRMCFGbits.ALRMEN;
 
                       #endif
                     break;
@@ -4316,7 +4319,7 @@ void main(void)
 
             /* Enable the Alarm interrupt, if the alarm had been enabled. */
 
-            PIE3bits.RTCCIE = ALCFGRPTbits.ALRMEN ? 1 : 0;
+            PIE3bits.RTCCIE = ALRMCFGbits.ALRMEN ? 1 : 0;
 
           #endif
 
