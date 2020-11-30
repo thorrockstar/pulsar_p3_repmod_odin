@@ -13,7 +13,7 @@
  *                      beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        15.11.2020
+ *  Last Change:        30.11.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -55,7 +55,7 @@
  * RB0 - Hour set button
  * RA0 - Minute set button
  * RA1 - Date readout button on the right side of the watch.
- * 
+ *
  * Segments:
  * For Odin mods it will be anodes and for Loki mods it will be cathodes.
  * RC4 'A' regulary but 'B' for the 10x digit of the hours.
@@ -249,7 +249,7 @@ const unsigned char g_div10[100] =
 
 /**
  * Global button state variables. */
- 
+
 unsigned char g_ucPB0TIMEState = PB_STATE_IDLE; // TIME
 unsigned char g_ucPB1DATEState = PB_STATE_IDLE; // DATE
 unsigned char g_ucPB2HOURState = PB_STATE_IDLE; // HOUR
@@ -309,16 +309,26 @@ const unsigned char *g_pDigits;
  * in between month and day or hour and minute. */
 
 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+     (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
 
 unsigned char g_ucDots = 0;
 
 #endif
 
 /**
- * Global deep sleep variables, that are stored
+ * Alarm counter, cancelled by expiring or pressing a button. */
+
+#if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+const unsigned short g_ucAlarm;
+
+#endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+/**
+ * Global (deep) sleep variables, that are stored
  * in two multi purpose registers, that are
- * non-volatile over deep sleep. */
+ * non-volatile over (deep) sleep. */
 
 DSGPR0Type g_sDSGPR0;
 DSGPR1Type g_sDSGPR1;
@@ -327,31 +337,31 @@ DSGPR1Type g_sDSGPR1;
  * Unlock the RTC. This is time critical, so we use
  * assembly language here to get it right.
  */
-            
+
 inline void Unlock_RTCC(void)
 {
     /* Write Magic */
-    
+
     EECON2 = 0x55;
     EECON2 = 0xAA;
 
     /* Set write enable bit. */
-    
+
     RTCCFGbits.RTCWREN = 1; // RTCC Value Registers Write Enable bit
 }
 
 /*
  * Lock the RTC and protect it from further write attempts.
  */
-            
+
 inline void Lock_RTCC(void)
 {
     /* Ensure the RTC is enabled. */
-    
+
     RTCCFGbits.RTCEN = 1;
-    
+
     /* Clear write enable bit. */
-    
+
     RTCCFGbits.RTCWREN = 0; // RTCC Value Registers Write Enable bit
 }
 
@@ -361,17 +371,17 @@ inline void Lock_RTCC(void)
 inline void Init_Inputs_Outputs_Ports(void)
 {
     /* Initialize LATA/B/C to clear output data latches. */
-    
+
     LATA = 0;
     LATB = 0;
     LATC = 0;
-    
+
     /* Free AN5 from being tight to the Voltage monitoring. */
-    
+
     HLVDCON = 8;
-    
+
     /* Turn off SSDMA */
-    
+
     DMACON1 = 0;
 }
 
@@ -402,21 +412,21 @@ inline void Configure_Inputs_Outputs(void)
 
     PORTAbits.RA3 = 0;
     PORTAbits.RA7 = 0;
-    
+
     /* ANCON0 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
      * 1 = Pin configured as a digital port
      * 0 = Pin configured as an analog channel - digital input disabled
      * and reads zero */
-    
+
     ANCON0 = 0xFF;          // AN0...7
-    
+
     /* ANCON1 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
      * 1 = Pin configured as a digital port
      * 0 = Pin configured as an analog channel - digital input disabled
      * and reads zero */
-    
+
     ANCON1 = 0x17;          // AN8..12 Activate AN11 as being an analogue input.
 
     // ADCON1
@@ -445,7 +455,7 @@ inline void Configure_Real_Time_Clock(void)
     unsigned char ucRTCInval;
     unsigned char ucTemp;
     unsigned char ucValue;
-    
+
     while(RTCCFGbits.RTCSYNC);
 
     /* Unlock write operations to the RTC. */
@@ -453,13 +463,13 @@ inline void Configure_Real_Time_Clock(void)
     Unlock_RTCC();
 
     /* Set write enable bit. */
-    
+
     RTCCFGbits.RTCWREN = 1; // RTCC Value Registers Write Enable bit
 
     /* Disable the RTCC */
-    
+
     RTCCFGbits.RTCEN = 0;   // RTCC module is disabled
-    
+
     /* Poll RTCSYNC until it has cleared.
      *
      * The RTCSYNC bit indicates a time window during
@@ -490,7 +500,7 @@ inline void Configure_Real_Time_Clock(void)
     {
         ucRTCInval = 1;
     }
-    
+
     ucTemp = RTCVALH; // Month
     ucValue = g_bcd_decimal[ucTemp];
     if ((ucValue < 1) || (ucValue > 12))
@@ -527,15 +537,15 @@ inline void Configure_Real_Time_Clock(void)
     }
 
     /* Reset RTC if invalid. */
-    
+
     if (ucRTCInval)
     {
         while(RTCCFGbits.RTCSYNC);
-        
+
         RTCCFG |= 3;
 
         RTCVALL = g_decimal_bcd[20]; // Year
-        
+
         ucRTCInval = RTCVALH; // Dummy for decrement
 
         RTCVALL = 1; // Day
@@ -547,7 +557,7 @@ inline void Configure_Real_Time_Clock(void)
         RTCVALL = 0; // Seconds
         RTCVALH = 0; // Minutes
     }
-    
+
     while(RTCCFGbits.RTCSYNC);
 
     /* Enable setting pointers to read MIN and SEC. */
@@ -560,26 +570,34 @@ inline void Configure_Real_Time_Clock(void)
     ALRMCFGbits.CHIME = 0;  /* If chime is enabled, ensure not to clear ALRMEN
                              * bit. ALRMRPT<7:0> bits are allowed to roll over
                              * from 00h to FFh */
-    
+
     /* Configure an optional alarm every second. */
-    
+
     ALRMCFGbits.AMASK0 = 1;
     ALRMCFGbits.AMASK1 = 0;
     ALRMCFGbits.AMASK2 = 0;
     ALRMCFGbits.AMASK3 = 0;
-    
+
     /* Disable the alarm for now. */
-    
+
     ALRMCFGbits.ALRMEN = 0;
 
+    /* Set Alarm repeat to zero. */
+
+    ALRMRPT = 0;
+
+    /* Disable the Alarm interrupt by default. */
+
+    PIE3bits.RTCCIE = 0;
+
     /* Enable the RTCC */
-    
+
     RTCCFGbits.RTCEN = 1;   // RTCC module is enabled
 
     while(RTCCFGbits.RTCSYNC);
 
     /* Lock writing to the RTCC. */
-    
+
     Lock_RTCC();
 }
 
@@ -615,9 +633,9 @@ inline void Configure_Timer_0(void)
     /* Turn the timer 0 off. */
 
     T0CONbits.TMR0ON = 0;
-    
+
     /* Timer usage */
-    
+
     g_ucTimer0Usage = 0;
 }
 
@@ -637,7 +655,7 @@ inline void Configure_Timer_1(void)
      * (1/32.768KHz) * prescaler = 30.5 us -> 0xFFFF -> 2 s */
 
     T1CONbits.T1CKPS = 0;
-    
+
     /* Enable T1 external oscillator. */
 
     T1CONbits.T1OSCEN = 1;  // Timer1 oscillator circuit enabled
@@ -682,9 +700,9 @@ inline void Configure_Timer_2(void)
     /* Turn timer 2 off. */
 
     T2CONbits.TMR2ON = 0;
-    
+
     /* Timer usage */
-    
+
     g_ucTimer2Usage = 0;
 }
 
@@ -730,7 +748,7 @@ inline void Configure_Timer_4(void)
     /* Set the timer to zero. */
 
     TMR4 = 0;
-    
+
     /* Turn timer 4 off. */
 
     T4CONbits.TMR4ON = 0;
@@ -747,24 +765,24 @@ inline void Configure_Timer_4(void)
 inline void enterSleep(void)
 {
     /* Map INT1 to RP0/RA0 (DATE) input for wake-up. */
-    
+
     RPINR1 = 0;
 
 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
      (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
-    
+
     /* Map INT2 to RP1/RA1 (MIN) input for wake-up. */
-    
+
     RPINR2 = 1;
 
     /* Map INT3 to RP2/RA5 (TIME) input for wake-up. */
-    
+
     RPINR3 = 2;
 
 #endif
-    
+
     /* Disable ULPWU usage. */
-    
+
     WDTCONbits.REGSLP  = 1; /* On-chip regulator enters low-power operation
                              * when device enters Sleep mode. */
     DSCONHbits.RTCWDIS = 0; // Wake-up from RTCC is enabled.
@@ -817,7 +835,7 @@ inline void enterSleep(void)
 
     /* Double check the TIME & DATE buttons to be low. Otherwise we
      * may fail to detect a rising edge. */
-    
+
     if ((!PB0 /*TIME*/) && (!PB1 /*DATE*/) && (!PB2 /*HOUR*/) && (!PB3 /*MIN*/))
     {
         /* Sleep vs. deep sleep mode. */
@@ -832,9 +850,37 @@ inline void enterSleep(void)
 #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
 /**
+ * This function will turn the alarm buzzer on again.
+ */
+
+void Turn_Buzzer_On(void)
+{
+    /* TODO: Activate the PWM output. */
+    
+    /* Alarm counter used to keep the buzzer on. */
+
+    g_ucAlarm = 10;
+
+    /* Turn the 'stay awake' timer on, if activating the buzzer. */
+
+    g_ucTimer2Usage = 1;    // Indicate using the timer.
+    TMR2 = 0;               // Zero the timer.
+    T2CONbits.TMR2ON = 1;   // Turn timer 2 on.
+}
+
+/**
+ * This function will turn the alarm buzzer off again.
+ */
+
+void Turn_Buzzer_Off(void)
+{
+    /* TODO: Deactivate the PWM output. */
+}
+
+/**
  * This function will read and debounce the push buttons.
  *
- * @return  Return zello, if the watch can enter deep sleep, non-zero otherwise.
+ * @return  Return zero, if the watch can enter sleep, non-zero otherwise.
  */
 
 unsigned char DebounceButtons(void)
@@ -843,15 +889,15 @@ unsigned char DebounceButtons(void)
     unsigned char *pstate;
     unsigned char ubutton;
     short itimer;
-    
+
     /* Button handler pointer. */
-    
+
     ButtonHandlerType ppressed;
     ButtonHandlerType phold;
     ButtonHandlerType preleased;
 
     /* Init */
-    
+
     unsigned char ibtns = 0;
     unsigned char istayawake = 0;
     unsigned char *pusage = &g_ucTimer0Usage;
@@ -859,7 +905,7 @@ unsigned char DebounceButtons(void)
     do // while(++ibtns < 4);
     {
         /* Read the button status and state machine value. */
-        
+
         switch(ibtns)
         {
             // PB1 - DATE
@@ -871,7 +917,7 @@ unsigned char DebounceButtons(void)
                 phold = &HoldPB1;
                 preleased = &ReleasePB1;
             break;
-            
+
             // PB2 - HOUR
             case 2:
                 pstate = &g_ucPB2HOURState;
@@ -891,7 +937,7 @@ unsigned char DebounceButtons(void)
                 phold = &HoldPB3;
                 preleased = &ReleasePB3;
             break;
-            
+
             // PB0 - TIME
             //case 0:
             default:
@@ -903,7 +949,7 @@ unsigned char DebounceButtons(void)
                 preleased = &ReleasePB0;
             break;
         }
-        
+
         /* Check if the button has been pressed. */
 
         if (ubutton) // pressed
@@ -911,27 +957,27 @@ unsigned char DebounceButtons(void)
             switch(*pstate)
             {
                 case PB_STATE_IDLE:
-                
+
                 /* If the button has been pressed, start debouncing it. */
 
                 *pstate = PB_STATE_DEBOUNCING;
-                
+
                 /* Start the timer, if not started yet by another
                  * button before. */
 
                 if (!(*pusage))
                 {
                     /* Zero timer */
-                    
+
                     TMR0H = 0;
                     TMR0L = 0;
-                    
+
                     /* Turn timer 0 on. */
-                    
+
                     T0CONbits.TMR0ON = 1;
-                    
+
                     /* Set the start timer value for this button. */
-                    
+
                     *ptimer = 0;
                 }
                 else // Timer already in use and running.
@@ -939,7 +985,7 @@ unsigned char DebounceButtons(void)
                     /* Read out the start timer value for this button,
                      * if the timer is already running, triggered by
                      * another button already using it.
-                     * 
+                     *
                      * TMR0H is not the actual high byte of Timer0 in 16-bit
                      * mode. It is actually a buffered version of the real high
                      * byte of Timer0, which is not directly readable nor
@@ -952,33 +998,33 @@ unsigned char DebounceButtons(void)
 
                     /* First read thelow byte of the timer, which will buffer
                      * the high byte. */
-                    
+
                     const unsigned char ulow = TMR0L;
-                    
+
                     /* Read now the buffered high byte of the timer, that
                      * had been stored, when the low byte had been read. */
-                    
+
                     const unsigned char uhigh = TMR0H;
-                    
+
                     *ptimer = ulow | (uhigh << 8);
                 }
-                
+
                 /* Indicate that this button is using the timer. */
-                
+
                 *pusage |= 1 << ibtns;
 
                 /* Return none-zero to indicate not to enter
                  * deep sleep mode. */
 
                 istayawake = 1;
-                
+
                 /* Continue checking the next button. */
-                
+
                 break;
-                
+
                 case PB_STATE_DEBOUNCING:
                 case PB_STATE_SHORT_PRESS:
-                
+
                 /* If the button is still pressed, read
                  * out the current timer value. */
 
@@ -995,14 +1041,14 @@ unsigned char DebounceButtons(void)
 
                     /* First read thelow byte of the timer, which will buffer
                      * the high byte. */
-                    
+
                     const unsigned char ulow = TMR0L;
-                    
+
                     /* Read now the buffered high byte of the timer, that
                      * had been stored, when the low byte had been read. */
-                    
+
                     const unsigned char uhigh = TMR0H;
-                    
+
                     itimer = ulow | (uhigh << 8);
                 }
 
@@ -1010,7 +1056,7 @@ unsigned char DebounceButtons(void)
                  * Use signed values to take mathimatical a rollover in account.
                  * This will work as long as the time span is lower than the
                  * half of the timer's range. */
-                
+
                 if ((itimer - (*ptimer + T0_HOLD)) >= 0)
                 {
                     /* Check if the state is already 'held'. */
@@ -1020,7 +1066,7 @@ unsigned char DebounceButtons(void)
                     *pstate = PB_STATE_LONG_PRESS;
 
                     /* Store timer value as new start point. */
-                    
+
                     *ptimer = itimer;
 
                     /* Call the hold handler for this button. */
@@ -1039,39 +1085,39 @@ unsigned char DebounceButtons(void)
                 else if ((itimer - (*ptimer + T0_DEBOUNCE)) >= 0)
                 {
                     /* If the short debounce timer has been expired. */
-                
+
                     if (*pstate != PB_STATE_SHORT_PRESS)
                     {
                         /* Set the button to 'pressed' state. */
-                        
+
                         *pstate = PB_STATE_SHORT_PRESS;
-                        
+
                         /* Call the 'press' handler. */
-                        
+
                         if (ppressed)
                         {
                             (*ppressed)();
                         }
-                        
+
                         /* Trigger 'stay awake' timer. */
-                        
+
                         g_ucTimer2Usage = 1;    // Indicate using the timer.
                         TMR2 = 0;               // Zero the timer.
                         T2CONbits.TMR2ON = 1;   // Turn timer 2 on.
-                        
+
                         /* Keep the timer going as we have to detect
                          * the 'hold' state as well.*/
                     }
                 }
-                
+
                 /* Do not enter deep sleep mode. */
 
                 istayawake = 1;
-                
+
                 /* Continue checking the next button. */
-                
+
                 break;
-                
+
                 case PB_STATE_LONG_PRESS:
 
                 /* If the button is still pressed, read
@@ -1107,7 +1153,7 @@ unsigned char DebounceButtons(void)
                  * half of the timer's range. */
 
                 short ltime = T0_REPEAT_SLOW;
-                
+
                 switch(ibtns)
                 {
                     case 0: // TIME
@@ -1116,7 +1162,7 @@ unsigned char DebounceButtons(void)
                     case 1: // DATE
                         ltime = T0_HOLD;
                     break;
-                        
+
                     case 2: // HOUR
                     case 3: // MINUTE
                         ltime = T0_REPEAT_QUICK;
@@ -1125,7 +1171,7 @@ unsigned char DebounceButtons(void)
                     default:
                     break;
                 }
-                
+
                 if ((itimer - (*ptimer + (ltime))) >= 0)
                 {
                     *ptimer = itimer;
@@ -1147,9 +1193,9 @@ unsigned char DebounceButtons(void)
                 /* Continue checking the next button. */
 
                 break;
-                    
+
                 case PB_STATE_RELEASED:
-            
+
                 /* If the button was held and then was dropped
                  * but actually was turned on again within the
                  * debounce time for dropping, go back to the
@@ -1162,11 +1208,11 @@ unsigned char DebounceButtons(void)
                  * deep sleep mode. */
 
                 istayawake = 1;
-                
+
                 /* Continue checking the next button. */
-                
+
                 break;
-                
+
                 default:
                 break;
             }
@@ -1181,23 +1227,23 @@ unsigned char DebounceButtons(void)
             {
                 /* The button has not been pressed and the state machine
                  * is idle. */
-                
+
                 case PB_STATE_IDLE:
-                
+
                 /* Continue checking the next button. */
-                
+
                 break;
-            
+
                 /* If the button was on debouncing for a peak up
                  * and the signal peaked down again, dismiss the
                  * debouncing process. */
-            
+
                 case PB_STATE_DEBOUNCING:
-                    
+
                 *pstate = PB_STATE_IDLE;
-                
+
                 /* Indicate that this button is not using the timer anymore. */
-                
+
                 *pusage &= ~(1 << ibtns);
 
                 /* If this was the last button using the timer, stop the timer. */
@@ -1205,7 +1251,7 @@ unsigned char DebounceButtons(void)
                 if (!(*pusage))
                 {
                     /* Stop the debouncing timer used. */
-                    
+
                     T0CONbits.TMR0ON = 0;
                 }
                 else
@@ -1216,17 +1262,17 @@ unsigned char DebounceButtons(void)
 
                     istayawake = 1;
                 }
-                
+
                 /* Continue checking the next button. */
-                
+
                 break;
 
                 case PB_STATE_SHORT_PRESS:
-                
+
                 *pstate = PB_STATE_IDLE;
-                
+
                 /* Indicate that this button is not using the timer anymore. */
-                
+
                 *pusage &= ~(1 << ibtns);
 
                 /* If this was the last button using the timer,
@@ -1235,7 +1281,7 @@ unsigned char DebounceButtons(void)
                 if (!(*pusage))
                 {
                     /* Stop the debouncing timer used. */
-                    
+
                     T0CONbits.TMR0ON = 0;
                 }
                 else
@@ -1246,7 +1292,7 @@ unsigned char DebounceButtons(void)
 
                     istayawake = 1;
                 }
-                    
+
                 /* Call the hold handler for this button. */
 
                 if (preleased)
@@ -1255,31 +1301,31 @@ unsigned char DebounceButtons(void)
                 }
 
                 /* Continue checking the next button. */
-                
+
                 break;
-            
+
                 /* If the button is not pressed anymore, but was hold
                  * down before for a while, debounce the dropping as well. */
-             
+
                 case PB_STATE_LONG_PRESS:
 
                 *pstate = PB_STATE_RELEASED;
-                
+
                 /* Start the timer, if not started yet by any other button. */
 
                 if (!(*pusage))
                 {
                     /* Zero timer */
-                    
+
                     TMR0H = 0;
                     TMR0L = 0;
-                    
+
                     /* Turn tmer 0 on. */
-                    
+
                     T0CONbits.TMR0ON = 1;
-                    
+
                     /* Set the start timer value for this button. */
-                    
+
                     *ptimer = 0;
                 }
                 else
@@ -1287,7 +1333,7 @@ unsigned char DebounceButtons(void)
                     /* Read out the start timer value for this button,
                      * if the timer is already running, triggered by
                      * another button already using it.
-                     * 
+                     *
                      * TMR0H is not the actual high byte of Timer0 in 16-bit
                      * mode. It is actually a buffered version of the real high
                      * byte of Timer0, which is not directly readable nor
@@ -1300,37 +1346,37 @@ unsigned char DebounceButtons(void)
 
                     /* First read thelow byte of the timer, which will buffer
                      * the high byte. */
-                    
+
                     const unsigned char ulow = TMR0L;
-                    
+
                     /* Read now the buffered high byte of the timer, that
                      * had been stored, when the low byte had been read. */
-                    
+
                     const unsigned char uhigh = TMR0H;
-                    
+
                     *ptimer = ulow | (uhigh << 8);
                 }
-                
+
                 /* Indicate that this button is using the timer. */
-                
+
                 *pusage |= 1 << ibtns;
 
                 /* Return none-zero to indicate not to enter
                  * deep sleep mode. */
-                 
+
                 istayawake = 1;
-                 
+
                 /* Continue checking the next button. */
-                
+
                 break;
-          
+
                 /* If the button has been dropped and was hold, before,
                  * debounce the dropping of the button as well. */
-             
+
                 case PB_STATE_RELEASED:
-                
+
                 /* Read out the timer value. */
-                
+
                 {
                     /* TMR0H is not the actual high byte of Timer0 in 16-bit
                      * mode. It is actually a buffered version of the real high
@@ -1344,27 +1390,27 @@ unsigned char DebounceButtons(void)
 
                     /* First read thelow byte of the timer, which will buffer
                      * the high byte. */
-                    
+
                     const unsigned char ulow = TMR0L;
-                    
+
                     /* Read now the buffered high byte of the timer, that
                      * had been stored, when the low byte had been read. */
-                    
+
                     const unsigned char uhigh = TMR0H;
-                    
+
                     itimer = ulow | (uhigh << 8);
                 }
-                
+
                 /* Check if the long (hold) debounce timer for dropping
                  * the button has been expired.
                  * Use signed values to take mathimatical a rollover in account.
                  * This will work as long as the time span is lower than the
                  * half of the timer's range. */
-                
+
                 if ((itimer - (*ptimer + T0_DEBOUNCE)) >= 0)
                 {
                     /* Indicate that this button is using the timer. */
-                
+
                     *pusage &= ~(1 << ibtns);
 
                     /* Check if any other button is not using the
@@ -1373,7 +1419,7 @@ unsigned char DebounceButtons(void)
                     if (!(*pusage))
                     {
                         /* Stop the debouncing timer used. */
-                        
+
                         T0CONbits.TMR0ON = 0;
                     }
                     else
@@ -1384,11 +1430,11 @@ unsigned char DebounceButtons(void)
 
                         istayawake = 1;
                     }
-                    
+
                     /* Set the state machine for the button back to 'idle. */
-                    
+
                     *pstate = PB_STATE_IDLE;
-                    
+
                     /* Call the hold handler for this button. */
 
                     if (preleased)
@@ -1407,17 +1453,17 @@ unsigned char DebounceButtons(void)
                     istayawake = 1;
                 }
                 break;
-                
+
                 default:
                 break;
             }
         }
     }
     while(++ibtns < 4);
-    
+
     /* Return none-zero to indicate not to enter
      * deep sleep mode. */
-    
+
     return (istayawake);
 }
 
@@ -1427,31 +1473,44 @@ unsigned char DebounceButtons(void)
 
 void PressPB0(void)
 {
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+    /* Check if the alarm buzzer is still active. */
+
+    if (g_ucAlarm)
+    {
+        g_ucAlarm = 0;
+
+        Turn_Buzzer_Off();
+    }
+
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
     /* When having set the time, the RTC will be disabled until
      * you press the very first time the 'TIME' button.
      * This will make the watch start counting time at zero seconds. */
-     
+
     if (g_sDSGPR1.stallState)
     {
         g_sDSGPR1.stallState = 0;
-        
+
         /* Unlock via magic. */
-        
+
         Unlock_RTCC();
-        
+
         /* Enable write to RTC */
-        
+
         RTCCFGbits.RTCWREN = 1;
-        
+
         /* Enable RTC operation. */
-        
+
         RTCCFGbits.RTCEN = 1;
-        
+
         /* Lock writing to the RTCC. */
-    
+
         Lock_RTCC();
     }
-    
+
     /* Revoke the 'blanked' state in order to turn the display on. */
 
     const int istate = g_sDSGPR1.dispState;
@@ -1478,7 +1537,7 @@ void PressPB0(void)
         {
             g_sDSGPR1.dispState = DISP_STATE_SET_YEAR;
         }
-        
+
       #endif
     }
 }
@@ -1493,7 +1552,7 @@ void HoldPB0(void)
      * But reagrding how Pulsar P2/P3 and eraly P4 works, the
      * time button can be hold pressed after the DATE button,
      * when setting the day of month. */
-    
+
     if ((g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
@@ -1514,7 +1573,7 @@ void ReleasePB0(void)
        (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
     const int istate = g_sDSGPR1.dispState;
-    
+
     if (istate == DISP_STATE_SET_DAY)
     {
         g_sDSGPR1.dispState = DISP_STATE_SET_MONTH;
@@ -1533,7 +1592,7 @@ void ReleasePB0(void)
 
         g_ucTimer2Usage = 0;
     }
-    
+
   #endif
 }
 
@@ -1543,24 +1602,97 @@ void ReleasePB0(void)
 
 void PressPB1(void)
 {
+    int ival;
+
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+    /* Check if the alarm buzzer is still active. */
+
+    if (g_ucAlarm)
+    {
+        g_ucAlarm = 0;
+
+        Turn_Buzzer_Off();
+    }
+
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
     /* Revoke the 'blanked' state in order to turn the display on. */
 
     DSGPR1Type *pb = &g_sDSGPR1;
-    
+
     if (pb->dispState == DISP_STATE_BLANK)
     {
         pb->dispState = DISP_STATE_DATE;
     }
-
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
-    
     else if (pb->dispState == DISP_STATE_TIME)
     {
+      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
         pb->dispState = DISP_STATE_DATE;
+
+      #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+        if (((g_ucPB0TIMEState == PB_STATE_SHORT_PRESS) || \
+             (g_ucPB0TIMEState == PB_STATE_LONG_PRESS)) \
+             \
+             && \
+             \
+            (g_ucPB2HOURState == PB_STATE_IDLE) && \
+            (g_ucPB3MINTState == PB_STATE_IDLE))
+        {
+            if (pb->dispState == DISP_STATE_TOGGLE_ALARM)
+            {
+                /* Unlock write access to the RTC and disable the clock. */
+
+                Unlock_RTCC();
+
+                /* Enable writing to the RTC */
+
+                RTCCFGbits.RTCWREN = 1;
+
+                /* Stop RTC operation. */
+
+                RTCCFGbits.RTCEN = 0;
+
+                /* Toggle the alarm bit. */
+
+                ALCFGRPTbits.AMASK = 0x06; // Alarm repeats every day.
+
+                ival = ALCFGRPTbits.ALRMEN;
+                ival = ival ? 0 : 1;
+                ALCFGRPTbits.ALRMEN = ival;  // Alarm enable
+
+                /* Set Alarm repeat */
+
+                ALRMRPT = ival ? 255 : 0;
+
+                /* Enable the Alarm interrupt, if the alarm had been enabled. */
+
+                PIE3bits.RTCCIE = ival;
+
+                /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
+
+                PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
+
+                /* Enable the RTC operation again.*/
+
+                RTCCFGbits.RTCEN = 1;
+
+                /* Lock writing to the RTCC. */
+
+                Lock_RTCC();
+            }
+            else
+            {
+                /* Show Alarm Time */
+
+                pb->dispState = DISP_STATE_ALARM;
+            }
+        }
+
+      #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
     }
-    
-  #endif
 }
 
 /**
@@ -1580,7 +1712,7 @@ void HoldPB1(void)
     {
         DSGPR1Type *pb = &g_sDSGPR1;
         const unsigned char ust = pb->dispState;
-        
+
         if (ust == DISP_STATE_DATE)
         {
             pb->dispState = DISP_STATE_WEEKDAY;
@@ -1589,14 +1721,14 @@ void HoldPB1(void)
         {
             pb->dispState = DISP_STATE_YEAR;
         }
-        
+
   #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
 
         else if (ust == DISP_STATE_YEAR)
         {
             pb->dispState = DISP_STATE_LIGHT_SENSOR;
         }
-    
+
   #endif // #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
     }
 }
@@ -1607,6 +1739,25 @@ void HoldPB1(void)
 
 void ReleasePB1(void)
 {
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+    DSGPR1Type *pb = &g_sDSGPR1;
+
+    if (pb->dispState == DISP_STATE_ALARM)
+    {
+        if (((g_ucPB0TIMEState == PB_STATE_SHORT_PRESS) || \
+             (g_ucPB0TIMEState == PB_STATE_LONG_PRESS)) \
+             \
+             && \
+             \
+            (g_ucPB2HOURState == PB_STATE_IDLE) && \
+            (g_ucPB3MINTState == PB_STATE_IDLE))
+        {
+            pb->dispState = DISP_STATE_TOGGLE_ALARM;
+        }
+    }
+    
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 }
 
 /**
@@ -1615,6 +1766,19 @@ void ReleasePB1(void)
 
 void PressPB2(void)
 {
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+    /* Check if the alarm buzzer is still active. */
+
+    if (g_ucAlarm)
+    {
+        g_ucAlarm = 0;
+
+        Turn_Buzzer_Off();
+    }
+
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
     /* Revoke the 'blanked' state in order to turn the display on. */
 
     DSGPR1Type *pb = &g_sDSGPR1;
@@ -1627,19 +1791,19 @@ void PressPB2(void)
     {
         /* If the display is in DATE mode and the DATE button is pressed,
          * enter setting the month mode. */
-         
+
         const unsigned char ust = pb->dispState;
-        
+
         if (((ust == DISP_STATE_DATE) || \
              (ust == DISP_STATE_SET_DAY) || \
              (ust == DISP_STATE_SET_MONTH)))
         {
             /* If time and date button have been pressed and the HOUR
              * button is pressed as well, forward the day of month.*/
-             
+
           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
-            
+
             if (g_ucPB1DATEState >= PB_STATE_SHORT_PRESS)
             {
                 if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
@@ -1651,7 +1815,7 @@ void PressPB2(void)
                     pb->dispState = DISP_STATE_SET_MONTH;
                 }
             }
-            
+
           #else
 
             pb->dispState = DISP_STATE_SET_MONTH;
@@ -1667,7 +1831,7 @@ void PressPB2(void)
             {
                 pb->dispState = DISP_STATE_SET_HOURS;
             }
-        
+
           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
@@ -1684,9 +1848,9 @@ void PressPB2(void)
           #endif
         }
     }
-    
+
     /* Quick forward the value */
-    
+
     HoldPB2();
 }
 
@@ -1701,9 +1865,9 @@ void HoldPB2(void)
     unsigned char ucExtra;
 
     /* Check if setting hours, minutes, month or day. */
-    
+
     const unsigned char ustate = g_sDSGPR1.dispState;
-    
+
     if (ustate == DISP_STATE_SET_HOURS)
     {
         /* Unlock write access to the RTC and disable the clock. */
@@ -1719,11 +1883,11 @@ void HoldPB2(void)
         RTCCFGbits.RTCEN = 0;
 
         /* Forward the hour. */
-        
+
         RTCCFGbits.RTCPTR0 = 1;
         RTCCFGbits.RTCPTR1 = 0;
         //while(RTCCFGbits.RTCSYNC);
-        
+
         ucTemp = RTCVALL;
         ucValue = 1 + g_bcd_decimal[ucTemp];
 
@@ -1805,32 +1969,32 @@ void HoldPB2(void)
 
         /* On every second cycle change betwen AM and PM and otherwise
          * forward the day. */
-        
+
         RTCCFGbits.RTCPTR0 = 1;
         RTCCFGbits.RTCPTR1 = 0;
-        
+
         ucTemp = RTCVALL;
         ucValue = g_bcd_decimal[ucTemp];
 
         if (ucValue < 12)
         {
             /* AM -> PM */
-            
+
             ucValue += 12;
-            
+
             ucTemp = g_decimal_bcd[ucValue];
             RTCVALL = ucTemp;
-            
+
             /* Do not forward the day. */
-            
+
             ucExtra = 0;
         }
         else
         {
             /* PM -> AM */
-            
+
             ucValue -= 12;
-            
+
             ucTemp = g_decimal_bcd[ucValue];
             RTCVALL = ucTemp;
         }
@@ -1931,6 +2095,50 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
+    
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  
+    else if ((ustate == DISP_STATE_ALARM) || \
+             (ustate == DISP_STATE_TOGGLE_ALARM))
+    {
+        /* Unlock write access to the RTC and disable the clock. */
+
+        Unlock_RTCC();
+
+        /* Enable writing to the RTC */
+
+        RTCCFGbits.RTCWREN = 1;
+
+        /* Stop RTC operation. */
+
+        RTCCFGbits.RTCEN = 0;
+
+        /* Forward the alarm hour. */
+
+        ALCFGRPTbits.ALRMPTR0 = 1;
+        ALCFGRPTbits.ALRMPTR1 = 0;
+
+        ucTemp = ALRMVALL;
+        ucValue = 1 + g_bcd_decimal[ucTemp];
+
+        if (ucValue >= 24)
+        {
+            ucValue = 0;
+        }
+
+        ucTemp = g_decimal_bcd[ucValue];
+        ALRMVALL = ucTemp;
+
+        /* Enable the RTC operation again.*/
+
+        RTCCFGbits.RTCEN = 1;
+
+        /* Lock writing to the RTCC. */
+
+        Lock_RTCC();
+    }
+    
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 }
 
 /**
@@ -1945,9 +2153,9 @@ void ReleasePB2(void)
     /* Turn timer 2 off. */
 
     T2CONbits.TMR2ON = 0;
-    
+
     /* Timer usage */
-    
+
     g_ucTimer2Usage = 0;
 
   #endif
@@ -1959,6 +2167,19 @@ void ReleasePB2(void)
 
 void PressPB3(void)
 {
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+    /* Check if the alarm buzzer is still active. */
+
+    if (g_ucAlarm)
+    {
+        g_ucAlarm = 0;
+
+        Turn_Buzzer_Off();
+    }
+
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
     /* Revoke the 'blanked' state in order to turn the display on. */
 
     DSGPR1Type *pb = &g_sDSGPR1;
@@ -1970,9 +2191,9 @@ void PressPB3(void)
     else
     {
         /* If the time is pressed, enable to set the MINUTES. */
-        
+
         unsigned char ust = pb->dispState;
-        
+
         if ((ust == DISP_STATE_TIME) || (ust == DISP_STATE_SET_HOURS))
         {
             pb->dispState = DISP_STATE_SET_MINUTES;
@@ -1981,7 +2202,7 @@ void PressPB3(void)
         {
           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
-            
+
             if (((ust == DISP_STATE_DATE) || (ust == DISP_STATE_YEAR) || \
                  (ust == DISP_STATE_WEEKDAY)))
             {
@@ -1997,7 +2218,7 @@ void PressPB3(void)
                     }
                 }
             }
-            
+
           #else
 
             if ((ust == DISP_STATE_DATE) || (ust == DISP_STATE_SET_MONTH))
@@ -2016,7 +2237,7 @@ void PressPB3(void)
             {
                 g_sDSGPR1.dispState = DISP_STATE_SET_SECONDS;
             }
-            
+
           #endif
         }
     }
@@ -2037,31 +2258,31 @@ void HoldPB3(void)
     unsigned char ucExtra;
 
     const unsigned char ust = g_sDSGPR1.dispState;
-    
+
     if (ust == DISP_STATE_SET_MINUTES)
     {
         /* Unlock write access to the RTC and disable the clock. */
 
         Unlock_RTCC();
-        
+
         /* Enabling writing to the RTC. */
-    
+
         RTCCFGbits.RTCWREN = 1;
 
         /* Stop the RTC */
-        
+
         RTCCFGbits.RTCEN = 0;
 
         /* Set the RTC register to read/write. */
 
         RTCCFG &= ~3;
         //while(RTCCFGbits.RTCSYNC);
-        
+
         /* Forward the minutes. */
-        
+
         ucTemp = RTCVALH;
         ucValue = 1 + g_bcd_decimal[ucTemp];
-        
+
         if (ucValue >= 60)
         {
             ucValue = 0;
@@ -2078,19 +2299,19 @@ void HoldPB3(void)
         /* Set seconds to zero. */
 
         //RTCCFG &= ~3;
-        
+
         RTCVALL = 0; // Zero the second when forwarding the minute.
-        
+
   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
        (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
-        
+
         /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
          * until the time readout button has been pressed the first time. */
-        
+
         g_sDSGPR1.stallState = 1;
 
   #else
-        
+
         /* Enable the RTC operation again.*/
 
         RTCCFGbits.RTCEN = 1;
@@ -2192,7 +2413,51 @@ void HoldPB3(void)
 
         Lock_RTCC();
     }
-    
+
+  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+    else if ((ustate == DISP_STATE_ALARM) || \
+             (ustate == DISP_STATE_TOGGLE_ALARM))
+    {
+        /* Unlock write access to the RTC and disable the clock. */
+
+        Unlock_RTCC();
+
+        /* Enable writing to the RTC */
+
+        RTCCFGbits.RTCWREN = 1;
+
+        /* Stop RTC operation. */
+
+        RTCCFGbits.RTCEN = 0;
+
+        /* Forward the alarm minute. */
+
+        ALCFGRPTbits.ALRMPTR0 = 0;
+        ALCFGRPTbits.ALRMPTR1 = 0;
+
+        ucTemp = ALRMVALH;
+        ucValue = 1 + g_bcd_decimal[ucTemp];
+
+        if (ucValue >= 60)
+        {
+            ucValue = 0;
+        }
+
+        ucTemp = g_decimal_bcd[ucValue];
+        ALRMVALH = ucTemp;
+
+        /* Enable the RTC operation again.*/
+
+        RTCCFGbits.RTCEN = 1;
+
+        /* Lock writing to the RTCC. */
+
+        Lock_RTCC();
+    }
+
+  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
   #if ((APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) && \
        (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
@@ -2215,17 +2480,17 @@ void HoldPB3(void)
         RTCCFGbits.RTCPTR0 = 0;
         RTCCFGbits.RTCPTR1 = 1;
         //while(RTCCFGbits.RTCSYNC);
-        
+
         ucTemp = RTCVALL; // day
         ucValue = 1 + g_bcd_decimal[ucTemp];
-        
+
         ucTemp = RTCVALH; // month
         ucExtra = g_bcd_decimal[ucTemp];
 
         if (ucExtra == 2) // February, always assume it to be a leap year.
         {
             /* Assume february to have 29 days to support leap years. */
-            
+
             if (ucValue >= 30) // 29 days (leap year)
             {
                 ucValue = 1;
@@ -2253,7 +2518,7 @@ void HoldPB3(void)
 
         ucTemp = g_decimal_bcd[ucValue];
         RTCVALL = ucTemp;
-        
+
         /* Enable the RTC operation again.*/
 
         RTCCFGbits.RTCEN = 1;
@@ -2282,7 +2547,7 @@ void HoldPB3(void)
         //while(RTCCFGbits.RTCSYNC);
 
         /* Zero the seconds. */
-        
+
         RTCVALL = 0;
 
         /* Enable the RTC operation again.*/
@@ -2309,9 +2574,9 @@ void ReleasePB3(void)
     /* Turn timer 2 off. */
 
     T2CONbits.TMR2ON = 0;
-    
+
     /* Timer usage */
-    
+
     g_ucTimer2Usage = 0;
 
   #endif
@@ -2320,7 +2585,7 @@ void ReleasePB3(void)
 /**
  * Show the time or date.
  */
- 
+
 void Display_Digits(void)
 {
     /* Read current digit to show
@@ -2329,42 +2594,42 @@ void Display_Digits(void)
     unsigned char ucPlex = g_ucMplexDigits;
 
     /* Lower the brightness, by skipping the multiplexing. */
-    
+
   #if APP_LIGHT_SENSOR_USAGE
-        
+
     if (g_ucDimming)
     {
         /* Skip multiplexing, keep display off. */
-        
+
         g_ucDimming--;
     }
     else
-        
+
   #endif // #if APP_LIGHT_SENSOR_USAGE
-        
+
     {
         /* Measure ambient brightness via AN11. */
 
       #if APP_LIGHT_SENSOR_USAGE
-        
+
         if (!ucPlex)
         {
             if (g_ucDimmingCnt)
             {
                 g_ucDimmingCnt--;
-                
+
                 /* Use the result of the last measurment. */
-                
+
                 const unsigned char uv = g_ucDimmingRef;
-                
+
                 g_ucDimming = uv;
-                
+
                 if (uv > 0)
                 {
                     /* Stop multiplexing, */
 
                     ucPlex = 255;
-                    
+
                     /* Turn all common pins off by setting the outputs to tri-state
                      * high impedance by making inputs out of them. */
 
@@ -2381,10 +2646,21 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                         LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        LED_DATE_DOT = 0;
+                   #endif
+                   
                  #endif
                 }
             }
@@ -2393,7 +2669,7 @@ void Display_Digits(void)
                 /* Start a new measurment */
 
                 g_ucDimmingCnt = 100;
-                
+
                 /* Turn all common pins off by setting the outputs to tri-state
                  * high impedance by making inputs out of them. */
 
@@ -2410,10 +2686,21 @@ void Display_Digits(void)
             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                 PORTC |= 0xF0;
                 PORTB |= 0x2C;
+                
+              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                   (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                 LED_DATE_DOT = 1;
+              #endif
+              
             #else
                 PORTC &= 0;
                 PORTB &= 1;
+
+              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                   (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                LED_DATE_DOT = 0;
+              #endif
+              
             #endif
 
                 /* Turn on RA6 to power up the light sensor. */
@@ -2513,22 +2800,22 @@ void Display_Digits(void)
         {
             /* Continue multiplexing after having skipped,
              * to lower the brightness. */
-            
+
             if (ucPlex == 255)
             {
                 ucPlex = 0;
             }
         }
-        
+
         /* Multiplexing disabled? */
-        
+
         if (ucPlex != 255)
-            
+
       #endif // #if APP_LIGHT_SENSOR_USAGE
 
         {
             unsigned char ucTemp;
-            
+
             /* If starting a new multiplexer cycle,
              * read out the RTC registers. */
 
@@ -2538,16 +2825,17 @@ void Display_Digits(void)
                 g_ucRightVal = 255;
 
            #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
 
                 g_ucDots = 0;
 
            #endif
 
                 /* Check what shall be displayed. */
-                
+
                 const unsigned char ustate = g_sDSGPR1.dispState;
-            
+
                 switch(ustate)
                 {
                     /* If being the table watch, show the
@@ -2595,9 +2883,9 @@ void Display_Digits(void)
                     case DISP_STATE_SET_MINUTES:
 
                         /* Hours */
+
                         RTCCFGbits.RTCPTR0 = 1;
                         RTCCFGbits.RTCPTR1 = 0;
-                        //while(RTCCFGbits.RTCSYNC);
 
                         ucTemp = RTCVALL;   // read hours
                         g_ucLeftVal = g_bcd_decimal[ucTemp];
@@ -2618,7 +2906,7 @@ void Display_Digits(void)
                         /* Minutes */
 
                         ucTemp = RTCVALH;   // dummy to decrement
-                        ucTemp = RTCVALH;   // read hours
+                        ucTemp = RTCVALH;   // read minutes
                         g_ucRightVal = g_bcd_decimal[ucTemp];
 
                         if (g_ucRightVal > 59)
@@ -2650,7 +2938,7 @@ void Display_Digits(void)
                     break;
 
                   #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
-                    
+
                     case DISP_STATE_LIGHT_SENSOR:
                         g_ucRightVal = (unsigned char)(g_ucLightSensor / 100); //g_ucDimmingRef
                         g_ucLeftVal = 255;
@@ -2705,10 +2993,11 @@ void Display_Digits(void)
 
                  #endif
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
 
                         g_ucDots = 1;
-                        
+
                  #endif
 
                     break;
@@ -2759,12 +3048,53 @@ void Display_Digits(void)
                         g_ucRightVal = ucTemp;
                     break;
 
+                 #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+                    case DISP_STATE_ALARM:
+                    case DISP_STATE_TOGGLE_ALARM:
+
+                        /* Alarm Hours */
+
+                        ALCFGRPTbits.ALRMPTR0 = 1;
+                        ALCFGRPTbits.ALRMPTR1 = 0;
+
+                        ucTemp = ALRMVALL;   // read alarm hours
+                        g_ucLeftVal = g_bcd_decimal[ucTemp];
+
+                        if (g_ucLeftVal > 23)
+                        {
+                            g_ucLeftVal = 0;
+                        }
+
+                        /* Alarm Minutes */
+
+                        ucTemp = ALRMVALH;   // dummy to decrement
+                        ucTemp = ALRMVALH;   // read minutes
+                        g_ucRightVal = g_bcd_decimal[ucTemp];
+
+                        if (g_ucRightVal > 59)
+                        {
+                            g_ucRightVal = 0;
+                        }
+
+                        /* Alarm on/off */
+
+                      #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                           (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+
+                        g_ucDots = ALCFGRPTbits.ALRMEN;
+
+                      #endif
+                    break;
+
+                 #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
                     default:
                     break;
                 }
-                
+
                 /* Depending on what to show, select the right digit table. */
-                
+
                 g_pDigits = ((ustate == DISP_STATE_WEEKDAY) || \
                              (ustate == DISP_STATE_SET_WEEKDAY)) ? \
                                        \
@@ -2793,7 +3123,7 @@ void Display_Digits(void)
                         /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
                          * them. */
-                        
+
                         /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
 
                         TRISB = 0x53;
@@ -2808,10 +3138,21 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                         LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
+
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        LED_DATE_DOT = 0;
+                   #endif
+
                  #endif
 
                         // segment a
@@ -2884,11 +3225,16 @@ void Display_Digits(void)
                  #endif
                         }
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                   (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
 
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                        LED_DATE_DOT = (g_ucDots) ? 0 : 1;
+                 #else
                         LED_DATE_DOT = (g_ucDots) ? 1 : 0;
-
                  #endif
+
+             #endif
 
              #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
@@ -2910,7 +3256,7 @@ void Display_Digits(void)
                         TRISB = 0x51;
 
              #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
-                
+
                         /* Turn the common cathode on. */
 
                         LED_10M = 0;
@@ -2941,14 +3287,25 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                         LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
+
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        LED_DATE_DOT = 0;
+                   #endif
+                   
                  #endif
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
-                    
+
                         /* Ten hour digit and dots */
 
                         if (g_ucLeftVal >= 10)
@@ -2973,7 +3330,7 @@ void Display_Digits(void)
                         TRISB = 0x13;
 
              #else // Not a 12h system watch.
-                        
+
                         /* Ten hour digit */
 
                  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
@@ -3001,7 +3358,7 @@ void Display_Digits(void)
                             ucTemp = g_div10[g_ucLeftVal];
                             ucTemp = *(pb + ucTemp);
                         }
-                            
+
                  #else // No Pulsar wrist watch.
 
                         ucTemp = g_div10[g_ucLeftVal];
@@ -3100,7 +3457,7 @@ void Display_Digits(void)
                             TRISB = 0x13;
 
              #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
-                
+
                             /* Turn the common cathode on. */
 
                             LED_1M = 0;
@@ -3136,10 +3493,21 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                     PORTC |= 0xF0;
                     PORTB |= 0x2C;
+                    
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                     LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                     PORTC &= 0;
                     PORTB &= 1;
+
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                    LED_DATE_DOT = 0;
+                   #endif
+                   
                  #endif
                 }
             }
@@ -3161,7 +3529,7 @@ void Display_Digits(void)
                         {
                             ucTemp = *(pb + (g_mod10[g_ucRightVal]));
                         }
-                        
+
                         /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
                          * them. */
@@ -3179,10 +3547,21 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                         LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
+
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        LED_DATE_DOT = 0;
+                   #endif
+                   
                  #endif
 
                         // segment a
@@ -3255,6 +3634,17 @@ void Display_Digits(void)
                  #endif
                         }
 
+             #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                  (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                        LED_DATE_DOT = (g_ucDots) ? 0 : 1;
+                 #else
+                        LED_DATE_DOT = (g_ucDots) ? 1 : 0;
+                 #endif
+
+             #endif
+
              #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
@@ -3273,7 +3663,7 @@ void Display_Digits(void)
                         TRISC = 0x04;
 
              #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
-                
+
                         /* Turn the common cathode on. */
 
                         LED_10H = 0;
@@ -3296,8 +3686,8 @@ void Display_Digits(void)
                         else
                         {
 
-           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+                 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
+                      (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
 
                             if (g_ucRightVal < 10)
                             {
@@ -3321,7 +3711,7 @@ void Display_Digits(void)
                                 ucTemp = g_div10[g_ucRightVal];
                                 ucTemp = *(pb + ucTemp);
                             }
-                            
+
                  #else // No Pulsar wrist watch.
 
                             ucTemp = g_div10[g_ucRightVal];
@@ -3329,7 +3719,7 @@ void Display_Digits(void)
 
                  #endif
                         }
-                        
+
                         /* Turn all common pins off by setting the outputs to tri-state
                          * high impedance by making inputs out of them. */
 
@@ -3346,10 +3736,21 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                         LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
+                        
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        LED_DATE_DOT = 0;
+                   #endif
+                   
                  #endif
 
            #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
@@ -3460,7 +3861,7 @@ void Display_Digits(void)
            #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
                         }
-                 #endif
+           #endif
                     }
                 }
                 else // if (g_ucRightVal != 255)
@@ -3481,10 +3882,21 @@ void Display_Digits(void)
                  #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
+
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
                         LED_DATE_DOT = 1;
+                   #endif
+                   
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
+
+                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
+                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        LED_DATE_DOT = 0;
+                   #endif
+                   
                  #endif
                 }
             }
@@ -3497,9 +3909,9 @@ void Display_Digits(void)
             }
         }
     }
-    
+
     /* Store new multiplexer value. */
-    
+
     g_ucMplexDigits = ucPlex;
 }
 
@@ -3510,7 +3922,7 @@ void Display_Digits(void)
 void main(void)
 {
     /* Init */
-    
+
     unsigned char ucstayawake;
     unsigned short urollover;
     unsigned char udivider;
@@ -3519,7 +3931,7 @@ void main(void)
 
     Init_Inputs_Outputs_Ports();
     Configure_Inputs_Outputs();
-    
+
     Configure_Timer_0();
     Configure_Timer_1();
     Configure_Timer_2();
@@ -3537,7 +3949,7 @@ void main(void)
          * deep sleep lock. */
 
         WDTCONbits.DS = 0;
-        
+
         // DEEP SLEEP CONTROL LOW BYTE REGISTER
         DSCONLbits.RELEASE = 0; //  Clear to unfreeze the I/O's.
 
@@ -3551,7 +3963,7 @@ void main(void)
         /* Copy the button states. */
 
         const DSGPR0Type udsg0 = g_sDSGPR0;
-        
+
         g_ucPB0TIMEState = udsg0.PB0State;
         g_ucPB1DATEState = udsg0.PB1State;
         g_ucPB2HOURState = udsg0.PB2State;
@@ -3560,7 +3972,7 @@ void main(void)
     else
     {
         /* Cold boot, for example after battery change. */
-        
+
         Init_Inputs_Outputs_Ports();
 
         /* Reset the button states */
@@ -3580,13 +3992,13 @@ void main(void)
         g_ucTimer2Usage = 1;    // Indicate using the timer.
 
         /* Set the display state back to blank. */
-        
+
         g_sDSGPR1.dispState = DISP_STATE_TIME;
 
   #else
 
         /* Set the display state back to blank. */
-        
+
         g_sDSGPR1.dispState = DISP_STATE_BLANK;
 
   #endif
@@ -3599,16 +4011,16 @@ void main(void)
     }
 
     /* Enable global interrupts. */
-    
+
     /* INTERRUPT CONTROL REGISTER */
-    
+
     // Global Interrupt Enable bit
     INTCONbits.GIE = 1;      // Enables all unmasked interrupts
     // Peripheral Interrupt Enable bit
     INTCONbits.PEIE = 1;     // Enables all unmasked peripheral interrupts
 
     /* INTERRUPT CONTROL REGISTER 2 */
-    
+
     // External Interrupt 0 Edge Select bit
     INTCON2bits.INTEDG0 = 1; // Interrupt on rising edge
     // External Interrupt 1 Edge Select bit
@@ -3627,17 +4039,36 @@ void main(void)
     g_ucDimming = 0;
 
     /* Init local variables. */
-    
+
     ucstayawake = 0;
     urollover = 1;
     udivider = 0;
 
     while (1)
     {
+        /* Check alarm. */
+
+      #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+        if (PIR3bits.RTCCIF) // PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3
+        {
+            PIR3bits.RTCCIF = 0;     // Clear RTCC interrupt.
+            
+            /* Reset the alarm repeat. */
+
+            ALRMRPT = 255;
+
+            /* Turn the alarm buzzer on. */
+
+            Turn_Buzzer_On();
+        }
+
+      #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
         /* Debounce the buttons. */
-        
+
         ucstayawake = DebounceButtons();
-        
+
         /* Handle 'stay awake' timer for keeping the display
          * on for a short while. */
 
@@ -3646,36 +4077,62 @@ void main(void)
             if (TMR2 >= 0xA0)
             {
                 TMR2 = 0;
-                
+
                 if (++urollover >= 350) // Rounds per second.
                 {
-                    /* Check if all button states are idle. */
-                    
-                    if ((!g_ucPB0TIMEState) && \
-                        (!g_ucPB1DATEState) && \
-                        (!g_ucPB2HOURState) && \
-                        (!g_ucPB3MINTState))
+                  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+                    /* Check if the alarm buzzer is still active. */
+
+                    if (g_ucAlarm)
                     {
-                        /* If no button is still pressed, turn the 'awake'
-                         * timer off. */
-                        
-                        T2CONbits.TMR2ON = 0;
+                        g_ucAlarm--;
 
-                        /* Indicate that we do not need to stay awake
-                         * anymore. */
+                        /* Turn the alarm buzzer off, if required. */
 
-                        urollover = 0;
-                        
-                        /* Indicate that timer 2 is not used anymore. */
-                        
-                        g_ucTimer2Usage = 0;
+                        if (!g_ucAlarm)
+                        {
+                            Turn_Buzzer_Off();
+                        }
+
+                        /* If there is still the alarm buzzer activated,
+                         * restart the rollover counter with a short value. */
+
+                        urollover = 100;
                     }
                     else
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
                     {
-                        /* If there is still at least one button pressed,
-                         * restart the rollover counter with a short value. */
-                        
-                        urollover = 100;
+                        /* Check if all button states are idle. */
+
+                        if ((!g_ucPB0TIMEState) && \
+                            (!g_ucPB1DATEState) && \
+                            (!g_ucPB2HOURState) && \
+                            (!g_ucPB3MINTState))
+                        {
+                            /* If no button is still pressed, turn the 'awake'
+                             * timer off. */
+
+                            T2CONbits.TMR2ON = 0;
+
+                            /* Indicate that we do not need to stay awake
+                             * anymore. */
+
+                            urollover = 0;
+
+                            /* Indicate that timer 2 is not used anymore. */
+
+                            g_ucTimer2Usage = 0;
+                        }
+                        else
+                        {
+                            /* If there is still at least one button pressed,
+                             * restart the rollover counter with a short value. */
+
+                            urollover = 100;
+                        }
                     }
                 }
             }
@@ -3686,9 +4143,9 @@ void main(void)
         {
             urollover = 1;
         }
-        
+
         /* Output the display. */
-        
+
       #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
         if (!(udivider & 3))
@@ -3697,14 +4154,14 @@ void main(void)
         }
 
         udivider++;
-        
+
         if (!ucstayawake)
         {
             /* Set blank mode. */
-            
+
             g_sDSGPR1.dispState = DISP_STATE_BLANK;
         }
-        
+
       #else // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
         if (ucstayawake)
@@ -3712,16 +4169,16 @@ void main(void)
             if (udivider == 3)
             {
                 udivider = 0;
-                
+
                 Display_Digits();
             }
-            
+
             udivider++;
         }
         else
         {
             /* Enter sleep again? */
-            
+
             /* Turn all common pins off by setting the outputs to tri-state
              * high impedance by making inputs out of them. */
 
@@ -3741,7 +4198,7 @@ void main(void)
 
             /* Ensure the RTC to operate, if not being in 'stalled' state,
              * after having set the minutes. */
-            
+
             if (!g_sDSGPR1.stallState)
             {
                 /* Unlock write operations to the RTC. */
@@ -3756,9 +4213,9 @@ void main(void)
 
                 RTCCFGbits.RTCEN = 1;   // RTCC module is enabled
             }
-            
+
             /* Set blank mode. */
-            
+
             g_sDSGPR1.dispState = DISP_STATE_BLANK;
 
             /* Reset the button states */
@@ -3769,7 +4226,7 @@ void main(void)
             g_sDSGPR0.PB3State = PB_STATE_IDLE;
 
             /* Reset timer values and states. */
-            
+
             g_sPB0Timer = 0;
             g_sPB1Timer = 0;
             g_sPB2Timer = 0;
@@ -3777,15 +4234,15 @@ void main(void)
 
             g_ucTimer0Usage = 0;
             g_ucTimer2Usage = 0;
-         
+
             /* If entering sleep, ensure the light sensor value to be zero. */
-            
+
             g_ucLightSensor = 0;
-            
+
             /* Init Multiplexing for digits. */
-            
+
             g_ucMplexDigits = 0;
-            
+
             /* Stop the debouncing timer used. */
 
             T0CONbits.TMR0ON = 0;
@@ -3808,7 +4265,7 @@ void main(void)
             RTCCFGbits.RTCWREN = 0; // RTCC Value Registers Write Enable bit
 
             /* Lock writing to the RTCC. */
-    
+
             Lock_RTCC();
 
             /* Clear all interuppts. */
@@ -3824,63 +4281,71 @@ void main(void)
             // DATE button
             INTCON3bits.INT2IF = 0;  // Clear INT2 Flag
             INTCON3bits.INT2IE = 1;  // Enable INT2
-            
+
             // TIME button
             INTCON3bits.INT3IF = 0;  // Clear INT3 Flag
             INTCON3bits.INT3IE = 1;  // Enable INT3
 
             INTCONbits.TMR0IF = 0;  // Clear Overflow Interrupt Flag bit.
-            
+
             /* Wake up on a rising edge of the DATE button. */
-            
+
             INTCON2bits.INTEDG0 = 1;    // External Interrupt 0 Edge Select bit
 
             /* Wake up on a rising edge of the TIME button. */
-            
+
             INTCON2bits.INTEDG1 = 1;    // External Interrupt 1 Edge Select bit
 
             /* Wake up on a rising edge of the HOUR button. */
-            
+
             INTCON2bits.INTEDG2 = 1;    // External Interrupt 2 Edge Select bit
 
             /* Wake up on a rising edge of the MIN button. */
-            
+
             INTCON2bits.INTEDG3 = 1;    // External Interrupt 3 Edge Select bit
 
             /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 1 */
-            
+
             PIR1bits.TMR1IF = 0;    // TMR1 register did not overflow.
-            
+
             /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
-            
+
             PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
-            
+
+          #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+            /* Enable the Alarm interrupt, if the alarm had been enabled. */
+
+            PIE3bits.RTCCIE = ALCFGRPTbits.ALRMEN ? 1 : 0;
+
+          #endif
+
             /* INTERRUPT CONTROL REGISTER */
-    
+
             // Global Interrupt Enable bit
             INTCONbits.GIE = 1;    // Enables all unmasked interrupts
             // Peripheral Interrupt Enable bit
             INTCONbits.PEIE = 1;   // Enables all unmasked peripheral interrupts
 
             /* Turn ADC off */
-           
+
             ADCON0bits.ADON = 0;    // Turn off ADC
 
             /* Enter sleep mode. This might fail, for example if inputs are
              * still high, that are used to wake up the controller via
              * rising edge. */
-            
+
             enterSleep();
 
             /* If using normal sleep isntead of deep sleep. */
-            
+
             ucstayawake = 0;
             urollover = 1;
             udivider = 0;
-         
+
             g_ucDimming = 0;
             g_ucDimmingCnt = 0;
-            
+
            /* Restore the two state variable in non-volatile
             * registers, that will survive deep sleep. */
 
@@ -3888,13 +4353,13 @@ void main(void)
            g_sDSGPR1.ucRaw = DSGPR1;
 
            /* Configure I/O. */
-           
+
            Init_Inputs_Outputs_Ports();
            Configure_Inputs_Outputs();
         }
-        
+
       #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
-        
+
     } // while (1)
 }
 
