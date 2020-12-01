@@ -319,11 +319,11 @@ unsigned char g_ucDots = 0;
 /**
  * Alarm counter, cancelled by expiring or pressing a button. */
 
-#if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#if APP_BUZZER_ALARM_USAGE
 
 unsigned short g_ucAlarm;
 
-#endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#endif // #if APP_BUZZER_ALARM_USAGE
 
 /**
  * Global (deep) sleep variables, that are stored
@@ -383,6 +383,29 @@ inline void Init_Inputs_Outputs_Ports(void)
     /* Turn off SSDMA */
 
     DMACON1 = 0;
+
+    /* Configure the output as PWM output channel A. */
+
+#if APP_BUZZER_ALARM_USAGE
+
+    /* Write Magic */
+
+    EECON2 = 0x55;
+    EECON2 = 0xAA;
+
+    /* Set write enable bit for the I/O mapping. */
+
+    IOLOCK = 1;
+
+    /* Map RP13 to CCP1/P1A - PWM Channel A */
+
+    RPOR13 = 14;
+
+    /* Clear write enable bit for the I/O mapping. */
+
+    IOLOCK = 0;
+
+#endif // #if APP_BUZZER_ALARM_USAGE
 }
 
 /**
@@ -404,9 +427,19 @@ inline void Configure_Inputs_Outputs(void)
 
     TRISB = 0x53;
 
+#if APP_BUZZER_ALARM_USAGE
+
+    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+    TRISC = 0x08;
+
+#else
+
     /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
     TRISC = 0x0C;
+
+#endif
 
     /* Set unused port pins to drive low. */
 
@@ -752,6 +785,14 @@ inline void Configure_Timer_4(void)
     /* Turn timer 4 off. */
 
     T4CONbits.TMR4ON = 0;
+
+    /* ECCP1 and ECCP2 both use Timer3 (capture/compare) and Timer4 (PWM) */
+
+  #if APP_BUZZER_ALARM_USAGE
+
+    TCLKCONbits.T3CCP = 0x02;
+
+  #endif // #if APP_BUZZER_ALARM_USAGE
 }
 
 /**
@@ -853,12 +894,10 @@ inline void enterSleep(void)
  * This function will turn the alarm buzzer on again.
  */
 
-#if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#if APP_BUZZER_ALARM_USAGE
 
 void Turn_Buzzer_On(void)
 {
-    /* TODO: Activate the PWM output. */
-    
     /* Alarm counter used to keep the buzzer on. */
 
     g_ucAlarm = 10;
@@ -868,18 +907,52 @@ void Turn_Buzzer_On(void)
     g_ucTimer2Usage = 1;    // Indicate using the timer.
     TMR2 = 0;               // Zero the timer.
     T2CONbits.TMR2ON = 1;   // Turn timer 2 on.
+    
+    /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+     * Having a timer 4 pre-scaler of 16 and using this equation
+     * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
+     * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
+    
+    PR4bits.PR4 = 91; // We are using timer 4 for the PWM!
+    
+    /* Set duty cycle.
+     * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+     * Having a timer 4 pre-scaler of 16 and using this equation
+     * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
+     * and turning that around to DC = (1/1700/2)/16/0,0000001 */
+    
+    CCP1CONbits.DC1B = 0;    // Lower 2 bit
+    CCPR1Lbits.CCPR1L = 46;  // Upper 8 Bit
+
+    /* Turn timer 4 as PWM source. */
+
+    T4CONbits.TMR4ON = 1;
+
+    /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+    CCP1CONbits.CCP2M = 0xC;
 }
 
 /**
  * This function will turn the alarm buzzer off again.
  */
 
-void Turn_Buzzer_Off(void)
+inline void Turn_Buzzer_Off(void)
 {
-    /* TODO: Deactivate the PWM output. */
+    /* Zero the Alarm counter used to keep the buzzer on. */
+
+    g_ucAlarm = 0;
+
+    /* Deactivate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+    CCP1CONbits.CCP2M = 0;
+
+    /* Turn timer 4 off again. */
+
+    T4CONbits.TMR4ON = 0;
 }
 
-#endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#endif // #if APP_BUZZER_ALARM_USAGE
 
 /**
  * This function will read and debounce the push buttons.
@@ -1477,18 +1550,16 @@ unsigned char DebounceButtons(void)
 
 void PressPB0(void)
 {
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
 
     /* Check if the alarm buzzer is still active. */
 
     if (g_ucAlarm)
     {
-        g_ucAlarm = 0;
-
         Turn_Buzzer_Off();
     }
 
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 
     /* When having set the time, the RTC will be disabled until
      * you press the very first time the 'TIME' button.
@@ -1608,18 +1679,16 @@ void PressPB1(void)
 {
     int ival;
 
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
 
     /* Check if the alarm buzzer is still active. */
 
     if (g_ucAlarm)
     {
-        g_ucAlarm = 0;
-
         Turn_Buzzer_Off();
     }
 
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
@@ -1636,6 +1705,8 @@ void PressPB1(void)
         pb->dispState = DISP_STATE_DATE;
 
       #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+      #if APP_BUZZER_ALARM_USAGE
 
         if (((g_ucPB0TIMEState == PB_STATE_SHORT_PRESS) || \
              (g_ucPB0TIMEState == PB_STATE_LONG_PRESS)) \
@@ -1694,6 +1765,8 @@ void PressPB1(void)
             }
         }
 
+      #endif // #if APP_BUZZER_ALARM_USAGE
+      
       #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
     }
 }
@@ -1742,7 +1815,7 @@ void HoldPB1(void)
 
 void ReleasePB1(void)
 {
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
 
     DSGPR1Type *pb = &g_sDSGPR1;
 
@@ -1760,7 +1833,7 @@ void ReleasePB1(void)
         }
     }
     
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 }
 
 /**
@@ -1769,18 +1842,16 @@ void ReleasePB1(void)
 
 void PressPB2(void)
 {
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
 
     /* Check if the alarm buzzer is still active. */
 
     if (g_ucAlarm)
     {
-        g_ucAlarm = 0;
-
         Turn_Buzzer_Off();
     }
 
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
@@ -2099,7 +2170,7 @@ void HoldPB2(void)
         Lock_RTCC();
     }
     
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
   
     else if ((ustate == DISP_STATE_ALARM) || \
              (ustate == DISP_STATE_TOGGLE_ALARM))
@@ -2141,7 +2212,7 @@ void HoldPB2(void)
         Lock_RTCC();
     }
     
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 }
 
 /**
@@ -2170,18 +2241,16 @@ void ReleasePB2(void)
 
 void PressPB3(void)
 {
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
 
     /* Check if the alarm buzzer is still active. */
 
     if (g_ucAlarm)
     {
-        g_ucAlarm = 0;
-
         Turn_Buzzer_Off();
     }
 
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
@@ -2417,7 +2486,7 @@ void HoldPB3(void)
         Lock_RTCC();
     }
 
-  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #if APP_BUZZER_ALARM_USAGE
 
     else if ((ust == DISP_STATE_ALARM) || \
              (ust == DISP_STATE_TOGGLE_ALARM))
@@ -2459,7 +2528,7 @@ void HoldPB3(void)
         Lock_RTCC();
     }
 
-  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+  #endif // #if APP_BUZZER_ALARM_USAGE
 
   #if ((APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) && \
        (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
@@ -2640,9 +2709,19 @@ void Display_Digits(void)
 
                     TRISB = 0x53;
 
+                #if APP_BUZZER_ALARM_USAGE
+
+                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                    TRISC = 0x08;
+
+                #else
+
                     /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                     TRISC = 0x0C;
+
+                #endif
 
                     /* Turn all segment outputs off. */
 
@@ -2680,9 +2759,19 @@ void Display_Digits(void)
 
                 TRISB = 0x53;
 
+            #if APP_BUZZER_ALARM_USAGE
+
+                /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                TRISC = 0x08;
+
+            #else
+
                 /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                 TRISC = 0x0C;
+
+            #endif
 
                 /* Turn all segment outputs off. */
 
@@ -3051,7 +3140,7 @@ void Display_Digits(void)
                         g_ucRightVal = ucTemp;
                     break;
 
-                 #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if APP_BUZZER_ALARM_USAGE
 
                     case DISP_STATE_ALARM:
                     case DISP_STATE_TOGGLE_ALARM:
@@ -3090,7 +3179,7 @@ void Display_Digits(void)
                       #endif
                     break;
 
-                 #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #endif // #if APP_BUZZER_ALARM_USAGE
 
                     default:
                     break;
@@ -3131,10 +3220,20 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
+                #if APP_BUZZER_ALARM_USAGE
+
+                        /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                        TRISC = 0x08;
+
+                #else
+
                         /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
                          * as input. */
 
                         TRISC = 0x0C;
+
+                #endif
 
                         /* Turn all segment outputs off. */
 
@@ -3280,10 +3379,20 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
+                #if APP_BUZZER_ALARM_USAGE
+
+                        /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                        TRISC = 0x08;
+
+                #else
+
                         /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
                          * as input. */
 
                         TRISC = 0x0C;
+
+                #endif
 
                         /* Turn all segment outputs off. */
 
@@ -3465,9 +3574,19 @@ void Display_Digits(void)
 
                             LED_1M = 0;
 
+                        #if APP_BUZZER_ALARM_USAGE
+
+                            /* Set RC0..7 to outputs. */
+
+                            TRISC = 0x00;
+
+                        #else
+
                             /* Set RC0/1/3/4/5..7 output and RC2(AN11) as input. */
 
                             TRISC = 0x04;
+
+                        #endif
 
              #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
@@ -3487,9 +3606,19 @@ void Display_Digits(void)
 
                    TRISB = 0x53;
 
+                #if APP_BUZZER_ALARM_USAGE
+
+                   /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                   TRISC = 0x08;
+
+                #else
+
                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                    TRISC = 0x0C;
+
+                #endif
 
                    /* Turn all segment outputs off. */
 
@@ -3541,9 +3670,19 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
+                    #if APP_BUZZER_ALARM_USAGE
+
+                        /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                        TRISC = 0x08;
+
+                    #else
+
                         /* Set RC0/1/4/5..7 to output and RC3/2(AN11) input. */
 
                         TRISC = 0x0C;
+
+                    #endif
 
                         /* Turn all segment outputs off. */
 
@@ -3661,9 +3800,19 @@ void Display_Digits(void)
                         LED_1M = 0;
                  #endif
 
+                    #if APP_BUZZER_ALARM_USAGE
+
+                        /* Set RC0..7 to outputs. */
+
+                        TRISC = 0x00;
+
+                    #else
+
                         /* Set RC0/1/3/4/5..7 to output and RC2(AN11) input. */
 
                         TRISC = 0x04;
+
+                    #endif
 
              #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
@@ -3730,9 +3879,19 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
+                    #if APP_BUZZER_ALARM_USAGE
+
+                        /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                        TRISC = 0x08;
+
+                    #else
+
                         /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                         TRISC = 0x0C;
+
+                    #endif
 
                         /* Turn all segment outputs off. */
 
@@ -3876,9 +4035,19 @@ void Display_Digits(void)
 
                     TRISB = 0x53;
 
-                    /* Set RC0/1/4/5..7 output and RC3 and RC2(AN11) input. */
+                    #if APP_BUZZER_ALARM_USAGE
 
-                    TRISC = 0x0C;
+                        /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                        TRISC = 0x08;
+
+                    #else
+
+                        /* Set RC0/1/4/5..7 output and RC3 and RC2(AN11) input. */
+
+                        TRISC = 0x0C;
+
+                    #endif
 
                     /* Turn all segment outputs off. */
 
@@ -4051,7 +4220,7 @@ void main(void)
     {
         /* Check alarm. */
 
-      #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+      #if APP_BUZZER_ALARM_USAGE
 
         if (PIR3bits.RTCCIF) // PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3
         {
@@ -4066,7 +4235,7 @@ void main(void)
             Turn_Buzzer_On();
         }
 
-      #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+      #endif // #if APP_BUZZER_ALARM_USAGE
 
         /* Debounce the buttons. */
 
@@ -4083,7 +4252,7 @@ void main(void)
 
                 if (++urollover >= 350) // Rounds per second.
                 {
-                  #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                  #if APP_BUZZER_ALARM_USAGE
 
                     /* Check if the alarm buzzer is still active. */
 
@@ -4105,7 +4274,7 @@ void main(void)
                     }
                     else
 
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                  #endif // #if APP_BUZZER_ALARM_USAGE
 
                     {
                         /* Check if all button states are idle. */
@@ -4189,9 +4358,19 @@ void main(void)
 
             TRISB = 0x53;
 
+        #if APP_BUZZER_ALARM_USAGE
+
+            /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+            TRISC = 0x08;
+
+        #else
+
             /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
             TRISC = 0x0C;
+
+        #endif
 
             /* Turn all segment outputs off. */
 
@@ -4271,6 +4450,14 @@ void main(void)
 
             Lock_RTCC();
 
+      #if APP_BUZZER_ALARM_USAGE
+
+            /* Turn the alarm buzzer on. */
+
+            Turn_Buzzer_Off();
+
+      #endif // #if APP_BUZZER_ALARM_USAGE
+
             /* Clear all interuppts. */
 
             // HOUR button
@@ -4315,13 +4502,13 @@ void main(void)
 
             PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
 
-          #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+          #if APP_BUZZER_ALARM_USAGE
 
             /* Enable the Alarm interrupt, if the alarm had been enabled. */
 
             PIE3bits.RTCCIE = ALRMCFGbits.ALRMEN ? 1 : 0;
 
-          #endif
+          #endif // #if APP_BUZZER_ALARM_USAGE
 
             /* INTERRUPT CONTROL REGISTER */
 
