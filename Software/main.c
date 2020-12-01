@@ -790,7 +790,8 @@ inline void Configure_Timer_4(void)
 
   #if APP_BUZZER_ALARM_USAGE
 
-    TCLKCONbits.T3CCP = 0x02;
+    TCLKCONbits.T3CCP1 = 0;
+    TCLKCONbits.T3CCP2 = 1;
 
   #endif // #if APP_BUZZER_ALARM_USAGE
 }
@@ -930,7 +931,7 @@ void Turn_Buzzer_On(void)
 
     /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
 
-    CCP1CONbits.CCP2M = 0xC;
+    CCP1CONbits.CCP1M = 0xC;
 }
 
 /**
@@ -945,7 +946,7 @@ inline void Turn_Buzzer_Off(void)
 
     /* Deactivate PWM mode PxA and PxC active-high; PxB and PxD active-high */
 
-    CCP1CONbits.CCP2M = 0;
+    CCP1CONbits.CCP1M = 0;
 
     /* Turn timer 4 off again. */
 
@@ -1677,8 +1678,6 @@ void ReleasePB0(void)
 
 void PressPB1(void)
 {
-    int ival;
-
   #if APP_BUZZER_ALARM_USAGE
 
     /* Check if the alarm buzzer is still active. */
@@ -1698,16 +1697,26 @@ void PressPB1(void)
     {
         pb->dispState = DISP_STATE_DATE;
     }
+  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
     else if (pb->dispState == DISP_STATE_TIME)
     {
-      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
-
         pb->dispState = DISP_STATE_DATE;
+    }
+    
+  #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
-      #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+   #if APP_BUZZER_ALARM_USAGE
 
-      #if APP_BUZZER_ALARM_USAGE
+    else if ((pb->dispState == DISP_STATE_TIME) || \
+             (pb->dispState == DISP_STATE_SECONDS))
+    {
+        /* Show Alarm Time */
 
+        pb->dispState = DISP_STATE_ALARM;
+    }
+    else if (pb->dispState == DISP_STATE_TOGGLE_ALARM)
+    {
         if (((g_ucPB0TIMEState == PB_STATE_SHORT_PRESS) || \
              (g_ucPB0TIMEState == PB_STATE_LONG_PRESS)) \
              \
@@ -1716,59 +1725,49 @@ void PressPB1(void)
             (g_ucPB2HOURState == PB_STATE_IDLE) && \
             (g_ucPB3MINTState == PB_STATE_IDLE))
         {
-            if (pb->dispState == DISP_STATE_TOGGLE_ALARM)
-            {
-                /* Unlock write access to the RTC and disable the clock. */
+            /* Unlock write access to the RTC and disable the clock. */
 
-                Unlock_RTCC();
+            Unlock_RTCC();
 
-                /* Enable writing to the RTC */
+            /* Enable writing to the RTC */
 
-                RTCCFGbits.RTCWREN = 1;
+            RTCCFGbits.RTCWREN = 1;
 
-                /* Stop RTC operation. */
+            /* Stop RTC operation. */
 
-                RTCCFGbits.RTCEN = 0;
+            RTCCFGbits.RTCEN = 0;
 
-                /* Toggle the alarm bit. */
+            /* Toggle the alarm bit. */
 
-                ALRMCFGbits.AMASK = 0x06; // Alarm repeats every day.
+            ALRMCFGbits.AMASK = 0x06; // Alarm repeats every day.
 
-                ival = ALRMCFGbits.ALRMEN ? 0 : 1;
-                ALRMCFGbits.ALRMEN = ival ? 1 : 0;  // Alarm enable
+            int ival = ALRMCFGbits.ALRMEN ? 0 : 1;
+            ALRMCFGbits.ALRMEN = ival ? 1 : 0;  // Alarm enable
 
-                /* Set Alarm repeat */
+            /* Set Alarm repeat */
 
-                ALRMRPT = ival ? 255 : 0;
+            ALRMRPT = ival ? 255 : 0;
 
-                /* Enable the Alarm interrupt, if the alarm had been enabled. */
+            /* Enable the Alarm interrupt, if the alarm had been enabled. */
 
-                PIE3bits.RTCCIE = ival ? 1 : 0;
+            PIE3bits.RTCCIE = ival ? 1 : 0;
 
-                /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
+            /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
 
-                PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
+            PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
 
-                /* Enable the RTC operation again.*/
+            /* Enable the RTC operation again.*/
 
-                RTCCFGbits.RTCEN = 1;
+            RTCCFGbits.RTCEN = 1;
 
-                /* Lock writing to the RTCC. */
+            /* Lock writing to the RTCC. */
 
-                Lock_RTCC();
-            }
-            else
-            {
-                /* Show Alarm Time */
-
-                pb->dispState = DISP_STATE_ALARM;
-            }
+            Lock_RTCC();
         }
-
-      #endif // #if APP_BUZZER_ALARM_USAGE
-      
-      #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
     }
+    
+   #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 }
 
 /**
