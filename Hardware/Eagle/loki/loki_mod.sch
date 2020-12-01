@@ -9447,6 +9447,8 @@ This is public domain.</text>
 <wire x1="7.62" y1="-41.91" x2="7.62" y2="-45.72" width="0.1524" layer="91"/>
 <pinref part="10M" gate="G$1" pin="K1"/>
 <wire x1="5.08" y1="-45.72" x2="7.62" y2="-45.72" width="0.1524" layer="91"/>
+<junction x="7.62" y="-45.72"/>
+<junction x="5.08" y="-45.72"/>
 </segment>
 </net>
 <net name="RC3/LED_M4" class="0">
@@ -9464,6 +9466,8 @@ This is public domain.</text>
 <wire x1="5.08" y1="-73.66" x2="5.08" y2="-76.2" width="0.1524" layer="91"/>
 <pinref part="1M" gate="G$1" pin="K2"/>
 <wire x1="5.08" y1="-76.2" x2="7.62" y2="-76.2" width="0.1524" layer="91"/>
+<junction x="7.62" y="-76.2"/>
+<junction x="5.08" y="-76.2"/>
 </segment>
 </net>
 <net name="RC4/LED_M3" class="0">
@@ -9541,6 +9545,8 @@ This is public domain.</text>
 <wire x1="7.62" y1="24.13" x2="7.62" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="10H" gate="G$1" pin="K1"/>
 <wire x1="5.08" y1="15.24" x2="7.62" y2="15.24" width="0.1524" layer="91"/>
+<junction x="5.08" y="15.24"/>
+<junction x="7.62" y="15.24"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="17.78" x2="-106.68" y2="17.78" width="0.1524" layer="91"/>
@@ -9608,6 +9614,8 @@ This is public domain.</text>
 <wire x1="5.08" y1="-10.16" x2="5.08" y2="-15.24" width="0.1524" layer="91"/>
 <pinref part="1H" gate="G$1" pin="K2"/>
 <wire x1="5.08" y1="-15.24" x2="7.62" y2="-15.24" width="0.1524" layer="91"/>
+<junction x="7.62" y="-15.24"/>
+<junction x="5.08" y="-15.24"/>
 </segment>
 </net>
 <net name="RA1/SW3" class="0">
@@ -9649,6 +9657,7 @@ This is public domain.</text>
 <pinref part="R9" gate="G$1" pin="2"/>
 <wire x1="22.86" y1="-2.54" x2="22.86" y2="12.7" width="0.1524" layer="91"/>
 <label x="22.86" y="12.7" size="1.778" layer="95"/>
+<junction x="22.86" y="-2.54"/>
 </segment>
 </net>
 <net name="RA5/SW4" class="0">
@@ -9685,6 +9694,10 @@ This is public domain.</text>
 <wire x1="-11.43" y1="-15.24" x2="-11.43" y2="-22.86" width="0.1524" layer="91"/>
 <pinref part="R7" gate="G$1" pin="2"/>
 <wire x1="-11.43" y1="-22.86" x2="-48.26" y2="-22.86" width="0.1524" layer="91"/>
+<junction x="-2.54" y="15.24"/>
+<junction x="-2.54" y="-15.24"/>
+<junction x="-2.54" y="-45.72"/>
+<junction x="-2.54" y="-76.2"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -9711,6 +9724,10 @@ This is public domain.</text>
 <wire x1="-12.7" y1="-11.43" x2="-12.7" y2="-30.48" width="0.1524" layer="91"/>
 <pinref part="R8" gate="G$1" pin="2"/>
 <wire x1="-12.7" y1="-30.48" x2="-48.26" y2="-30.48" width="0.1524" layer="91"/>
+<junction x="0" y="15.24"/>
+<junction x="0" y="-15.24"/>
+<junction x="0" y="-45.72"/>
+<junction x="0" y="-76.2"/>
 </segment>
 </net>
 <net name="N$9" class="0">
@@ -9737,6 +9754,10 @@ This is public domain.</text>
 <wire x1="-13.97" y1="-2.54" x2="-13.97" y2="22.86" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="2"/>
 <wire x1="-13.97" y1="22.86" x2="-48.26" y2="22.86" width="0.1524" layer="91"/>
+<junction x="-2.54" y="-2.54"/>
+<junction x="-2.54" y="-33.02"/>
+<junction x="-2.54" y="-63.5"/>
+<junction x="-2.54" y="-93.98"/>
 </segment>
 </net>
 <net name="N$10" class="0">
@@ -9763,6 +9784,10 @@ This is public domain.</text>
 <wire x1="-17.78" y1="-7.62" x2="-17.78" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="R3" gate="G$1" pin="2"/>
 <wire x1="-17.78" y1="15.24" x2="-48.26" y2="15.24" width="0.1524" layer="91"/>
+<junction x="0" y="-2.54"/>
+<junction x="0" y="-33.02"/>
+<junction x="0" y="-63.5"/>
+<junction x="0" y="-93.98"/>
 </segment>
 </net>
 <net name="N$13" class="0">
@@ -9789,6 +9814,10 @@ This is public domain.</text>
 <wire x1="-27.94" y1="-6.35" x2="-27.94" y2="0" width="0.1524" layer="91"/>
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="-27.94" y1="0" x2="-48.26" y2="0" width="0.1524" layer="91"/>
+<junction x="2.54" y="-2.54"/>
+<junction x="2.54" y="-33.02"/>
+<junction x="2.54" y="-63.5"/>
+<junction x="2.54" y="-93.98"/>
 </segment>
 </net>
 <net name="N$7" class="0">
@@ -9815,6 +9844,10 @@ This is public domain.</text>
 <wire x1="-22.86" y1="-5.08" x2="-22.86" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="R4" gate="G$1" pin="2"/>
 <wire x1="-22.86" y1="7.62" x2="-48.26" y2="7.62" width="0.1524" layer="91"/>
+<junction x="5.08" y="-2.54"/>
+<junction x="5.08" y="-33.02"/>
+<junction x="5.08" y="-63.5"/>
+<junction x="5.08" y="-93.98"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -9841,6 +9874,10 @@ This is public domain.</text>
 <wire x1="-13.97" y1="-3.81" x2="-13.97" y2="-15.24" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="-13.97" y1="-15.24" x2="-48.26" y2="-15.24" width="0.1524" layer="91"/>
+<junction x="7.62" y="-2.54"/>
+<junction x="7.62" y="-33.02"/>
+<junction x="7.62" y="-63.5"/>
+<junction x="7.62" y="-93.98"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -9849,6 +9886,13 @@ This is public domain.</text>
 <wire x1="2.54" y1="-15.24" x2="2.54" y2="-12.7" width="0.1524" layer="91"/>
 <wire x1="2.54" y1="-12.7" x2="22.86" y2="-12.7" width="0.1524" layer="91"/>
 <pinref part="R9" gate="G$1" pin="1"/>
+<junction x="22.86" y="-12.7"/>
+<junction x="2.54" y="-15.24"/>
+<pinref part="1M" gate="G$1" pin="H"/>
+<wire x1="2.54" y1="-76.2" x2="2.54" y2="-71.12" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="-71.12" x2="22.86" y2="-71.12" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="-71.12" x2="22.86" y2="-12.7" width="0.1524" layer="91"/>
+<junction x="2.54" y="-76.2"/>
 </segment>
 </net>
 </nets>
