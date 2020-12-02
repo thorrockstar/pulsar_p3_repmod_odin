@@ -901,7 +901,7 @@ void Turn_Buzzer_On(void)
 {
     /* Alarm counter used to keep the buzzer on. */
 
-    g_ucAlarm = 10;
+    g_ucAlarm = 5000;
 
     /* Turn the 'stay awake' timer on, if activating the buzzer. */
 
@@ -951,6 +951,107 @@ inline void Turn_Buzzer_Off(void)
     /* Turn timer 4 off again. */
 
     T4CONbits.TMR4ON = 0;
+}
+
+/**
+ * This function will turn the alarm buzzer off again.
+ *
+ * @param ufancy  Alter the sound (0-off, 1..3 frequency variant)
+ */
+
+inline void Turn_Buzzer_Fancy(unsigned char ufancy)
+{
+    /* Deactivate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+    CCP1CONbits.CCP1M = 0;
+    
+    /* Turn timer 4 as PWM source off. */
+
+    T4CONbits.TMR4ON = 0;
+    
+    switch(ufancy)
+    {
+        case 0:
+        break;
+        
+        case 1:
+            /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+             * Having a timer 4 pre-scaler of 16 and using this equation
+             * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
+             * that around to PR4 = ((1/1000)/4/16/0,0000001)-1 */
+            
+            PR4bits.PR4 = 156; // We are using timer 4 for the PWM!
+            
+            /* Set duty cycle.
+             * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+             * Having a timer 4 pre-scaler of 16 and using this equation
+             * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
+             * and turning that around to DC = (1/1000/2)/16/0,0000001 */
+            
+            CCPR1Lbits.CCPR1L = 78;  // Upper 8 Bit
+
+            /* Turn timer 4 as PWM source. */
+
+            T4CONbits.TMR4ON = 1;
+
+            /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+            CCP1CONbits.CCP1M = 0xC;
+        break;
+        
+        case 2:
+            /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+             * Having a timer 4 pre-scaler of 16 and using this equation
+             * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
+             * that around to PR4 = ((1/1300)/4/16/0,0000001)-1 */
+            
+            PR4bits.PR4 = 120; // We are using timer 4 for the PWM!
+            
+            /* Set duty cycle.
+             * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+             * Having a timer 4 pre-scaler of 16 and using this equation
+             * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
+             * and turning that around to DC = (1/1300/2)/16/0,0000001 */
+            
+            CCPR1Lbits.CCPR1L = 60;  // Upper 8 Bit
+
+            /* Turn timer 4 as PWM source. */
+
+            T4CONbits.TMR4ON = 1;
+
+            /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+            CCP1CONbits.CCP1M = 0xC;
+        break;
+
+        case 3:
+            /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+             * Having a timer 4 pre-scaler of 16 and using this equation
+             * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
+             * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
+            
+            PR4bits.PR4 = 91; // We are using timer 4 for the PWM!
+            
+            /* Set duty cycle.
+             * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+             * Having a timer 4 pre-scaler of 16 and using this equation
+             * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
+             * and turning that around to DC = (1/1700/2)/16/0,0000001 */
+            
+            CCPR1Lbits.CCPR1L = 46;  // Upper 8 Bit
+
+            /* Turn timer 4 as PWM source. */
+
+            T4CONbits.TMR4ON = 1;
+
+            /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+            CCP1CONbits.CCP1M = 0xC;
+        break;
+
+        default:
+        break;
+    }
 }
 
 #endif // #if APP_BUZZER_ALARM_USAGE
@@ -4249,61 +4350,68 @@ void main(void)
             {
                 TMR2 = 0;
 
+              #if APP_BUZZER_ALARM_USAGE
+
+                /* Check if the alarm buzzer is still active. */
+
+                unsigned short *palarm = &g_ucAlarm;
+
+                if (*palarm)
+                {
+                    (*palarm)--;
+
+                    /* Turn the alarm buzzer off, if required. */
+
+                    const unsigned short ualarm = *palarm;
+
+                    if (!ualarm)
+                    {
+                        Turn_Buzzer_Off();
+                    }
+                    else
+                    {
+                        Turn_Buzzer_Fancy((ualarm >> 5) & 0x03);
+                    }
+
+                    /* If there is still the alarm buzzer activated,
+                     * restart the rollover counter with a short value. */
+
+                    urollover = 100;
+                }
+
+              #endif // #if APP_BUZZER_ALARM_USAGE
+
+                /* Counter for keeping the display on. */
+
                 if (++urollover >= 350) // Rounds per second.
                 {
-                  #if APP_BUZZER_ALARM_USAGE
+                    /* Check if all button states are idle. */
 
-                    /* Check if the alarm buzzer is still active. */
-
-                    if (g_ucAlarm)
+                    if ((!g_ucPB0TIMEState) && \
+                        (!g_ucPB1DATEState) && \
+                        (!g_ucPB2HOURState) && \
+                        (!g_ucPB3MINTState))
                     {
-                        g_ucAlarm--;
+                        /* If no button is still pressed, turn the 'awake'
+                         * timer off. */
 
-                        /* Turn the alarm buzzer off, if required. */
+                        T2CONbits.TMR2ON = 0;
 
-                        if (!g_ucAlarm)
-                        {
-                            Turn_Buzzer_Off();
-                        }
+                        /* Indicate that we do not need to stay awake
+                         * anymore. */
 
-                        /* If there is still the alarm buzzer activated,
+                        urollover = 0;
+
+                        /* Indicate that timer 2 is not used anymore. */
+
+                        g_ucTimer2Usage = 0;
+                    }
+                    else
+                    {
+                        /* If there is still at least one button pressed,
                          * restart the rollover counter with a short value. */
 
                         urollover = 100;
-                    }
-                    else
-
-                  #endif // #if APP_BUZZER_ALARM_USAGE
-
-                    {
-                        /* Check if all button states are idle. */
-
-                        if ((!g_ucPB0TIMEState) && \
-                            (!g_ucPB1DATEState) && \
-                            (!g_ucPB2HOURState) && \
-                            (!g_ucPB3MINTState))
-                        {
-                            /* If no button is still pressed, turn the 'awake'
-                             * timer off. */
-
-                            T2CONbits.TMR2ON = 0;
-
-                            /* Indicate that we do not need to stay awake
-                             * anymore. */
-
-                            urollover = 0;
-
-                            /* Indicate that timer 2 is not used anymore. */
-
-                            g_ucTimer2Usage = 0;
-                        }
-                        else
-                        {
-                            /* If there is still at least one button pressed,
-                             * restart the rollover counter with a short value. */
-
-                            urollover = 100;
-                        }
                     }
                 }
             }
