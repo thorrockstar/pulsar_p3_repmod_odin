@@ -287,7 +287,7 @@ unsigned char g_ucMplexDigits = 0;
  * Brightness variable for the digits, reflecting
  * the readout from the AN11 analogue input. */
 
-unsigned char  g_ucDimmingCnt;
+unsigned char  g_ucDimmingCnt = 0;
 unsigned char  g_ucDimmingRef = 0;
 unsigned char  g_ucDimming = 0;
 unsigned short g_ucLightSensor = 0;
@@ -901,13 +901,18 @@ void Turn_Buzzer_On(void)
 {
     /* Alarm counter used to keep the buzzer on. */
 
-    g_ucAlarm = 5000;
+    g_ucAlarm = 6000;
 
     /* Turn the 'stay awake' timer on, if activating the buzzer. */
 
     g_ucTimer2Usage = 1;    // Indicate using the timer.
     TMR2 = 0;               // Zero the timer.
     T2CONbits.TMR2ON = 1;   // Turn timer 2 on.
+
+    /* Single output: PxA, PxB, PxC and PxD controlled by steering. */
+
+    CCP1CONbits.P1M1 = 0;
+    CCP1CONbits.P1M0 = 0;
     
     /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
      * Having a timer 4 pre-scaler of 16 and using this equation
