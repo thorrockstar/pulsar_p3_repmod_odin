@@ -446,6 +446,8 @@ inline void Configure_Inputs_Outputs(void)
     PORTAbits.RA3 = 0;
     PORTAbits.RA7 = 0;
 
+#if APP_LIGHT_SENSOR_USAGE
+    
     /* ANCON0 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
      * 1 = Pin configured as a digital port
@@ -475,6 +477,8 @@ inline void Configure_Inputs_Outputs(void)
     ADCON0bits.CHS = 11;    // Select ADC channel -> AD11
     ADCON0bits.ADON = 1;    // Turn on ADC
 
+#endif // #if APP_LIGHT_SENSOR_USAGE
+    
     /* Set RA0/1/2/5 to input, RA3/4/6/7 as output. */
 
     TRISA = 0x27;
@@ -3137,7 +3141,7 @@ void Display_Digits(void)
                   #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
 
                     case DISP_STATE_LIGHT_SENSOR:
-                        g_ucRightVal = (unsigned char)(g_ucLightSensor / 100); //g_ucDimmingRef
+                        g_ucRightVal = (unsigned char)(g_ucLightSensor / 100);
                         g_ucLeftVal = 255;
                     break;
 
