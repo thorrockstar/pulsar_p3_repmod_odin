@@ -3304,11 +3304,11 @@ void Display_Digits(void)
 
                       #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
 
-                        g_ucDots = ALRMCFGbits.ALRMEN;
+                        g_ucDots = ALRMCFGbits.ALRMEN ? 2 : 0;
 
                       #elif APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
-                        g_ucDots = ALRMCFGbits.ALRMEN;
+                        g_ucDots = ALRMCFGbits.ALRMEN ? 2 : 0;
 
                       #endif
                     break;
@@ -3468,14 +3468,14 @@ void Display_Digits(void)
 
                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                        if (g_ucDots)
+                        if (g_ucDots & 1)
                         {
                             LED_DATE_DOT = 0;
                         }
 
                  #else
 
-                        if (g_ucDots)
+                        if (g_ucDots & 1)
                         {
                             LED_DATE_DOT = 1;
                         }
@@ -3935,14 +3935,14 @@ void Display_Digits(void)
 
                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                        if (g_ucDots)
+                        if (g_ucDots & 2)
                         {
                             LED_DATE_DOT = 0;
                         }
 
                  #else
 
-                        if (g_ucDots)
+                        if (g_ucDots & 2)
                         {
                             LED_DATE_DOT = 1;
                         }

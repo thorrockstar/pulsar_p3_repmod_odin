@@ -9895,6 +9895,15 @@ This is public domain.</text>
 <junction x="2.54" y="-76.2"/>
 </segment>
 </net>
+<net name="PIEZO" class="0">
+<segment>
+<pinref part="U$1" gate="A" pin="RC2/AN11/CTPLS/RP13"/>
+<wire x1="27.94" y1="101.6" x2="48.26" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="101.6" x2="48.26" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="73.66" x2="27.94" y2="73.66" width="0.1524" layer="91"/>
+<label x="27.94" y="73.66" size="1.778" layer="95"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
