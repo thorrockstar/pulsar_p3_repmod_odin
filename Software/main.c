@@ -475,6 +475,28 @@ inline void Configure_Inputs_Outputs(void)
     ADCON0bits.CHS = 11;    // Select ADC channel -> AD11
     ADCON0bits.ADON = 1;    // Turn on ADC
 
+#else
+
+    /* ANCON0 - A/D PORT CONFIGURATION REGISTER
+     * Analog Port Configuration bits (AN<7:0>)
+     * 1 = Pin configured as a digital port
+     * 0 = Pin configured as an analog channel - digital input disabled
+     * and reads zero */
+
+    ANCON0 = 0xFF;          // AN0...7
+
+    /* ANCON1 - A/D PORT CONFIGURATION REGISTER
+     * Analog Port Configuration bits (AN<7:0>)
+     * 1 = Pin configured as a digital port
+     * 0 = Pin configured as an analog channel - digital input disabled
+     * and reads zero */
+
+    ANCON1 = 0x1F;          // AN8..12 Activate AN11 as being an analogue input.
+
+    /* ADCON0 */
+
+    ADCON0bits.ADON = 0;    // Turn off ADC
+
 #endif
 
     /* Set RA0/1/2/5 to input, RA3/4/6/7 as output. */
