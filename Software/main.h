@@ -73,30 +73,65 @@
 #define APP_WATCH_COMMON_CATHODE    0
 #define APP_WATCH_COMMON_ANODE      1
 
-#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-     (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD) || \
-     (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
     #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
+    #define APP_WATCH_ANY_PULSAR_MODEL  1
+
+#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
+    #define APP_WATCH_ANY_PULSAR_MODEL  1
+
+#elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
+
+    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
+    #define APP_WATCH_ANY_PULSAR_MODEL  0
+
+#elif (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+
+    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
+    #define APP_WATCH_ANY_PULSAR_MODEL  0
 
 #else
 
     #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
+    #define APP_WATCH_ANY_PULSAR_MODEL  0
 
 #endif
 
 /**
- * Define to turn on display dimming via a LDR.
+ * Define to turn on display dimming via a LDR and the alarm feature.
  */
 
-#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
-  #define APP_LIGHT_SENSOR_USAGE                     0
-  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
-  #define APP_BUZZER_ALARM_USAGE                     0
-#else
+#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
   #define APP_LIGHT_SENSOR_USAGE                     1
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 0
+
+#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+  #define APP_LIGHT_SENSOR_USAGE                     0
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
+  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 1
+
+#elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
+
+  #define APP_LIGHT_SENSOR_USAGE                     1
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
+  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 1
+
+#else
+
+  #define APP_LIGHT_SENSOR_USAGE                     1
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
+  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 0
+
 #endif
 
 /**
@@ -107,8 +142,7 @@ typedef void(*ButtonHandlerType)(void);
 
 /* Macro used to define the 7-segment table for driving the display. */
 
-#define MAKE_7SEG(a,b,c,d,e,f,g) ((a)|((b)<<1)|((c)<<2)|((d)<<3)|((e)<<4)|\
-                                 ((f)<<5)|((g)<<6))
+#define MAKE_7SEG(a,b,c,d,e,f,g) ((a)|((b)<<1)|((c)<<2)|((d)<<3)|((e)<<4)|((f)<<5)|((g)<<6))
 
 /* The last four words of Flash program memory,
  * known as the Flash Configuration Words (FCW), are
@@ -161,14 +195,30 @@ typedef void(*ButtonHandlerType)(void);
 /**
 * Button port definitions */
 
-#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
-// Pulsar P2/3
+// Pulsar P2/3 with original display
 
     // TIME
     #define PB0_PORT_BITS   PORTAbits
-    #define PB0_PIN         RA5 // Pulsar wrist watch and VFD table watch
+    #define PB0_PIN         RA5
+    //DATE
+    #define PB1_PORT_BITS   PORTAbits
+    #define PB1_PIN         RA1
+    //HOUR
+    #define PB2_PORT_BITS   PORTBbits
+    #define PB2_PIN         RB0
+    //MIN
+    #define PB3_PORT_BITS   PORTAbits
+    #define PB3_PIN         RA0
+
+#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+
+// Pulsar P2/3 with replacement display
+
+    // TIME
+    #define PB0_PORT_BITS   PORTAbits
+    #define PB0_PIN         RA5
     //DATE
     #define PB1_PORT_BITS   PORTAbits
     #define PB1_PIN         RA1

@@ -13,7 +13,7 @@
  *                      beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        30.11.2020
+ *  Last Change:        07.12.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -93,7 +93,7 @@
  * 24 hour to 12 hour system conversion.
  */
 
-#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
 const unsigned char g_24_to_12_hours[] = { /* AM */12, 1, 2, 3, 4, 5, 6, \
                                                     7, 8, 9, 10, 11, \
@@ -109,7 +109,7 @@ const unsigned char g_24_to_AMPM[] = { /* AM */ 1, 1, 1, 1, 1, 1, 1, \
                                        /* PM */ 2, 2, 2, 2, 2, 2, 2, \
                                                 2, 2, 2, 2, 2 };
 
-#endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#endif
 
 /**
  * 7-segment numerical encoding table
@@ -308,9 +308,7 @@ const unsigned char *g_pDigits;
  * Variable, reflecting the state of the Dot-LED's on the display,
  * in between month and day or hour and minute. */
 
-#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-     (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+#if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
 unsigned char g_ucDots = 0;
 
@@ -319,11 +317,11 @@ unsigned char g_ucDots = 0;
 /**
  * Alarm counter, cancelled by expiring or pressing a button. */
 
-#if APP_BUZZER_ALARM_USAGE
+#if APP_BUZZER_ALARM_USAGE==1
 
 unsigned short g_ucAlarm;
 
-#endif // #if APP_BUZZER_ALARM_USAGE
+#endif
 
 /**
  * Global (deep) sleep variables, that are stored
@@ -386,7 +384,7 @@ inline void Init_Inputs_Outputs_Ports(void)
 
     /* Configure the output as PWM output channel A. */
 
-#if APP_BUZZER_ALARM_USAGE
+#if APP_BUZZER_ALARM_USAGE==1
 
     /* Write Magic */
 
@@ -405,7 +403,7 @@ inline void Init_Inputs_Outputs_Ports(void)
 
     IOLOCK = 0;
 
-#endif // #if APP_BUZZER_ALARM_USAGE
+#endif
 }
 
 /**
@@ -427,7 +425,7 @@ inline void Configure_Inputs_Outputs(void)
 
     TRISB = 0x53;
 
-#if APP_BUZZER_ALARM_USAGE
+#if APP_BUZZER_ALARM_USAGE==1
 
     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -446,8 +444,8 @@ inline void Configure_Inputs_Outputs(void)
     PORTAbits.RA3 = 0;
     PORTAbits.RA7 = 0;
 
-#if APP_LIGHT_SENSOR_USAGE
-    
+#if APP_LIGHT_SENSOR_USAGE==1
+
     /* ANCON0 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
      * 1 = Pin configured as a digital port
@@ -477,8 +475,8 @@ inline void Configure_Inputs_Outputs(void)
     ADCON0bits.CHS = 11;    // Select ADC channel -> AD11
     ADCON0bits.ADON = 1;    // Turn on ADC
 
-#endif // #if APP_LIGHT_SENSOR_USAGE
-    
+#endif
+
     /* Set RA0/1/2/5 to input, RA3/4/6/7 as output. */
 
     TRISA = 0x27;
@@ -792,12 +790,12 @@ inline void Configure_Timer_4(void)
 
     /* ECCP1 and ECCP2 both use Timer3 (capture/compare) and Timer4 (PWM) */
 
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     TCLKCONbits.T3CCP1 = 0;
     TCLKCONbits.T3CCP2 = 1;
 
-  #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif
 }
 
 /**
@@ -806,16 +804,19 @@ inline void Configure_Timer_4(void)
  *
  * Once the system wakes up, it will restart the program an the main entry point. */
 
-#if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+#if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
 
 inline void enterSleep(void)
 {
+    /* Set RA0/1/2/5 to input, RA3/4/6/7 as output. */
+
+    TRISA = 0x27;
+
     /* Map INT1 to RP0/RA0 (DATE) input for wake-up. */
 
     RPINR1 = 0;
 
-#if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-     (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+#if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
     /* Map INT2 to RP1/RA1 (MIN) input for wake-up. */
 
@@ -893,13 +894,13 @@ inline void enterSleep(void)
     }
 }
 
-#endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+#endif
 
 /**
  * This function will turn the alarm buzzer on again.
  */
 
-#if APP_BUZZER_ALARM_USAGE
+#if APP_BUZZER_ALARM_USAGE==1
 
 void Turn_Buzzer_On(void)
 {
@@ -917,20 +918,20 @@ void Turn_Buzzer_On(void)
 
     CCP1CONbits.P1M1 = 0;
     CCP1CONbits.P1M0 = 0;
-    
+
     /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
      * Having a timer 4 pre-scaler of 16 and using this equation
      * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
      * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
-    
+
     PR4bits.PR4 = 91; // We are using timer 4 for the PWM!
-    
+
     /* Set duty cycle.
      * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
      * Having a timer 4 pre-scaler of 16 and using this equation
      * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
      * and turning that around to DC = (1/1700/2)/16/0,0000001 */
-    
+
     CCP1CONbits.DC1B = 0;    // Lower 2 bit
     CCPR1Lbits.CCPR1L = 46;  // Upper 8 Bit
 
@@ -973,30 +974,30 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
     /* Deactivate PWM mode PxA and PxC active-high; PxB and PxD active-high */
 
     CCP1CONbits.CCP1M = 0;
-    
+
     /* Turn timer 4 as PWM source off. */
 
     T4CONbits.TMR4ON = 0;
-    
+
     switch(ufancy)
     {
         case 0:
         break;
-        
+
         case 1:
             /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
              * Having a timer 4 pre-scaler of 16 and using this equation
              * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
              * that around to PR4 = ((1/1000)/4/16/0,0000001)-1 */
-            
+
             PR4bits.PR4 = 156; // We are using timer 4 for the PWM!
-            
+
             /* Set duty cycle.
              * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
              * Having a timer 4 pre-scaler of 16 and using this equation
              * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
              * and turning that around to DC = (1/1000/2)/16/0,0000001 */
-            
+
             CCPR1Lbits.CCPR1L = 78;  // Upper 8 Bit
 
             /* Turn timer 4 as PWM source. */
@@ -1007,21 +1008,21 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
 
             CCP1CONbits.CCP1M = 0xC;
         break;
-        
+
         case 2:
             /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
              * Having a timer 4 pre-scaler of 16 and using this equation
              * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
              * that around to PR4 = ((1/1300)/4/16/0,0000001)-1 */
-            
+
             PR4bits.PR4 = 120; // We are using timer 4 for the PWM!
-            
+
             /* Set duty cycle.
              * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
              * Having a timer 4 pre-scaler of 16 and using this equation
              * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
              * and turning that around to DC = (1/1300/2)/16/0,0000001 */
-            
+
             CCPR1Lbits.CCPR1L = 60;  // Upper 8 Bit
 
             /* Turn timer 4 as PWM source. */
@@ -1038,15 +1039,15 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
              * Having a timer 4 pre-scaler of 16 and using this equation
              * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
              * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
-            
+
             PR4bits.PR4 = 91; // We are using timer 4 for the PWM!
-            
+
             /* Set duty cycle.
              * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
              * Having a timer 4 pre-scaler of 16 and using this equation
              * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
              * and turning that around to DC = (1/1700/2)/16/0,0000001 */
-            
+
             CCPR1Lbits.CCPR1L = 46;  // Upper 8 Bit
 
             /* Turn timer 4 as PWM source. */
@@ -1063,7 +1064,7 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
     }
 }
 
-#endif // #if APP_BUZZER_ALARM_USAGE
+#endif
 
 /**
  * This function will read and debounce the push buttons.
@@ -1661,7 +1662,7 @@ unsigned char DebounceButtons(void)
 
 void PressPB0(void)
 {
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     /* Check if the alarm buzzer is still active. */
 
@@ -1670,7 +1671,7 @@ void PressPB0(void)
         Turn_Buzzer_Off();
     }
 
-  #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif
 
     /* When having set the time, the RTC will be disabled until
      * you press the very first time the 'TIME' button.
@@ -1712,8 +1713,7 @@ void PressPB0(void)
          * the time button can be pressed together with the DATE button,
          * when setting the day of month. */
 
-      #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-           (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+      #if APP_WATCH_ANY_PULSAR_MODEL==1
 
         if ((istate == DISP_STATE_DATE) || (istate == DISP_STATE_SET_MONTH))
         {
@@ -1755,8 +1755,7 @@ void HoldPB0(void)
 
 void ReleasePB0(void)
 {
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if APP_WATCH_ANY_PULSAR_MODEL==1
 
     const int istate = g_sDSGPR1.dispState;
 
@@ -1788,7 +1787,7 @@ void ReleasePB0(void)
 
 void PressPB1(void)
 {
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     /* Check if the alarm buzzer is still active. */
 
@@ -1797,7 +1796,7 @@ void PressPB1(void)
         Turn_Buzzer_Off();
     }
 
-  #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
@@ -1807,16 +1806,17 @@ void PressPB1(void)
     {
         pb->dispState = DISP_STATE_DATE;
     }
-  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+  #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
     else if (pb->dispState == DISP_STATE_TIME)
     {
         pb->dispState = DISP_STATE_DATE;
     }
-    
-  #else // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
 
-   #if APP_BUZZER_ALARM_USAGE
+  #else
+
+   #if APP_BUZZER_ALARM_USAGE==1
 
     else if ((pb->dispState == DISP_STATE_TIME) || \
              (pb->dispState == DISP_STATE_SECONDS))
@@ -1875,9 +1875,10 @@ void PressPB1(void)
             Lock_RTCC();
         }
     }
-    
-   #endif // #if APP_BUZZER_ALARM_USAGE
-  #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+   #endif
+
+  #endif
 }
 
 /**
@@ -1907,14 +1908,14 @@ void HoldPB1(void)
             pb->dispState = DISP_STATE_YEAR;
         }
 
-  #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
+  #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
         else if (ust == DISP_STATE_YEAR)
         {
             pb->dispState = DISP_STATE_LIGHT_SENSOR;
         }
 
-  #endif // #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
+  #endif
     }
 }
 
@@ -1924,7 +1925,7 @@ void HoldPB1(void)
 
 void ReleasePB1(void)
 {
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     DSGPR1Type *pb = &g_sDSGPR1;
 
@@ -1941,8 +1942,8 @@ void ReleasePB1(void)
             pb->dispState = DISP_STATE_TOGGLE_ALARM;
         }
     }
-    
-  #endif // #if APP_BUZZER_ALARM_USAGE
+
+  #endif
 }
 
 /**
@@ -1951,7 +1952,7 @@ void ReleasePB1(void)
 
 void PressPB2(void)
 {
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     /* Check if the alarm buzzer is still active. */
 
@@ -1960,7 +1961,7 @@ void PressPB2(void)
         Turn_Buzzer_Off();
     }
 
-  #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
@@ -1984,8 +1985,7 @@ void PressPB2(void)
             /* If time and date button have been pressed and the HOUR
              * button is pressed as well, forward the day of month.*/
 
-          #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+          #if APP_WATCH_ANY_PULSAR_MODEL==1
 
             if (g_ucPB1DATEState >= PB_STATE_SHORT_PRESS)
             {
@@ -2015,8 +2015,7 @@ void PressPB2(void)
                 pb->dispState = DISP_STATE_SET_HOURS;
             }
 
-          #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+          #if APP_WATCH_ANY_PULSAR_MODEL==1
 
             else
             {
@@ -2146,7 +2145,7 @@ void HoldPB2(void)
 
         RTCCFGbits.RTCEN = 0;
 
-      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+      #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
         ucExtra = 1;
 
@@ -2183,7 +2182,9 @@ void HoldPB2(void)
         }
 
         if (ucExtra)
-      #endif // #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+
+      #endif
+
         {
             /* Forward the day of month. */
 
@@ -2278,9 +2279,9 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
-    
-  #if APP_BUZZER_ALARM_USAGE
-  
+
+  #if APP_BUZZER_ALARM_USAGE==1
+
     else if ((ustate == DISP_STATE_ALARM) || \
              (ustate == DISP_STATE_TOGGLE_ALARM))
     {
@@ -2320,8 +2321,8 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
-    
-  #endif // #if APP_BUZZER_ALARM_USAGE
+
+  #endif
 }
 
 /**
@@ -2330,8 +2331,7 @@ void HoldPB2(void)
 
 void ReleasePB2(void)
 {
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if APP_WATCH_ANY_PULSAR_MODEL==1
 
     /* Turn timer 2 off. */
 
@@ -2350,7 +2350,7 @@ void ReleasePB2(void)
 
 void PressPB3(void)
 {
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     /* Check if the alarm buzzer is still active. */
 
@@ -2359,7 +2359,7 @@ void PressPB3(void)
         Turn_Buzzer_Off();
     }
 
-  #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
@@ -2381,8 +2381,7 @@ void PressPB3(void)
         }
         else
         {
-          #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+          #if APP_WATCH_ANY_PULSAR_MODEL==1
 
             if (((ust == DISP_STATE_DATE) || (ust == DISP_STATE_YEAR) || \
                  (ust == DISP_STATE_WEEKDAY)))
@@ -2483,8 +2482,7 @@ void HoldPB3(void)
 
         RTCVALL = 0; // Zero the second when forwarding the minute.
 
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if APP_WATCH_ANY_PULSAR_MODEL==1
 
         /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
          * until the time readout button has been pressed the first time. */
@@ -2595,7 +2593,7 @@ void HoldPB3(void)
         Lock_RTCC();
     }
 
-  #if APP_BUZZER_ALARM_USAGE
+  #if APP_BUZZER_ALARM_USAGE==1
 
     else if ((ust == DISP_STATE_ALARM) || \
              (ust == DISP_STATE_TOGGLE_ALARM))
@@ -2637,10 +2635,9 @@ void HoldPB3(void)
         Lock_RTCC();
     }
 
-  #endif // #if APP_BUZZER_ALARM_USAGE
+  #endif
 
-  #if ((APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) && \
-       (APP_WATCH_TYPE_BUILD!=APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if APP_WATCH_ANY_PULSAR_MODEL==0
 
     else if (ust == DISP_STATE_SET_DAY)
     {
@@ -2749,8 +2746,7 @@ void HoldPB3(void)
 
 void ReleasePB3(void)
 {
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if APP_WATCH_ANY_PULSAR_MODEL==1
 
     /* Turn timer 2 off. */
 
@@ -2776,7 +2772,7 @@ void Display_Digits(void)
 
     /* Lower the brightness, by skipping the multiplexing. */
 
-  #if APP_LIGHT_SENSOR_USAGE
+  #if APP_LIGHT_SENSOR_USAGE==1
 
     if (g_ucDimming)
     {
@@ -2786,12 +2782,12 @@ void Display_Digits(void)
     }
     else
 
-  #endif // #if APP_LIGHT_SENSOR_USAGE
+  #endif
 
     {
         /* Measure ambient brightness via AN11. */
 
-      #if APP_LIGHT_SENSOR_USAGE
+      #if APP_LIGHT_SENSOR_USAGE==1
 
         if (!ucPlex)
         {
@@ -2818,7 +2814,7 @@ void Display_Digits(void)
 
                     TRISB = 0x53;
 
-                #if APP_BUZZER_ALARM_USAGE
+                #if APP_BUZZER_ALARM_USAGE==1
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -2834,24 +2830,27 @@ void Display_Digits(void)
 
                     /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 0;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
                    #endif
-                   
+
                  #endif
                 }
             }
@@ -2868,7 +2867,7 @@ void Display_Digits(void)
 
                 TRISB = 0x53;
 
-            #if APP_BUZZER_ALARM_USAGE
+            #if APP_BUZZER_ALARM_USAGE==1
 
                 /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -2884,33 +2883,36 @@ void Display_Digits(void)
 
                 /* Turn all segment outputs off. */
 
-            #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+            #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                 PORTC |= 0xF0;
                 PORTB |= 0x2C;
-                
-              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                   (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                LED_DATE_DOT = 1;
+
+              #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                PORTA |= 0x40;
+
               #endif
-              
+
             #else
                 PORTC &= 0;
                 PORTB &= 1;
 
-              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                   (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                LED_DATE_DOT = 0;
+              #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                PORTA &= 0xBF;
+
               #endif
-              
+
             #endif
 
                 /* Turn on RA6 to power up the light sensor. */
 
-              #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+            #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
 
                 PWR_LGTH_SENSOR = 1;
 
-              #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+            #endif
 
                 /* Measure the voltage across the resistor. */
 
@@ -2937,11 +2939,11 @@ void Display_Digits(void)
 
                 /* Turn off RA6 to power down the light sensor. */
 
-              #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+            #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
 
                 PWR_LGTH_SENSOR = 0;
 
-              #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+            #endif
 
                 /* Calculate the average value between this readout
                  * and the very last. */
@@ -2952,7 +2954,7 @@ void Display_Digits(void)
 
                 if (uv)  // If the resitor would be missing.
                 {
-                  #if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
+                  #if APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD
 
                     /* Normal daylight */
 
@@ -2965,7 +2967,7 @@ void Display_Digits(void)
                         uv = 15 - (uv >> 6);
                     }
 
-                  #else  // #if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
+                  #else
 
                     /* Normal daylight */
 
@@ -2978,7 +2980,7 @@ void Display_Digits(void)
                         uv = 2 - (uv >> 6);
                     }
 
-                  #endif // #else#if (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
+                  #endif
 
                     g_ucDimming = (unsigned char)uv;
                     g_ucDimmingRef = (unsigned char)uv;
@@ -3012,7 +3014,7 @@ void Display_Digits(void)
 
         if (ucPlex != 255)
 
-      #endif // #if APP_LIGHT_SENSOR_USAGE
+      #endif // #if APP_LIGHT_SENSOR_USAGE==1
 
         {
             unsigned char ucTemp;
@@ -3025,9 +3027,7 @@ void Display_Digits(void)
                 g_ucLeftVal = 255;
                 g_ucRightVal = 255;
 
-           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+           #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                 g_ucDots = 0;
 
@@ -3042,7 +3042,7 @@ void Display_Digits(void)
                     /* If being the table watch, show the
                      * time instead of blanking the watch. */
 
-                  #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                     case DISP_STATE_BLANK:
 
@@ -3072,12 +3072,12 @@ void Display_Digits(void)
 
                         break;
 
-                  #else // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #else // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                     case DISP_STATE_BLANK:
                     break;
 
-                  #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #endif // #else #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                     case DISP_STATE_TIME:
                     case DISP_STATE_SET_HOURS:
@@ -3098,7 +3098,7 @@ void Display_Digits(void)
 
                         /* 24h -> 12h system */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
                         g_ucLeftVal = g_24_to_12_hours[g_ucLeftVal];
 
@@ -3115,7 +3115,7 @@ void Display_Digits(void)
                             g_ucRightVal = 0;
                         }
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
                         g_ucDots = 3; // Show both dots.
 
@@ -3138,14 +3138,14 @@ void Display_Digits(void)
                         }
                     break;
 
-                  #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
+                  #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
                     case DISP_STATE_LIGHT_SENSOR:
                         g_ucRightVal = (unsigned char)(g_ucLightSensor / 100);
                         g_ucLeftVal = 255;
                     break;
 
-                  #endif // #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE
+                  #endif // #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
                     case DISP_STATE_DATE:
                     case DISP_STATE_SET_MONTH:
@@ -3175,7 +3175,7 @@ void Display_Digits(void)
 
                         /* 24h -> 12h system */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
                         /* Hours to indicate AM/PM dot. */
 
@@ -3192,10 +3192,11 @@ void Display_Digits(void)
 
                         g_ucDots = g_24_to_AMPM[ucTemp]; // AM/PM dot
 
-                 #endif
+                 #elif APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
 
-                 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                        g_ucDots = 1;
+
+                 #elif APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                         g_ucDots = 1;
 
@@ -3207,7 +3208,6 @@ void Display_Digits(void)
                     case DISP_STATE_SET_YEAR:
 
                         RTCCFG |= 3;
-                        //while(RTCCFGbits.RTCSYNC);
 
                         /* Year */
                         ucTemp = RTCVALL;
@@ -3218,7 +3218,7 @@ void Display_Digits(void)
                             g_ucRightVal = 0;
                         }
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
                         g_ucLeftVal = 255;    // Show year with two digits.
 
@@ -3249,7 +3249,7 @@ void Display_Digits(void)
                         g_ucRightVal = ucTemp;
                     break;
 
-                 #if APP_BUZZER_ALARM_USAGE
+                 #if APP_BUZZER_ALARM_USAGE==1
 
                     case DISP_STATE_ALARM:
                     case DISP_STATE_TOGGLE_ALARM:
@@ -3280,15 +3280,18 @@ void Display_Digits(void)
 
                         /* Alarm on/off */
 
-                      #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                           (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+                      #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+
+                        g_ucDots = ALRMCFGbits.ALRMEN;
+
+                      #elif APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                         g_ucDots = ALRMCFGbits.ALRMEN;
 
                       #endif
                     break;
 
-                 #endif // #if APP_BUZZER_ALARM_USAGE
+                 #endif // #if APP_BUZZER_ALARM_USAGE==1
 
                     default:
                     break;
@@ -3329,7 +3332,7 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
-                #if APP_BUZZER_ALARM_USAGE
+                #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -3346,22 +3349,25 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
 
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 0;
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
                    #endif
 
                  #endif
@@ -3369,7 +3375,7 @@ void Display_Digits(void)
                         // segment a
                         if (ucTemp & 1)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AA_B = 0;
                  #else
                             LED_AA_B = 1;
@@ -3379,7 +3385,7 @@ void Display_Digits(void)
                         // segment b
                         if (ucTemp & 2)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AB_TD = 0;
                  #else
                             LED_AB_TD = 1;
@@ -3389,7 +3395,7 @@ void Display_Digits(void)
                         // segment c
                         if (ucTemp & 4)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AC_LD = 0;
                  #else
                             LED_AC_LD = 1;
@@ -3399,7 +3405,7 @@ void Display_Digits(void)
                         // segment d
                         if (ucTemp & 8)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AD_C = 0;
                  #else
                             LED_AD_C = 1;
@@ -3409,7 +3415,7 @@ void Display_Digits(void)
                         // segment e
                         if (ucTemp & 16)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AE = 0;
                  #else
                             LED_AE = 1;
@@ -3419,7 +3425,7 @@ void Display_Digits(void)
                         // segment f
                         if (ucTemp & 32)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AF = 0;
                  #else
                             LED_AF = 1;
@@ -3429,27 +3435,36 @@ void Display_Digits(void)
                         // segment g
                         if (ucTemp & 64)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AG = 0;
                  #else
                             LED_AG = 1;
                  #endif
                         }
 
-              #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                   (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+             #if APP_DATE_SPECIAL_DOT_USAGE==1
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
-                        LED_DATE_DOT = (g_ucDots) ? 0 : 1;
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                        if (g_ucDots)
+                        {
+                            LED_DATE_DOT = 0;
+                        }
+
                  #else
-                        LED_DATE_DOT = (g_ucDots) ? 1 : 0;
+
+                        if (g_ucDots)
+                        {
+                            LED_DATE_DOT = 1;
+                        }
+
                  #endif
 
              #endif
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                         /* Turn the common anode on. */
 
@@ -3466,7 +3481,7 @@ void Display_Digits(void)
 
                         TRISB = 0x51;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                         /* Turn the common cathode on. */
 
@@ -3476,7 +3491,7 @@ void Display_Digits(void)
 
                         TRISB = 0x43;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
                     }
                     else if (ucPlex == 3)
                     {
@@ -3488,44 +3503,47 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
-                #if APP_BUZZER_ALARM_USAGE
+                 #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
                         TRISC = 0x08;
 
-                #else
+                 #else
 
                         /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
                          * as input. */
 
                         TRISC = 0x0C;
 
-                #endif
+                 #endif
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
 
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 0;
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
                    #endif
-                   
+
                  #endif
 
-             #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+               #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
                         /* Ten hour digit and dots */
 
@@ -3550,11 +3568,11 @@ void Display_Digits(void)
 
                         TRISB = 0x13;
 
-             #else // Not a 12h system watch.
+               #else // Not a 12h system watch.
 
                         /* Ten hour digit */
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
 
                         if (g_ucLeftVal < 10)
                         {
@@ -3587,14 +3605,14 @@ void Display_Digits(void)
 
                  #endif
 
-                 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
                         if (ucTemp)
                         {
                  #endif
                             // segment a
                             if (ucTemp & 1)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AA_B = 0;
                  #else
                                 LED_AA_B = 1;
@@ -3603,7 +3621,7 @@ void Display_Digits(void)
                             // segment b
                             if (ucTemp & 2)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AB_TD = 0;
                  #else
                                 LED_AB_TD = 1;
@@ -3613,7 +3631,7 @@ void Display_Digits(void)
                             // segment c
                             if (ucTemp & 4)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AC_LD = 0;
                  #else
                                 LED_AC_LD = 1;
@@ -3623,7 +3641,7 @@ void Display_Digits(void)
                             // segment d
                             if (ucTemp & 8)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AD_C = 0;
                  #else
                                 LED_AD_C = 1;
@@ -3633,7 +3651,7 @@ void Display_Digits(void)
                             // segment e
                             if (ucTemp & 16)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AE = 0;
                  #else
                                 LED_AE = 1;
@@ -3643,7 +3661,7 @@ void Display_Digits(void)
                             // segment f
                             if (ucTemp & 32)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AF = 0;
                  #else
                                 LED_AF = 1;
@@ -3653,37 +3671,37 @@ void Display_Digits(void)
                             // segment g
                             if (ucTemp & 64)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AG = 0;
                  #else
                                 LED_AG = 1;
                  #endif
                             }
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+                 #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                             /* Turn the common anode on. */
 
                             LED_10H = 1;
-                 #else
+                   #else
                             /* Turn the common cathode on. */
 
                             LED_10H = 0;
-                 #endif
+                   #endif
 
                             /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
 
                             TRISB = 0x13;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+                 #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                             /* Turn the common cathode on. */
 
                             LED_1M = 0;
 
-                        #if APP_BUZZER_ALARM_USAGE
+                        #if APP_BUZZER_ALARM_USAGE==1
 
                             /* Set RC0..7 to outputs. */
 
@@ -3697,13 +3715,13 @@ void Display_Digits(void)
 
                         #endif
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+                 #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-             #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
                         }
-             #endif
+                 #endif
 
-             #endif // A 24 h based watch.
+               #endif // A 24 h based watch.
                     }
                 }
                 else // if (g_ucLeftVal != 255)
@@ -3715,7 +3733,7 @@ void Display_Digits(void)
 
                    TRISB = 0x53;
 
-                #if APP_BUZZER_ALARM_USAGE
+                #if APP_BUZZER_ALARM_USAGE==1
 
                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -3731,24 +3749,27 @@ void Display_Digits(void)
 
                    /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                     PORTC |= 0xF0;
                     PORTB |= 0x2C;
-                    
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                    LED_DATE_DOT = 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                    PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                     PORTC &= 0;
                     PORTB &= 1;
 
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                    LED_DATE_DOT = 0;
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                    PORTA &= 0xBF;
+
                    #endif
-                   
+
                  #endif
                 }
             }
@@ -3779,7 +3800,7 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
-                    #if APP_BUZZER_ALARM_USAGE
+                    #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -3795,30 +3816,33 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
 
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 0;
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
                    #endif
-                   
+
                  #endif
 
                         // segment a
                         if (ucTemp & 1)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AA_B = 0;
                  #else
                             LED_AA_B = 1;
@@ -3828,7 +3852,7 @@ void Display_Digits(void)
                         // segment b
                         if (ucTemp & 2)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AB_TD = 0;
                  #else
                             LED_AB_TD = 1;
@@ -3838,7 +3862,7 @@ void Display_Digits(void)
                         // segment c
                         if (ucTemp & 4)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AC_LD = 0;
                  #else
                             LED_AC_LD = 1;
@@ -3848,7 +3872,7 @@ void Display_Digits(void)
                         // segment d
                         if (ucTemp & 8)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AD_C = 0;
                  #else
                             LED_AD_C = 1;
@@ -3858,7 +3882,7 @@ void Display_Digits(void)
                         // segment e
                         if (ucTemp & 16)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AE = 0;
                  #else
                             LED_AE = 1;
@@ -3868,7 +3892,7 @@ void Display_Digits(void)
                         // segment f
                         if (ucTemp & 32)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AF = 0;
                  #else
                             LED_AF = 1;
@@ -3878,52 +3902,63 @@ void Display_Digits(void)
                         // segment g
                         if (ucTemp & 64)
                         {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_AG = 0;
                  #else
                             LED_AG = 1;
                  #endif
                         }
 
-             #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                  (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
+             #if APP_DATE_SPECIAL_DOT_USAGE==1
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
-                        LED_DATE_DOT = (g_ucDots) ? 0 : 1;
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                        if (g_ucDots)
+                        {
+                            LED_DATE_DOT = 0;
+                        }
+
                  #else
-                        LED_DATE_DOT = (g_ucDots) ? 1 : 0;
+
+                        if (g_ucDots)
+                        {
+                            LED_DATE_DOT = 1;
+                        }
+
                  #endif
 
              #endif
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                         /* Turn the common anodes on. */
 
                         LED_1M = 1;
+
                  #else
                         /* Turn the common cathode on. */
 
                         LED_1M = 0;
+
                  #endif
 
-                    #if APP_BUZZER_ALARM_USAGE
+                 #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0..7 to outputs. */
 
                         TRISC = 0x00;
 
-                    #else
+                 #else
 
                         /* Set RC0/1/3/4/5..7 to output and RC2(AN11) input. */
 
                         TRISC = 0x04;
 
-                    #endif
+                 #endif
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                         /* Turn the common cathode on. */
 
@@ -3933,7 +3968,7 @@ void Display_Digits(void)
 
                         TRISB = 0x13;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                     }
                     else if (ucPlex == 1)
@@ -3947,8 +3982,7 @@ void Display_Digits(void)
                         else
                         {
 
-                 #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                      (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+                 #if APP_WATCH_ANY_PULSAR_MODEL==1
 
                             if (g_ucRightVal < 10)
                             {
@@ -3988,7 +4022,7 @@ void Display_Digits(void)
 
                         TRISB = 0x53;
 
-                    #if APP_BUZZER_ALARM_USAGE
+                    #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -4004,35 +4038,37 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
-                        
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 0;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
                    #endif
-                   
+
                  #endif
 
-           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+                 #if APP_WATCH_ANY_PULSAR_MODEL==1
                         if (ucTemp)
                         {
-           #endif
+                 #endif
                             // segment a
                             if (ucTemp & 1)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AA_B = 0;
                  #else
                                 LED_AA_B = 1;
@@ -4042,7 +4078,7 @@ void Display_Digits(void)
                             // segment b
                             if (ucTemp & 2)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AB_TD = 0;
                  #else
                                 LED_AB_TD = 1;
@@ -4052,7 +4088,7 @@ void Display_Digits(void)
                             // segment c
                             if (ucTemp & 4)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AC_LD = 0;
                  #else
                                 LED_AC_LD = 1;
@@ -4062,7 +4098,7 @@ void Display_Digits(void)
                             // segment d
                             if (ucTemp & 8)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AD_C = 0;
                  #else
                                 LED_AD_C = 1;
@@ -4072,7 +4108,7 @@ void Display_Digits(void)
                             // segment e
                             if (ucTemp & 16)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AE = 0;
                  #else
                                 LED_AE = 1;
@@ -4082,7 +4118,7 @@ void Display_Digits(void)
                             // segment f
                             if (ucTemp & 32)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AF = 0;
                  #else
                                 LED_AF = 1;
@@ -4092,16 +4128,16 @@ void Display_Digits(void)
                             // segment g
                             if (ucTemp & 64)
                             {
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                                 LED_AG = 0;
                  #else
                                 LED_AG = 1;
                  #endif
                             }
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                             /* Turn the common anode on. */
 
@@ -4117,7 +4153,7 @@ void Display_Digits(void)
 
                             TRISB = 0x43;
 
-             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                             /* Turn the common cathode on. */
 
@@ -4127,12 +4163,11 @@ void Display_Digits(void)
 
                             TRISB = 0x51;
 
-             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
+             #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-           #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-                (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+             #if APP_WATCH_ANY_PULSAR_MODEL==1
                         }
-           #endif
+             #endif
                     }
                 }
                 else // if (g_ucRightVal != 255)
@@ -4144,7 +4179,7 @@ void Display_Digits(void)
 
                     TRISB = 0x53;
 
-                    #if APP_BUZZER_ALARM_USAGE
+                    #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -4160,24 +4195,27 @@ void Display_Digits(void)
 
                     /* Turn all segment outputs off. */
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE)
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                         PORTC |= 0xF0;
                         PORTB |= 0x2C;
 
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 1;
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
                    #endif
-                   
+
                  #else
                         PORTC &= 0;
                         PORTB &= 1;
 
-                   #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO) || \
-                        (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-                        LED_DATE_DOT = 0;
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
                    #endif
-                   
+
                  #endif
                 }
             }
@@ -4252,7 +4290,7 @@ void main(void)
     }
     else
     {
-        /* Cold boot, for example after battery change. */
+        /* Cold boot, for example after a battery change. */
 
         Init_Inputs_Outputs_Ports();
 
@@ -4265,20 +4303,19 @@ void main(void)
 
         /* Turn the 'stay awake' timer off again. */
 
-  #if ((APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO) || \
-       (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO))
+  #if APP_WATCH_ANY_PULSAR_MODEL==1
 
         TMR2 = 0;               // Zero the timer.
         T2CONbits.TMR2ON = 1;   // Turn timer 2 on.
         g_ucTimer2Usage = 1;    // Indicate using the timer.
 
-        /* Set the display state back to blank. */
+        /* Set the display state to time reading. */
 
         g_sDSGPR1.dispState = DISP_STATE_TIME;
 
   #else
 
-        /* Set the display state back to blank. */
+        /* Set the display state to blank. */
 
         g_sDSGPR1.dispState = DISP_STATE_BLANK;
 
@@ -4329,12 +4366,12 @@ void main(void)
     {
         /* Check alarm. */
 
-      #if APP_BUZZER_ALARM_USAGE
+      #if APP_BUZZER_ALARM_USAGE==1
 
         if (PIR3bits.RTCCIF) // PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3
         {
             PIR3bits.RTCCIF = 0;     // Clear RTCC interrupt.
-            
+
             /* Reset the alarm repeat. */
 
             ALRMRPT = 255;
@@ -4344,7 +4381,7 @@ void main(void)
             Turn_Buzzer_On();
         }
 
-      #endif // #if APP_BUZZER_ALARM_USAGE
+      #endif // #if APP_BUZZER_ALARM_USAGE==1
 
         /* Debounce the buttons. */
 
@@ -4359,7 +4396,7 @@ void main(void)
             {
                 TMR2 = 0;
 
-              #if APP_BUZZER_ALARM_USAGE
+              #if APP_BUZZER_ALARM_USAGE==1
 
                 /* Check if the alarm buzzer is still active. */
 
@@ -4388,7 +4425,7 @@ void main(void)
                     urollover = 100;
                 }
 
-              #endif // #if APP_BUZZER_ALARM_USAGE
+              #endif // #if APP_BUZZER_ALARM_USAGE==1
 
                 /* Counter for keeping the display on. */
 
@@ -4434,7 +4471,7 @@ void main(void)
 
         /* Output the display. */
 
-      #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+      #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
         if (!(udivider & 3))
         {
@@ -4450,7 +4487,7 @@ void main(void)
             g_sDSGPR1.dispState = DISP_STATE_BLANK;
         }
 
-      #else // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+      #else // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
         if (ucstayawake)
         {
@@ -4474,7 +4511,7 @@ void main(void)
 
             TRISB = 0x53;
 
-        #if APP_BUZZER_ALARM_USAGE
+        #if APP_BUZZER_ALARM_USAGE==1
 
             /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -4566,13 +4603,13 @@ void main(void)
 
             Lock_RTCC();
 
-      #if APP_BUZZER_ALARM_USAGE
+      #if APP_BUZZER_ALARM_USAGE==1
 
-            /* Turn the alarm buzzer on. */
+            /* Turn the alarm buzzer off. */
 
             Turn_Buzzer_Off();
 
-      #endif // #if APP_BUZZER_ALARM_USAGE
+      #endif // #if APP_BUZZER_ALARM_USAGE==1
 
             /* Clear all interuppts. */
 
@@ -4618,13 +4655,13 @@ void main(void)
 
             PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
 
-          #if APP_BUZZER_ALARM_USAGE
+          #if APP_BUZZER_ALARM_USAGE==1
 
             /* Enable the Alarm interrupt, if the alarm had been enabled. */
 
             PIE3bits.RTCCIE = ALRMCFGbits.ALRMEN ? 1 : 0;
 
-          #endif // #if APP_BUZZER_ALARM_USAGE
+          #endif // #if APP_BUZZER_ALARM_USAGE==1
 
             /* INTERRUPT CONTROL REGISTER */
 
@@ -4664,7 +4701,7 @@ void main(void)
            Configure_Inputs_Outputs();
         }
 
-      #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+      #endif // #else #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
     } // while (1)
 }
