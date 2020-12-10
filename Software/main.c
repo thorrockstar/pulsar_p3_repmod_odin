@@ -13,7 +13,7 @@
  *                      beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        07.12.2020
+ *  Last Change:        10.12.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -313,6 +313,13 @@ const unsigned char *g_pDigits;
 unsigned char g_ucDots = 0;
 
 #endif
+
+/**
+ * In order not to change the display mode while multiplexing
+ * store a copy of the display state, when the multiplexing
+ * cycle had started. */
+
+unsigned char g_uDispState;
 
 /**
  * Alarm counter, cancelled by expiring or pressing a button. */
@@ -2803,13 +2810,8 @@ void Display_Digits(void)
         g_ucDimming--;
     }
     else
-
-  #endif
-
     {
         /* Measure ambient brightness via AN11. */
-
-      #if APP_LIGHT_SENSOR_USAGE==1
 
         if (!ucPlex)
         {
@@ -3035,10 +3037,10 @@ void Display_Digits(void)
         /* Multiplexing disabled? */
 
         if (ucPlex != 255)
-
-      #endif // #if APP_LIGHT_SENSOR_USAGE==1
-
         {
+
+  #endif // #if APP_LIGHT_SENSOR_USAGE==1
+
             unsigned char ucTemp;
 
             /* If starting a new multiplexer cycle,
@@ -3058,6 +3060,8 @@ void Display_Digits(void)
                 /* Check what shall be displayed. */
 
                 const unsigned char ustate = g_sDSGPR1.dispState;
+
+                g_uDispState = ustate;
 
                 switch(ustate)
                 {
@@ -3148,7 +3152,6 @@ void Display_Digits(void)
                     case DISP_STATE_SET_SECONDS:
 
                         RTCCFG &= ~3;
-                        //while(RTCCFGbits.RTCSYNC);
 
                         g_ucLeftVal = 255; // Hidden
                         ucTemp = RTCVALL;
@@ -3175,7 +3178,6 @@ void Display_Digits(void)
 
                         RTCCFGbits.RTCPTR0 = 0;
                         RTCCFGbits.RTCPTR1 = 1;
-                        //while(RTCCFGbits.RTCSYNC);
 
                         /* Day of month */
                         ucTemp = RTCVALL;
@@ -3256,7 +3258,6 @@ void Display_Digits(void)
 
                         RTCCFGbits.RTCPTR0 = 1;
                         RTCCFGbits.RTCPTR1 = 0;
-                        //while(RTCCFGbits.RTCSYNC);
 
                         /* Weekday */
                         ucTemp = RTCVALH;
@@ -3598,14 +3599,14 @@ void Display_Digits(void)
 
                         if (g_ucLeftVal < 10)
                         {
-                            switch(g_sDSGPR1.dispState)
+                            switch(g_uDispState)
                             {
-                                case DISP_STATE_DATE:
-                                case DISP_STATE_SET_MONTH:
-                                case DISP_STATE_SET_DAY:
                                 case DISP_STATE_TIME:
+                                case DISP_STATE_DATE:
                                 case DISP_STATE_SET_HOURS:
                                 case DISP_STATE_SET_MINUTES:
+                                case DISP_STATE_SET_MONTH:
+                                case DISP_STATE_SET_DAY:
                                     ucTemp = 0;
                                     break;
 
@@ -4008,7 +4009,7 @@ void Display_Digits(void)
 
                             if (g_ucRightVal < 10)
                             {
-                                switch(g_sDSGPR1.dispState)
+                                switch(g_uDispState)
                                 {
                                     case DISP_STATE_DATE:
                                     case DISP_STATE_SET_MONTH:
@@ -4248,8 +4249,11 @@ void Display_Digits(void)
             {
                 ucPlex = 0;
             }
+
+  #if APP_LIGHT_SENSOR_USAGE==1
         }
     }
+  #endif // #if APP_LIGHT_SENSOR_USAGE==1
 
     /* Store new multiplexer value. */
 
@@ -4486,7 +4490,7 @@ void main(void)
 
             ucstayawake |= urollover ? 1 : 0;
         }
-        else
+        else // if (g_ucTimer2Usage)
         {
             urollover = 1;
         }
