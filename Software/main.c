@@ -2394,15 +2394,15 @@ void PressPB3(void)
 
     DSGPR1Type *pb = &g_sDSGPR1;
 
-    if (pb->dispState == DISP_STATE_BLANK)
+    unsigned char ust = pb->dispState;
+
+    if (ust == DISP_STATE_BLANK)
     {
         pb->dispState = DISP_STATE_SET_MINUTES;
     }
     else
     {
         /* If the time is pressed, enable to set the MINUTES. */
-
-        unsigned char ust = pb->dispState;
 
         if ((ust == DISP_STATE_TIME) || (ust == DISP_STATE_SET_HOURS))
         {
@@ -2413,7 +2413,7 @@ void PressPB3(void)
           #if APP_WATCH_ANY_PULSAR_MODEL==1
 
             if (((ust == DISP_STATE_DATE) || (ust == DISP_STATE_YEAR) || \
-                 (ust == DISP_STATE_WEEKDAY)))
+                 (ust == DISP_STATE_WEEKDAY) || (ust == DISP_STATE_SET_DAY)))
             {
                 if (g_ucPB1DATEState >= PB_STATE_SHORT_PRESS)
                 {
