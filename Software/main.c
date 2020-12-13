@@ -13,7 +13,7 @@
  *                      beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        10.12.2020
+ *  Last Change:        13.12.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -140,7 +140,7 @@ const unsigned char g_numerical_7segment[16] =
  * 7-segment weekday encoding table
  */
 
-const unsigned char g_weekday_7segment[14] =
+const unsigned char g_weekday_7segment[16] =
 {
     //        a b c d e f g
     MAKE_7SEG(1,0,1,1,0,1,1),   // S
@@ -163,6 +163,9 @@ const unsigned char g_weekday_7segment[14] =
     \
     MAKE_7SEG(1,0,1,1,0,1,1),   // S
     MAKE_7SEG(1,1,1,0,1,1,1),   // A
+    \
+    MAKE_7SEG(0,0,0,0,0,0,1),   // -
+    MAKE_7SEG(0,0,0,0,0,0,1),   // -
 };
 
 /**
@@ -388,29 +391,6 @@ inline void Init_Inputs_Outputs_Ports(void)
     /* Turn off SSDMA */
 
     DMACON1 = 0;
-
-    /* Configure the output as PWM output channel A. */
-
-#if APP_BUZZER_ALARM_USAGE==1
-
-    /* Write Magic */
-
-    EECON2 = 0x55;
-    EECON2 = 0xAA;
-
-    /* Set write enable bit for the I/O mapping. */
-
-    IOLOCK = 1;
-
-    /* Map RP13 to CCP1/P1A - PWM Channel A */
-
-    RPOR13 = 14;
-
-    /* Clear write enable bit for the I/O mapping. */
-
-    IOLOCK = 0;
-
-#endif
 }
 
 /**
@@ -498,7 +478,7 @@ inline void Configure_Inputs_Outputs(void)
      * 0 = Pin configured as an analog channel - digital input disabled
      * and reads zero */
 
-    ANCON1 = 0x1F;          // AN8..12 Activate AN11 as being an analogue input.
+    ANCON1 = 0x1F;          // AN8..12
 
     /* ADCON0 */
 
@@ -509,6 +489,29 @@ inline void Configure_Inputs_Outputs(void)
     /* Set RA0/1/2/5 to input, RA3/4/6/7 as output. */
 
     TRISA = 0x27;
+
+    /* Configure the output as PWM output channel A. */
+
+#if APP_BUZZER_ALARM_USAGE==1
+
+    /* Write Magic */
+
+    EECON2 = 0x55;
+    EECON2 = 0xAA;
+
+    /* Set write enable bit for the I/O mapping. */
+
+    IOLOCK = 0;
+
+    /* Map RP13 to CCP1/P1A - PWM Channel A */
+
+    RPOR13 = 14;
+
+    /* Clear write enable bit for the I/O mapping. */
+
+    IOLOCK = 1;
+
+#endif
 }
 
 /**
@@ -620,6 +623,20 @@ inline void Configure_Real_Time_Clock(void)
 
         RTCVALL = 0; // Seconds
         RTCVALH = 0; // Minutes
+        
+        /* Initialize alarm registers. */
+
+        ALRMCFGbits.ALRMPTR0 = 0;
+        ALRMCFGbits.ALRMPTR1 = 1;
+
+        ALRMVALL = 1; // Day
+        ALRMVALH = 1; // Month
+
+        ALRMVALL = 0; // Hour
+        ALRMVALH = 1; // Weekday
+
+        ALRMVALL = 0; // Seconds
+        ALRMVALH = 0; // Minutes
     }
 
     while(RTCCFGbits.RTCSYNC);
@@ -637,10 +654,7 @@ inline void Configure_Real_Time_Clock(void)
 
     /* Configure an optional alarm every second. */
 
-    ALRMCFGbits.AMASK0 = 1;
-    ALRMCFGbits.AMASK1 = 0;
-    ALRMCFGbits.AMASK2 = 0;
-    ALRMCFGbits.AMASK3 = 0;
+    ALRMCFGbits.AMASK = 0x06; // Alarm repeats every day.
 
     /* Disable the alarm for now. */
 
@@ -870,7 +884,7 @@ inline void enterSleep(void)
      * and DSGPR1 registers. */
 
     DSGPR0 = g_sDSGPR0.ucRaw;  // This register to stores the button states.
-    DSGPR1 = g_sDSGPR1.ucRaw;  // This register to stores the display states.
+    DSGPR1 = g_sDSGPR1;        // This register to stores the display states.
 
     /* Wake up on a rising edge of the DATE button. */
 
@@ -901,6 +915,18 @@ inline void enterSleep(void)
 
     INTCON3bits.INT3IF = 0;  // Clear INT3 Flag
     INTCON3bits.INT3IE = 1;  // Enable INT3
+
+#if APP_BUZZER_ALARM_USAGE==1
+
+    /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
+
+    PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
+
+    /* Enable the Alarm interrupt, if the alarm had been enabled. */
+
+    PIE3bits.RTCCIE = ALRMCFGbits.ALRMEN ? 1 : 0;
+
+#endif // #if APP_BUZZER_ALARM_USAGE==1
 
     /* INTERRUPT CONTROL REGISTER */
 
@@ -936,6 +962,13 @@ void Turn_Buzzer_On(void)
     /* Alarm counter used to keep the buzzer on. */
 
     g_ucAlarm = 6000;
+
+    /* Set the display state to time reading. */
+
+    if (g_sDSGPR1 == DISP_STATE_BLANK)
+    {
+        g_sDSGPR1 = DISP_STATE_TIME;
+    }
 
     /* Turn the 'stay awake' timer on, if activating the buzzer. */
 
@@ -1702,13 +1735,15 @@ void PressPB0(void)
 
   #endif
 
+    int istate = g_sDSGPR1;
+
     /* When having set the time, the RTC will be disabled until
      * you press the very first time the 'TIME' button.
      * This will make the watch start counting time at zero seconds. */
 
-    if (g_sDSGPR1.stallState)
+    if (istate == DISP_STATE_SECONDS_STALLED)
     {
-        g_sDSGPR1.stallState = 0;
+        g_sDSGPR1 = DISP_STATE_TIME;
 
         /* Unlock via magic. */
 
@@ -1729,11 +1764,9 @@ void PressPB0(void)
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
-    const int istate = g_sDSGPR1.dispState;
-
     if (istate == DISP_STATE_BLANK)
     {
-        g_sDSGPR1.dispState = DISP_STATE_TIME;
+        g_sDSGPR1 = DISP_STATE_TIME;
     }
     else
     {
@@ -1746,11 +1779,11 @@ void PressPB0(void)
 
         if ((istate == DISP_STATE_DATE) || (istate == DISP_STATE_SET_MONTH))
         {
-            g_sDSGPR1.dispState = DISP_STATE_SET_DAY;
+            g_sDSGPR1 = DISP_STATE_SET_DAY;
         }
         else if (istate == DISP_STATE_SET_WEEKDAY)
         {
-            g_sDSGPR1.dispState = DISP_STATE_SET_YEAR;
+            g_sDSGPR1 = DISP_STATE_SET_YEAR                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ;
         }
 
       #endif
@@ -1771,9 +1804,9 @@ void HoldPB0(void)
     if ((g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
-        if (g_sDSGPR1.dispState == DISP_STATE_TIME)
+        if (g_sDSGPR1 == DISP_STATE_TIME)
         {
-            g_sDSGPR1.dispState = DISP_STATE_SECONDS;
+            g_sDSGPR1 = DISP_STATE_SECONDS;
         }
     }
 }
@@ -1786,15 +1819,15 @@ void ReleasePB0(void)
 {
   #if APP_WATCH_ANY_PULSAR_MODEL==1
 
-    const int istate = g_sDSGPR1.dispState;
+    const int istate = g_sDSGPR1;
 
     if (istate == DISP_STATE_SET_DAY)
     {
-        g_sDSGPR1.dispState = DISP_STATE_SET_MONTH;
+        g_sDSGPR1 = DISP_STATE_SET_MONTH;
     }
     else if (istate == DISP_STATE_SET_YEAR)
     {
-        g_sDSGPR1.dispState = DISP_STATE_SET_WEEKDAY;
+        g_sDSGPR1 = DISP_STATE_SET_WEEKDAY;
     }
     else if (istate == DISP_STATE_SECONDS)
     {
@@ -1831,30 +1864,30 @@ void PressPB1(void)
 
     DSGPR1Type *pb = &g_sDSGPR1;
 
-    if (pb->dispState == DISP_STATE_BLANK)
+    if (*pb == DISP_STATE_BLANK)
     {
-        pb->dispState = DISP_STATE_DATE;
+        *pb = DISP_STATE_DATE;
     }
 
   #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
-    else if (pb->dispState == DISP_STATE_TIME)
+    else if (*pb == DISP_STATE_TIME)
     {
-        pb->dispState = DISP_STATE_DATE;
+        *pb = DISP_STATE_DATE;
     }
 
   #else
 
    #if APP_BUZZER_ALARM_USAGE==1
 
-    else if ((pb->dispState == DISP_STATE_TIME) || \
-             (pb->dispState == DISP_STATE_SECONDS))
+    else if ((*pb == DISP_STATE_TIME) || \
+             (*pb == DISP_STATE_SECONDS))
     {
         /* Show Alarm Time */
 
-        pb->dispState = DISP_STATE_ALARM;
+        *pb = DISP_STATE_ALARM;
     }
-    else if (pb->dispState == DISP_STATE_TOGGLE_ALARM)
+    else if (*pb == DISP_STATE_TOGGLE_ALARM)
     {
         if (((g_ucPB0TIMEState == PB_STATE_SHORT_PRESS) || \
              (g_ucPB0TIMEState == PB_STATE_LONG_PRESS)) \
@@ -1881,7 +1914,8 @@ void PressPB1(void)
             ALRMCFGbits.AMASK = 0x06; // Alarm repeats every day.
 
             int ival = ALRMCFGbits.ALRMEN ? 0 : 1;
-            ALRMCFGbits.ALRMEN = ival ? 1 : 0;  // Alarm enable
+
+            ALRMCFGbits.CHIME = ival ? 1 : 0;  // Chime enable;
 
             /* Set Alarm repeat */
 
@@ -1894,6 +1928,10 @@ void PressPB1(void)
             /* PERIPHERAL INTERRUPT REQUEST (FLAG) REGISTER 3 */
 
             PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
+
+            /* Enable/diable alarm */
+            
+            ALRMCFGbits.ALRMEN = ival ? 1 : 0;  // Alarm enable
 
             /* Enable the RTC operation again.*/
 
@@ -1926,22 +1964,22 @@ void HoldPB1(void)
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
         DSGPR1Type *pb = &g_sDSGPR1;
-        const unsigned char ust = pb->dispState;
+        const unsigned char ust = *pb;
 
         if (ust == DISP_STATE_DATE)
         {
-            pb->dispState = DISP_STATE_WEEKDAY;
+            *pb = DISP_STATE_WEEKDAY;
         }
         else if (ust == DISP_STATE_WEEKDAY)
         {
-            pb->dispState = DISP_STATE_YEAR;
+            *pb = DISP_STATE_YEAR;
         }
 
   #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
         else if (ust == DISP_STATE_YEAR)
         {
-            pb->dispState = DISP_STATE_LIGHT_SENSOR;
+            *pb = DISP_STATE_LIGHT_SENSOR;
         }
 
   #endif
@@ -1958,7 +1996,7 @@ void ReleasePB1(void)
 
     DSGPR1Type *pb = &g_sDSGPR1;
 
-    if (pb->dispState == DISP_STATE_ALARM)
+    if (*pb == DISP_STATE_ALARM)
     {
         if (((g_ucPB0TIMEState == PB_STATE_SHORT_PRESS) || \
              (g_ucPB0TIMEState == PB_STATE_LONG_PRESS)) \
@@ -1968,7 +2006,7 @@ void ReleasePB1(void)
             (g_ucPB2HOURState == PB_STATE_IDLE) && \
             (g_ucPB3MINTState == PB_STATE_IDLE))
         {
-            pb->dispState = DISP_STATE_TOGGLE_ALARM;
+            *pb = DISP_STATE_TOGGLE_ALARM;
         }
     }
 
@@ -1996,16 +2034,16 @@ void PressPB2(void)
 
     DSGPR1Type *pb = &g_sDSGPR1;
 
-    if (pb->dispState == DISP_STATE_BLANK)
+    if (*pb == DISP_STATE_BLANK)
     {
-        pb->dispState = DISP_STATE_SET_HOURS;
+        *pb = DISP_STATE_SET_HOURS;
     }
     else
     {
         /* If the display is in DATE mode and the DATE button is pressed,
          * enter setting the month mode. */
 
-        const unsigned char ust = pb->dispState;
+        const unsigned char ust = *pb;
 
         if (((ust == DISP_STATE_DATE) || \
              (ust == DISP_STATE_SET_DAY) || \
@@ -2020,17 +2058,17 @@ void PressPB2(void)
             {
                 if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
                 {
-                    pb->dispState = DISP_STATE_SET_DAY;
+                    *pb = DISP_STATE_SET_DAY;
                 }
                 else
                 {
-                    pb->dispState = DISP_STATE_SET_MONTH;
+                    *pb = DISP_STATE_SET_MONTH;
                 }
             }
 
           #else
 
-            pb->dispState = DISP_STATE_SET_MONTH;
+            *pb = DISP_STATE_SET_MONTH;
 
           #endif
         }
@@ -2041,7 +2079,7 @@ void PressPB2(void)
             if ((ust == DISP_STATE_TIME) || (ust == DISP_STATE_SET_MINUTES) || \
                 (ust == DISP_STATE_SET_SECONDS))
             {
-                pb->dispState = DISP_STATE_SET_HOURS;
+                *pb = DISP_STATE_SET_HOURS;
             }
 
           #if APP_WATCH_ANY_PULSAR_MODEL==1
@@ -2052,7 +2090,7 @@ void PressPB2(void)
 
                 if (ust == DISP_STATE_YEAR)
                 {
-                    pb->dispState = DISP_STATE_SET_YEAR;
+                    *pb = DISP_STATE_SET_YEAR;
                 }
             }
 
@@ -2077,7 +2115,7 @@ void HoldPB2(void)
 
     /* Check if setting hours, minutes, month or day. */
 
-    const unsigned char ustate = g_sDSGPR1.dispState;
+    const unsigned char ustate = g_sDSGPR1;
 
     if (ustate == DISP_STATE_SET_HOURS)
     {
@@ -2342,6 +2380,15 @@ void HoldPB2(void)
         ucTemp = g_decimal_bcd[ucValue];
         ALRMVALL = ucTemp;
 
+        /* Ensure the other register being valid. */
+
+        ALRMCFGbits.ALRMPTR0 = 0;
+        ALRMCFGbits.ALRMPTR1 = 1;
+
+        ALRMVALL = 1; // Day
+        ALRMVALH = 1; // Month
+        ALRMVALH = 1; // Weekday
+
         /* Enable the RTC operation again.*/
 
         RTCCFGbits.RTCEN = 1;
@@ -2393,12 +2440,11 @@ void PressPB3(void)
     /* Revoke the 'blanked' state in order to turn the display on. */
 
     DSGPR1Type *pb = &g_sDSGPR1;
-
-    unsigned char ust = pb->dispState;
+    unsigned char ust = *pb;
 
     if (ust == DISP_STATE_BLANK)
     {
-        pb->dispState = DISP_STATE_SET_MINUTES;
+        *pb = DISP_STATE_SET_MINUTES;
     }
     else
     {
@@ -2406,7 +2452,7 @@ void PressPB3(void)
 
         if ((ust == DISP_STATE_TIME) || (ust == DISP_STATE_SET_HOURS))
         {
-            pb->dispState = DISP_STATE_SET_MINUTES;
+            *pb = DISP_STATE_SET_MINUTES;
         }
         else
         {
@@ -2419,11 +2465,11 @@ void PressPB3(void)
                 {
                     if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
                     {
-                        pb->dispState = DISP_STATE_SET_YEAR;
+                        *pb = DISP_STATE_SET_YEAR;
                     }
                     else
                     {
-                        pb->dispState = DISP_STATE_SET_WEEKDAY;
+                        *pb = DISP_STATE_SET_WEEKDAY;
                     }
                 }
             }
@@ -2432,19 +2478,19 @@ void PressPB3(void)
 
             if ((ust == DISP_STATE_DATE) || (ust == DISP_STATE_SET_MONTH))
             {
-                g_sDSGPR1.dispState = DISP_STATE_SET_DAY;
+                g_sDSGPR1 = DISP_STATE_SET_DAY;
             }
             else if (ust == DISP_STATE_YEAR)
             {
-                g_sDSGPR1.dispState = DISP_STATE_SET_YEAR;
+                g_sDSGPR1 = DISP_STATE_SET_YEAR;
             }
             else if (ust == DISP_STATE_WEEKDAY)
             {
-                g_sDSGPR1.dispState = DISP_STATE_SET_WEEKDAY;
+                g_sDSGPR1 = DISP_STATE_SET_WEEKDAY;
             }
             else if (ust == DISP_STATE_SECONDS)
             {
-                g_sDSGPR1.dispState = DISP_STATE_SET_SECONDS;
+                g_sDSGPR1 = DISP_STATE_SET_SECONDS;
             }
 
           #endif
@@ -2466,7 +2512,7 @@ void HoldPB3(void)
     unsigned char ucValue;
     unsigned char ucExtra;
 
-    const unsigned char ust = g_sDSGPR1.dispState;
+    const unsigned char ust = g_sDSGPR1;
 
     if (ust == DISP_STATE_SET_MINUTES)
     {
@@ -2511,14 +2557,7 @@ void HoldPB3(void)
 
         RTCVALL = 0; // Zero the second when forwarding the minute.
 
-  #if APP_WATCH_ANY_PULSAR_MODEL==1
-
-        /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
-         * until the time readout button has been pressed the first time. */
-
-        g_sDSGPR1.stallState = 1;
-
-  #else
+  #if APP_WATCH_ANY_PULSAR_MODEL==0
 
         /* Enable the RTC operation again.*/
 
@@ -2655,6 +2694,19 @@ void HoldPB3(void)
         ucTemp = g_decimal_bcd[ucValue];
         ALRMVALH = ucTemp;
 
+        /* Set Alarm seconds to zero. */
+        
+        ALRMVALL = 0;
+
+        /* Ensure the other register being valid. */
+
+        ALRMCFGbits.ALRMPTR0 = 0;
+        ALRMCFGbits.ALRMPTR1 = 1;
+
+        ALRMVALL = 1; // Day
+        ALRMVALH = 1; // Month
+        ALRMVALH = 1; // Weekday
+
         /* Enable the RTC operation again.*/
 
         RTCCFGbits.RTCEN = 1;
@@ -2777,13 +2829,25 @@ void ReleasePB3(void)
 {
   #if APP_WATCH_ANY_PULSAR_MODEL==1
 
-    /* Turn timer 2 off. */
+    /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
+     * until the time readout button has been pressed the first time. */
 
-    T2CONbits.TMR2ON = 0;
+    const unsigned char ustate = g_sDSGPR1;
 
-    /* Timer usage */
+    if (ustate == DISP_STATE_SET_MINUTES)
+    {
+        g_sDSGPR1 = DISP_STATE_SECONDS_STALLED;
+    }
+    else
+    {
+        /* Turn timer 2 off. */
 
-    g_ucTimer2Usage = 0;
+        T2CONbits.TMR2ON = 0;
+
+        /* Timer usage */
+
+        g_ucTimer2Usage = 0;
+    }
 
   #endif
 }
@@ -3059,12 +3123,16 @@ void Display_Digits(void)
 
                 /* Check what shall be displayed. */
 
-                const unsigned char ustate = g_sDSGPR1.dispState;
+                const unsigned char ustate = g_sDSGPR1;
 
                 g_uDispState = ustate;
 
                 switch(ustate)
                 {
+                    case DISP_STATE_SECONDS_STALLED:
+                        g_ucRightVal = 7;
+                    break;
+
                     /* If being the table watch, show the
                      * time instead of blanking the watch. */
 
@@ -3268,7 +3336,6 @@ void Display_Digits(void)
                         }
 
                         // We do not use the left two digits.
-                        g_ucLeftVal = 255;
                         g_ucRightVal = ucTemp;
                     break;
 
@@ -3323,7 +3390,8 @@ void Display_Digits(void)
                 /* Depending on what to show, select the right digit table. */
 
                 g_pDigits = ((ustate == DISP_STATE_WEEKDAY) || \
-                             (ustate == DISP_STATE_SET_WEEKDAY)) ? \
+                             (ustate == DISP_STATE_SET_WEEKDAY) || \
+                             (ustate == DISP_STATE_SECONDS_STALLED)) ? \
                                        \
                                        g_weekday_7segment : \
                                        g_numerical_7segment;
@@ -3609,6 +3677,13 @@ void Display_Digits(void)
                                 case DISP_STATE_SET_DAY:
                                     ucTemp = 0;
                                     break;
+
+                        #if APP_BUZZER_ALARM_USAGE==1
+                                case DISP_STATE_ALARM:
+                                case DISP_STATE_TOGGLE_ALARM:
+                                    ucTemp = 0;
+                                    break;
+                        #endif
 
                                 default:
                                     ucTemp = *pb; // '0'
@@ -4303,7 +4378,7 @@ void main(void)
          * display) from them. */
 
         g_sDSGPR0.ucRaw = DSGPR0;
-        g_sDSGPR1.ucRaw = DSGPR1;
+        g_sDSGPR1       = DSGPR1;
 
         /* Copy the button states. */
 
@@ -4337,13 +4412,13 @@ void main(void)
 
         /* Set the display state to time reading. */
 
-        g_sDSGPR1.dispState = DISP_STATE_TIME;
+        g_sDSGPR1 = DISP_STATE_TIME;
 
   #else
 
         /* Set the display state to blank. */
 
-        g_sDSGPR1.dispState = DISP_STATE_BLANK;
+        g_sDSGPR1 = DISP_STATE_BLANK;
 
   #endif
 
@@ -4351,7 +4426,7 @@ void main(void)
          * registers, that will survive deep sleep. */
 
         DSGPR0 = g_sDSGPR0.ucRaw;
-        DSGPR1 = g_sDSGPR1.ucRaw;
+        DSGPR1 = g_sDSGPR1;
     }
 
     /* Enable global interrupts. */
@@ -4459,10 +4534,16 @@ void main(void)
                 {
                     /* Check if all button states are idle. */
 
-                    if ((!g_ucPB0TIMEState) && \
+                    if ( /* No button pressed. */
+
+                        (!g_ucPB0TIMEState) && \
                         (!g_ucPB1DATEState) && \
                         (!g_ucPB2HOURState) && \
-                        (!g_ucPB3MINTState))
+                        (!g_ucPB3MINTState) && \
+
+                        /* Display not in 'watch stalled' mode. */
+                            
+                        (g_sDSGPR1 != DISP_STATE_SECONDS_STALLED))
                     {
                         /* If no button is still pressed, turn the 'awake'
                          * timer off. */
@@ -4510,7 +4591,7 @@ void main(void)
         {
             /* Set blank mode. */
 
-            g_sDSGPR1.dispState = DISP_STATE_BLANK;
+            g_sDSGPR1 = DISP_STATE_BLANK;
         }
 
       #else // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
@@ -4560,24 +4641,19 @@ void main(void)
             /* Ensure the RTC to operate, if not being in 'stalled' state,
              * after having set the minutes. */
 
-            if (!g_sDSGPR1.stallState)
-            {
-                /* Unlock write operations to the RTC. */
+            Unlock_RTCC();
 
-                Unlock_RTCC();
+            /* Set write enable bit. */
 
-                /* Set write enable bit. */
+            RTCCFGbits.RTCWREN = 1; // RTCC Value Registers Write Enable bit
 
-                RTCCFGbits.RTCWREN = 1; // RTCC Value Registers Write Enable bit
+            /* Enable setting pointers to read MIN and SEC. */
 
-                /* Enable setting pointers to read MIN and SEC. */
-
-                RTCCFGbits.RTCEN = 1;   // RTCC module is enabled
-            }
+            RTCCFGbits.RTCEN = 1;   // RTCC module is enabled
 
             /* Set blank mode. */
 
-            g_sDSGPR1.dispState = DISP_STATE_BLANK;
+            g_sDSGPR1 = DISP_STATE_BLANK;
 
             /* Reset the button states */
 
@@ -4681,13 +4757,13 @@ void main(void)
 
             PIR3bits.RTCCIF = 0;    // No RTCC interrupt occurred.
 
-          #if APP_BUZZER_ALARM_USAGE==1
+      #if APP_BUZZER_ALARM_USAGE==1
 
             /* Enable the Alarm interrupt, if the alarm had been enabled. */
 
             PIE3bits.RTCCIE = ALRMCFGbits.ALRMEN ? 1 : 0;
 
-          #endif // #if APP_BUZZER_ALARM_USAGE==1
+      #endif // #if APP_BUZZER_ALARM_USAGE==1
 
             /* INTERRUPT CONTROL REGISTER */
 
@@ -4719,7 +4795,7 @@ void main(void)
             * registers, that will survive deep sleep. */
 
            g_sDSGPR0.ucRaw = DSGPR0;
-           g_sDSGPR1.ucRaw = DSGPR1;
+           g_sDSGPR1       = DSGPR1;
 
            /* Configure I/O. */
 

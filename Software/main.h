@@ -306,8 +306,8 @@ typedef void(*ButtonHandlerType)(void);
 #define T0_REPEAT_QUICK 0x2000
 
 /**
- * Type definitions for mapping out bits of deep sleep persistent
- * memory byte 0. */
+ * Type definitions for mapping out bits of
+ * deep sleep persistent memory byte 0 and 1. */
 
 typedef union t_DSGPR0Type
 {
@@ -322,20 +322,7 @@ typedef union t_DSGPR0Type
     
 } DSGPR0Type;
 
-/**
- * Type definitions for mapping out bits of deep sleep persistent
- * memory byte 1. */
-
-typedef union t_DSGPR1Type
-{
-    struct
-    {
-        unsigned char dispState  : 4;
-        unsigned char stallState : 1;
-    };
-    unsigned char ucRaw;
-    
-} DSGPR1Type;
+typedef unsigned char DSGPR1Type;
 
 /**
  * Button states */
@@ -373,8 +360,10 @@ typedef enum DisplayStateEnum
     DISP_STATE_SET_SECONDS = 13,
     // Alarm on/off
     DISP_STATE_TOGGLE_ALARM = 14,
+    // Wait for starting the seconds again.
+    DISP_STATE_SECONDS_STALLED = 15,
     // Debug
-    DISP_STATE_LIGHT_SENSOR = 15
+    DISP_STATE_LIGHT_SENSOR = 16
 
 } DisplayStateEnum;
 
