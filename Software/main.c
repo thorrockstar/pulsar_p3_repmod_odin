@@ -8,12 +8,12 @@
  *  Project:            Pulsar Replacement module 'Odin' & 'Loki'.
  *                      The 'Odin' module is featuring the original
  *                      Litronix made dotty display, while the 'Loki'
- *                      module is featuring an USSR made L104G display
- *                      in the case the original display is corroded
- *                      beyond repair.
+ *                      module is featuring an USSR made L104G display.
+ *                      The 'Loki' module is used in the case the
+ *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        13.12.2020
+ *  Last Change:        15.12.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -52,31 +52,36 @@
  *
  * Reed switches:
  * RA5 - Time readout button on the right side of the watch.
+ * RA1 - Date readout button on the right side of the watch.
  * RB0 - Hour set button
  * RA0 - Minute set button
- * RA1 - Date readout button on the right side of the watch.
  *
  * Segments:
- * For Odin mods it will be anodes and for Loki mods it will be cathodes.
- * RC4 'A' regulary but 'B' for the 10x digit of the hours.
- * RC5 'B' regulary but 'top dot' in the middle of the display.
- * RC6 'C' regulary but 'lower dot' in the middle of the display.
+ * There is a macro in the header file, that let you select these outputs
+ * to be anodes or cathodes signals.
+ * RC4 'A' (but 'B' for the left most 10h digit of the Litronix display)
+ * RC5 'B' (but 'top dot' in the middle of the Litronix display)
+ * RC6 'C' (but 'lower dot' in the middle of the Litronix display)
  * RC7 'E'
  * RB2 'G'
- * RB3 'D' regulary but 'C' for the 10x digit of the hours.
+ * RB3 'D' (but 'C' for the left most 10h digit of the Litronix display)
  * RB5 'F'
  *
  * Common:
- * For Odin mods it will be cathodes and for Loki mods it will be anodes.
+ * There is a macro in the header file, that let you select these outputs
+ * to be anodes or cathodes signals.
  * RC3 for '1' minute
  * RB4 for '10' minute and dots
  * RB1 for '1' hour
  * RB6 for '10' hour
  *
- * Light sensor
+ * Light sensor option
  * RA6 provides power to the light sensor, when measuring
- * RC2 used as AN11 analogue input
+ * RC2 used as AN11 analogue input to measure the light indirectly
  *
+ * Optional buzzer option (mutual exlude with the light sensor option)
+ * RC2 used as PWM to drive the piezo.
+ * 
  * RC0 RTCC Xtal OSO
  * RC1 RTCC Xtal OSI
  */
@@ -90,7 +95,7 @@
 #include "main.h"
 
 /**
- * 24 hour to 12 hour system conversion.
+ * 24 hour to 12 hour system conversion for the original Litronix display.
  */
 
 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
@@ -101,7 +106,7 @@ const unsigned char g_24_to_12_hours[] = { /* AM */12, 1, 2, 3, 4, 5, 6, \
                                                     7, 8, 9, 10, 11 };
 
 /**
- * 24 hour to AM/PM hour system conversion.
+ * 24 hour to AM/PM dot system conversion for the original Litronix display.
  */
 
 const unsigned char g_24_to_AMPM[] = { /* AM */ 1, 1, 1, 1, 1, 1, 1, \
@@ -215,7 +220,7 @@ const unsigned char g_decimal_bcd[100] =
 };
 
 /**
- * Modulo 10 table for hours, minutes, seconds.
+ * Modulo 10 table for the 1x digits
  */
 
 const unsigned char g_mod10[100] =
@@ -233,7 +238,7 @@ const unsigned char g_mod10[100] =
 };
 
 /**
- * Div 10 table for hours, minutes, seconds.
+ * Div 10 table for the 10x digits
  */
 
 const unsigned char g_div10[100] =
@@ -303,6 +308,12 @@ unsigned char g_ucLeftVal = 255;
 unsigned char g_ucRightVal = 255;
 
 /**
+ * Alarm piezo base period value. */
+
+const unsigned char g_ualarm_period = 20 + 64;
+const unsigned char g_ualarm_duty_cycle = 10 + 32;
+
+/**
  * Table to the 7-segment digits, can be set to numerical or character table. */
 
 const unsigned char *g_pDigits;
@@ -334,7 +345,7 @@ unsigned short g_ucAlarm;
 #endif
 
 /**
- * Global (deep) sleep variables, that are stored
+ * Global sleep variables, that are stored
  * in two multi purpose registers, that are
  * non-volatile over (deep) sleep. */
 
@@ -462,7 +473,7 @@ inline void Configure_Inputs_Outputs(void)
     ADCON0bits.CHS = 11;    // Select ADC channel -> AD11
     ADCON0bits.ADON = 1;    // Turn on ADC
 
-#else
+#else // Light sensor not used. Anyway free the analogue inputs for digital use.
 
     /* ANCON0 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
@@ -815,7 +826,7 @@ inline void Configure_Timer_3(void)
 
 /**
  * Configure the timer 4.
- * This timer is not used yet. */
+ * This timer is used for the buzzer, driven via PWM. */
 
 inline void Configure_Timer_4(void)
 {
@@ -986,7 +997,7 @@ void Turn_Buzzer_On(void)
      * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
      * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
 
-    PR4bits.PR4 = 91; // We are using timer 4 for the PWM!
+    PR4bits.PR4 = g_ualarm_period; // We are using timer 4 for the PWM!
 
     /* Set duty cycle.
      * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
@@ -995,7 +1006,7 @@ void Turn_Buzzer_On(void)
      * and turning that around to DC = (1/1700/2)/16/0,0000001 */
 
     CCP1CONbits.DC1B = 0;    // Lower 2 bit
-    CCPR1Lbits.CCPR1L = 46;  // Upper 8 Bit
+    CCPR1Lbits.CCPR1L = g_ualarm_duty_cycle;  // Upper 8 Bit
 
     /* Turn timer 4 as PWM source. */
 
@@ -1041,89 +1052,28 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
 
     T4CONbits.TMR4ON = 0;
 
-    switch(ufancy)
-    {
-        case 0:
-        break;
+    /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+     * Having a timer 4 pre-scaler of 16 and using this equation
+     * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
+     * that around to PR4 = ((1/1000)/4/16/0,0000001)-1 */
 
-        case 1:
-            /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-             * Having a timer 4 pre-scaler of 16 and using this equation
-             * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
-             * that around to PR4 = ((1/1000)/4/16/0,0000001)-1 */
+    PR4bits.PR4 = (unsigned char) (g_ualarm_period - (ufancy << 3)); // We are using timer 4 for the PWM!
 
-            PR4bits.PR4 = 156; // We are using timer 4 for the PWM!
+    /* Set duty cycle.
+     * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+     * Having a timer 4 pre-scaler of 16 and using this equation
+     * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
+     * and turning that around to DC = (1/1000/2)/16/0,0000001 */
 
-            /* Set duty cycle.
-             * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-             * Having a timer 4 pre-scaler of 16 and using this equation
-             * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
-             * and turning that around to DC = (1/1000/2)/16/0,0000001 */
+    CCPR1Lbits.CCPR1L = (unsigned char) (g_ualarm_duty_cycle - (ufancy << 2));  // Upper 8 Bit
 
-            CCPR1Lbits.CCPR1L = 78;  // Upper 8 Bit
+    /* Turn timer 4 as PWM source. */
 
-            /* Turn timer 4 as PWM source. */
+    T4CONbits.TMR4ON = 1;
 
-            T4CONbits.TMR4ON = 1;
+    /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
 
-            /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
-
-            CCP1CONbits.CCP1M = 0xC;
-        break;
-
-        case 2:
-            /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-             * Having a timer 4 pre-scaler of 16 and using this equation
-             * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
-             * that around to PR4 = ((1/1300)/4/16/0,0000001)-1 */
-
-            PR4bits.PR4 = 120; // We are using timer 4 for the PWM!
-
-            /* Set duty cycle.
-             * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-             * Having a timer 4 pre-scaler of 16 and using this equation
-             * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
-             * and turning that around to DC = (1/1300/2)/16/0,0000001 */
-
-            CCPR1Lbits.CCPR1L = 60;  // Upper 8 Bit
-
-            /* Turn timer 4 as PWM source. */
-
-            T4CONbits.TMR4ON = 1;
-
-            /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
-
-            CCP1CONbits.CCP1M = 0xC;
-        break;
-
-        case 3:
-            /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-             * Having a timer 4 pre-scaler of 16 and using this equation
-             * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
-             * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
-
-            PR4bits.PR4 = 91; // We are using timer 4 for the PWM!
-
-            /* Set duty cycle.
-             * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-             * Having a timer 4 pre-scaler of 16 and using this equation
-             * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
-             * and turning that around to DC = (1/1700/2)/16/0,0000001 */
-
-            CCPR1Lbits.CCPR1L = 46;  // Upper 8 Bit
-
-            /* Turn timer 4 as PWM source. */
-
-            T4CONbits.TMR4ON = 1;
-
-            /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
-
-            CCP1CONbits.CCP1M = 0xC;
-        break;
-
-        default:
-        break;
-    }
+    CCP1CONbits.CCP1M = 0xC;
 }
 
 #endif
@@ -2040,7 +1990,7 @@ void PressPB2(void)
     }
     else
     {
-        /* If the display is in DATE mode and the DATE button is pressed,
+        /* If the display is in DATE mode and the HOUR button is pressed,
          * enter setting the month mode. */
 
         const unsigned char ust = *pb;
@@ -2510,7 +2460,6 @@ void HoldPB3(void)
 {
     unsigned char ucTemp;
     unsigned char ucValue;
-    unsigned char ucExtra;
 
     const unsigned char ust = g_sDSGPR1;
 
@@ -2744,7 +2693,7 @@ void HoldPB3(void)
         ucValue = 1 + g_bcd_decimal[ucTemp];
 
         ucTemp = RTCVALH; // month
-        ucExtra = g_bcd_decimal[ucTemp];
+        unsigned char ucExtra = g_bcd_decimal[ucTemp];
 
         if (ucExtra == 2) // February, always assume it to be a leap year.
         {
@@ -4517,7 +4466,7 @@ void main(void)
                     }
                     else
                     {
-                        Turn_Buzzer_Fancy((ualarm >> 5) & 0x03);
+                        Turn_Buzzer_Fancy((ualarm >> 6) & 0x07);
                     }
 
                     /* If there is still the alarm buzzer activated,

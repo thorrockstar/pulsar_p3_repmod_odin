@@ -1,12 +1,17 @@
-Open Source Pulsar P3 Replacement Module 'Odin'
-===============================================
+Open Source Pulsar P3 Replacement Module 'Odin' & 'Loki'
+========================================================
 
-This project bundles my source code, binary, schematics and PCB layout files for my own Open Source Pulsar P3 LED watch replacement module. I do **not** sell those modules or any component and I do **not** do any repairs. This project is purely for the enthusiast, that want to fix a Pulsar LED watch himself or herself, that is far beyond repair otherwise. This project is **not** meant to be used commercially.
+This project bundles my source code, binary, schematics and PCB layout files for my own Open Source Pulsar P3 LED watch replacement modules. I do **not** sell those modules or any component and I do **not** do any repairs. This project is purely for the enthusiast, that want to fix a Pulsar LED watch himself or herself, that is far beyond repair otherwise. This project is **not** meant to be used commercially.
 
 The PCB layout is made in a way, allowing it to be opened and edited with the free Eagle version. I prefer the older Eagle 6.6 release, that still was made by CADSoft.
 
 The free trial version of the CAD-Soft Eagle software can be found here:
 ftp://ftp.cadsoft.de/eagle/program/6.6/
+
+Module Types
+============
+
+This project contains the 'Odin' board, that can be used, if the original Litronix dotty LED display could be rescued. The 'Loki' module can be used if the original display is broken and shall be replaced with four USSR made ALS314A single digit displays.
 
 License Agreement
 =================
@@ -26,8 +31,17 @@ Hardware & Software
 
 This project features a MicroChip PIC18F24J11 MCU. The software can be compiled using Microchip's MPLAB IDE and the XC8 compiler. You can get those free for private use. To flash the controller I used a PICKIT™3 unit. You still get those units second hand or NOS but you can also use a more recent one.
 
+**Module 'Odin' featuring the original display and light sensor.**
+
 ![Module Image](p3_odin.png)
 ![PCB Image](pulsar_pcb.png)
+
+In the main header file, select the right type of watch module. You find also ready compiled binaries for the 'Odin' and 'Loki' module.
+
+**Module 'Loki' featuring four replacement single digit displays and no light sensor.**
+
+![Module Image](p3_loki.png)
+![PCB Image](pulsar_loki.png)
 
 Important
 ==========
@@ -62,7 +76,7 @@ To forward the hours, place the magnet in the HOURS recess. To forward the minut
 Settings the Extra Features of the Firmware not included in the original P3
 ===========================================================================
 
-The firmware for this replacement module adds two additional functions to the watch. It adds the weekday and the year. To set the weekday hold the DATE button pressed and forward the weekday by putting the magnet into the MIN recess. To set the year hold the DATE and TIME button pressed and forward the year by putting the magnet into the MIN recess as well.
+The firmware for this replacement module adds two additional functions to the watch. It adds the weekday and the year. To set the weekday hold the DATE button pressed and forward the weekday by putting the magnet into the MIN recess. To set the year hold the DATE button pressed and wait until the year appears. Forward the year by putting the magnet into the HOUR recess.
 
 Light Sensor Readout
 ====================
