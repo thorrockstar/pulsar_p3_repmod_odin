@@ -9231,7 +9231,7 @@ In the case of using an oscillator chip, connect its output to the OSI and leave
 <text x="10.16" y="-96.52" size="1.778" layer="94">Pulsar P3 Replacement module 'Odin'.
 Created by Roy Schneider 2020.
 This is public domain.</text>
-<text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 RepMOD</text>
+<text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Odin Mod</text>
 <text x="-20.32" y="27.94" size="1.778" layer="94">If using a photo diode,
 instead of the vintage
 LDR, use 6,8 k instead

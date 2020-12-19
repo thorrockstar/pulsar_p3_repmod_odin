@@ -9169,13 +9169,13 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
-<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
-<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
-<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
 <part name="R14" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="R15" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
@@ -9209,7 +9209,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="1H" library="l104g" deviceset="L104G" device=""/>
 <part name="10M" library="l104g" deviceset="L104G" device=""/>
 <part name="1M" library="l104g" deviceset="L104G" device=""/>
-<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
+<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
 </parts>
 <sheets>
 <sheet>
@@ -9220,7 +9220,7 @@ In the case of using an oscillator chip, connect its output to the OSI and leave
 <text x="-76.2" y="-76.2" size="1.778" layer="94">Pulsar P3 Replacement module 'Loki'.
 Created by Roy Schneider 2020.
 This is public domain.</text>
-<text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 RepMOD</text>
+<text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Loki Mod</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>
