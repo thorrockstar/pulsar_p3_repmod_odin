@@ -8,7 +8,7 @@
  *  Project:            Pulsar Replacement module 'Odin'.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        27.09.2020
+ *  Last Change:        19.12.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -58,7 +58,7 @@
 #define APP_TABLE_WATCH                            3 // VFD watch project.
 
 /**
- * Define watch types, that shall be build.
+ * Choose watch module type, that shall be build.
  */
  
 #define APP_WATCH_TYPE_BUILD    APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
@@ -115,7 +115,7 @@
 
   #define APP_LIGHT_SENSOR_USAGE                     0
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
-  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_BUZZER_ALARM_USAGE                     1
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
 
 #elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
@@ -309,20 +309,8 @@ typedef void(*ButtonHandlerType)(void);
  * Type definitions for mapping out bits of
  * deep sleep persistent memory byte 0 and 1. */
 
-typedef union t_DSGPR0Type
-{
-    struct
-    {
-        unsigned char PB0State : 2;
-        unsigned char PB1State : 2;
-        unsigned char PB2State : 2;
-        unsigned char PB3State : 2;
-    };
-    unsigned char ucRaw;
-    
-} DSGPR0Type;
-
-typedef unsigned char DSGPR1Type;
+typedef unsigned char ButtonStateType;
+typedef unsigned char DisplayStateType;
 
 /**
  * Button states */

@@ -13,7 +13,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        15.12.2020
+ *  Last Change:        17.12.2020
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -258,10 +258,10 @@ const unsigned char g_div10[100] =
 /**
  * Global button state variables. */
 
-unsigned char g_ucPB0TIMEState = PB_STATE_IDLE; // TIME
-unsigned char g_ucPB1DATEState = PB_STATE_IDLE; // DATE
-unsigned char g_ucPB2HOURState = PB_STATE_IDLE; // HOUR
-unsigned char g_ucPB3MINTState = PB_STATE_IDLE; // MIN
+ButtonStateType g_ucPB0TIMEState = PB_STATE_IDLE; // TIME
+ButtonStateType g_ucPB1DATEState = PB_STATE_IDLE; // DATE
+ButtonStateType g_ucPB2HOURState = PB_STATE_IDLE; // HOUR
+ButtonStateType g_ucPB3MINTState = PB_STATE_IDLE; // MIN
 
 /**
  * Global button debounce timer value variables.
@@ -295,10 +295,14 @@ unsigned char g_ucMplexDigits = 0;
  * Brightness variable for the digits, reflecting
  * the readout from the AN11 analogue input. */
 
+#if APP_LIGHT_SENSOR_USAGE==1
+
 unsigned char  g_ucDimmingCnt = 0;
 unsigned char  g_ucDimmingRef = 0;
 unsigned char  g_ucDimming = 0;
 unsigned short g_ucLightSensor = 0;
+
+#endif
 
 /**
  * Current shown values for the left two and right two
@@ -333,7 +337,8 @@ unsigned char g_ucDots = 0;
  * store a copy of the display state, when the multiplexing
  * cycle had started. */
 
-unsigned char g_uDispState;
+DisplayStateType g_uDispState;
+DisplayStateType g_uDispStateBackup;
 
 /**
  * Alarm counter, cancelled by expiring or pressing a button. */
@@ -343,14 +348,6 @@ unsigned char g_uDispState;
 unsigned short g_ucAlarm;
 
 #endif
-
-/**
- * Global sleep variables, that are stored
- * in two multi purpose registers, that are
- * non-volatile over (deep) sleep. */
-
-DSGPR0Type g_sDSGPR0;
-DSGPR1Type g_sDSGPR1;
 
 /*
  * Unlock the RTC. This is time critical, so we use
@@ -523,6 +520,22 @@ inline void Configure_Inputs_Outputs(void)
     IOLOCK = 1;
 
 #endif
+}
+
+/**
+ * Initialize the button states. */
+
+inline void Init_Button_States(void)
+{
+    g_ucPB0TIMEState = PB_STATE_IDLE; // TIME
+    g_ucPB1DATEState = PB_STATE_IDLE; // DATE
+    g_ucPB2HOURState = PB_STATE_IDLE; // HOUR
+    g_ucPB3MINTState = PB_STATE_IDLE; // MIN
+
+    g_sPB0Timer = 0;
+    g_sPB1Timer = 0;
+    g_sPB2Timer = 0;
+    g_sPB3Timer = 0;
 }
 
 /**
@@ -891,11 +904,11 @@ inline void enterSleep(void)
     DSCONLbits.ULPWDIS = 1; // ULPWU wake-up source is disabled.
 
     /* Applications needing to save a small amount of data throughout a
-     * Deep Sleep cycle can save the data to thegeneral purpose DSGPR0
+     * Deep Sleep cycle can save the data to the general purpose DSGPR0
      * and DSGPR1 registers. */
 
-    DSGPR0 = g_sDSGPR0.ucRaw;  // This register to stores the button states.
-    DSGPR1 = g_sDSGPR1;        // This register to stores the display states.
+    //DSGPR0
+    //DSGPR1
 
     /* Wake up on a rising edge of the DATE button. */
 
@@ -976,9 +989,9 @@ void Turn_Buzzer_On(void)
 
     /* Set the display state to time reading. */
 
-    if (g_sDSGPR1 == DISP_STATE_BLANK)
+    if (g_uDispState == DISP_STATE_BLANK)
     {
-        g_sDSGPR1 = DISP_STATE_TIME;
+        g_uDispState = DISP_STATE_TIME;
     }
 
     /* Turn the 'stay awake' timer on, if activating the buzzer. */
@@ -1685,7 +1698,7 @@ void PressPB0(void)
 
   #endif
 
-    int istate = g_sDSGPR1;
+    DisplayStateType istate = g_uDispState;
 
     /* When having set the time, the RTC will be disabled until
      * you press the very first time the 'TIME' button.
@@ -1693,7 +1706,7 @@ void PressPB0(void)
 
     if (istate == DISP_STATE_SECONDS_STALLED)
     {
-        g_sDSGPR1 = DISP_STATE_TIME;
+        g_uDispState = DISP_STATE_TIME;
 
         /* Unlock via magic. */
 
@@ -1716,7 +1729,7 @@ void PressPB0(void)
 
     if (istate == DISP_STATE_BLANK)
     {
-        g_sDSGPR1 = DISP_STATE_TIME;
+        g_uDispState = DISP_STATE_TIME;
     }
     else
     {
@@ -1729,11 +1742,11 @@ void PressPB0(void)
 
         if ((istate == DISP_STATE_DATE) || (istate == DISP_STATE_SET_MONTH))
         {
-            g_sDSGPR1 = DISP_STATE_SET_DAY;
+            g_uDispState = DISP_STATE_SET_DAY;
         }
         else if (istate == DISP_STATE_SET_WEEKDAY)
         {
-            g_sDSGPR1 = DISP_STATE_SET_YEAR                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ;
+            g_uDispState = DISP_STATE_SET_YEAR                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ;
         }
 
       #endif
@@ -1754,9 +1767,9 @@ void HoldPB0(void)
     if ((g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
-        if (g_sDSGPR1 == DISP_STATE_TIME)
+        if (g_uDispState == DISP_STATE_TIME)
         {
-            g_sDSGPR1 = DISP_STATE_SECONDS;
+            g_uDispState = DISP_STATE_SECONDS;
         }
     }
 }
@@ -1769,15 +1782,15 @@ void ReleasePB0(void)
 {
   #if APP_WATCH_ANY_PULSAR_MODEL==1
 
-    const int istate = g_sDSGPR1;
+    const DisplayStateType istate = g_uDispState;
 
     if (istate == DISP_STATE_SET_DAY)
     {
-        g_sDSGPR1 = DISP_STATE_SET_MONTH;
+        g_uDispState = DISP_STATE_SET_MONTH;
     }
     else if (istate == DISP_STATE_SET_YEAR)
     {
-        g_sDSGPR1 = DISP_STATE_SET_WEEKDAY;
+        g_uDispState = DISP_STATE_SET_WEEKDAY;
     }
     else if (istate == DISP_STATE_SECONDS)
     {
@@ -1812,7 +1825,7 @@ void PressPB1(void)
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
-    DSGPR1Type *pb = &g_sDSGPR1;
+    DisplayStateType *pb = &g_uDispState;
 
     if (*pb == DISP_STATE_BLANK)
     {
@@ -1913,7 +1926,7 @@ void HoldPB1(void)
         (g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
-        DSGPR1Type *pb = &g_sDSGPR1;
+        DisplayStateType *pb = &g_uDispState;
         const unsigned char ust = *pb;
 
         if (ust == DISP_STATE_DATE)
@@ -1944,7 +1957,7 @@ void ReleasePB1(void)
 {
   #if APP_BUZZER_ALARM_USAGE==1
 
-    DSGPR1Type *pb = &g_sDSGPR1;
+    DisplayStateType *pb = &g_uDispState;
 
     if (*pb == DISP_STATE_ALARM)
     {
@@ -1982,7 +1995,7 @@ void PressPB2(void)
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
-    DSGPR1Type *pb = &g_sDSGPR1;
+    DisplayStateType *pb = &g_uDispState;
 
     if (*pb == DISP_STATE_BLANK)
     {
@@ -2065,7 +2078,7 @@ void HoldPB2(void)
 
     /* Check if setting hours, minutes, month or day. */
 
-    const unsigned char ustate = g_sDSGPR1;
+    const DisplayStateType ustate = g_uDispState;
 
     if (ustate == DISP_STATE_SET_HOURS)
     {
@@ -2389,8 +2402,8 @@ void PressPB3(void)
 
     /* Revoke the 'blanked' state in order to turn the display on. */
 
-    DSGPR1Type *pb = &g_sDSGPR1;
-    unsigned char ust = *pb;
+    DisplayStateType *pb = &g_uDispState;
+    DisplayStateType ust = *pb;
 
     if (ust == DISP_STATE_BLANK)
     {
@@ -2428,19 +2441,19 @@ void PressPB3(void)
 
             if ((ust == DISP_STATE_DATE) || (ust == DISP_STATE_SET_MONTH))
             {
-                g_sDSGPR1 = DISP_STATE_SET_DAY;
+                g_uDispState = DISP_STATE_SET_DAY;
             }
             else if (ust == DISP_STATE_YEAR)
             {
-                g_sDSGPR1 = DISP_STATE_SET_YEAR;
+                g_uDispState = DISP_STATE_SET_YEAR;
             }
             else if (ust == DISP_STATE_WEEKDAY)
             {
-                g_sDSGPR1 = DISP_STATE_SET_WEEKDAY;
+                g_uDispState = DISP_STATE_SET_WEEKDAY;
             }
             else if (ust == DISP_STATE_SECONDS)
             {
-                g_sDSGPR1 = DISP_STATE_SET_SECONDS;
+                g_uDispState = DISP_STATE_SET_SECONDS;
             }
 
           #endif
@@ -2461,7 +2474,7 @@ void HoldPB3(void)
     unsigned char ucTemp;
     unsigned char ucValue;
 
-    const unsigned char ust = g_sDSGPR1;
+    const DisplayStateType ust = g_uDispState;
 
     if (ust == DISP_STATE_SET_MINUTES)
     {
@@ -2781,11 +2794,11 @@ void ReleasePB3(void)
     /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
      * until the time readout button has been pressed the first time. */
 
-    const unsigned char ustate = g_sDSGPR1;
+    const DisplayStateType ustate = g_uDispState;
 
     if (ustate == DISP_STATE_SET_MINUTES)
     {
-        g_sDSGPR1 = DISP_STATE_SECONDS_STALLED;
+        g_uDispState = DISP_STATE_SECONDS_STALLED;
     }
     else
     {
@@ -3072,9 +3085,9 @@ void Display_Digits(void)
 
                 /* Check what shall be displayed. */
 
-                const unsigned char ustate = g_sDSGPR1;
+                const DisplayStateType ustate = g_uDispState;
 
-                g_uDispState = ustate;
+                g_uDispStateBackup = ustate;
 
                 switch(ustate)
                 {
@@ -3616,7 +3629,7 @@ void Display_Digits(void)
 
                         if (g_ucLeftVal < 10)
                         {
-                            switch(g_uDispState)
+                            switch(g_uDispStateBackup)
                             {
                                 case DISP_STATE_TIME:
                                 case DISP_STATE_DATE:
@@ -3628,6 +3641,7 @@ void Display_Digits(void)
                                     break;
 
                         #if APP_BUZZER_ALARM_USAGE==1
+
                                 case DISP_STATE_ALARM:
                                 case DISP_STATE_TOGGLE_ALARM:
                                     ucTemp = 0;
@@ -4033,7 +4047,7 @@ void Display_Digits(void)
 
                             if (g_ucRightVal < 10)
                             {
-                                switch(g_uDispState)
+                                switch(g_uDispStateBackup)
                                 {
                                     case DISP_STATE_DATE:
                                     case DISP_STATE_SET_MONTH:
@@ -4290,11 +4304,9 @@ void Display_Digits(void)
 
 void main(void)
 {
-    /* Init */
-
     unsigned char ucstayawake;
-    unsigned short urollover;
     unsigned char udivider;
+    unsigned short urollover;
 
     /* Initialize and configure. */
 
@@ -4308,6 +4320,8 @@ void main(void)
     Configure_Timer_4();
 
     Configure_Real_Time_Clock();
+    
+    Init_Button_States();
 
     /* If the controller has been waken up from deep sleep, we have to unlock
      * the general purpose inputs and outputs first. */
@@ -4323,34 +4337,13 @@ void main(void)
         DSCONLbits.RELEASE = 0; //  Clear to unfreeze the I/O's.
 
         /* The two general purpose registers of the MCU are non-volatile and
-         * survive the deep sleep mode. So we load the status (buttons and
-         * display) from them. */
+         * survive the deep sleep mode. They are named DSGPR0 and DSGPR1. */
 
-        g_sDSGPR0.ucRaw = DSGPR0;
-        g_sDSGPR1       = DSGPR1;
-
-        /* Copy the button states. */
-
-        const DSGPR0Type udsg0 = g_sDSGPR0;
-
-        g_ucPB0TIMEState = udsg0.PB0State;
-        g_ucPB1DATEState = udsg0.PB1State;
-        g_ucPB2HOURState = udsg0.PB2State;
-        g_ucPB3MINTState = udsg0.PB3State;
+        // DSGPR0
+        // DSGPR1
     }
     else
     {
-        /* Cold boot, for example after a battery change. */
-
-        Init_Inputs_Outputs_Ports();
-
-        /* Reset the button states */
-
-        g_sDSGPR0.PB0State = PB_STATE_IDLE;
-        g_sDSGPR0.PB1State = PB_STATE_IDLE;
-        g_sDSGPR0.PB2State = PB_STATE_IDLE;
-        g_sDSGPR0.PB3State = PB_STATE_IDLE;
-
         /* Turn the 'stay awake' timer off again. */
 
   #if APP_WATCH_ANY_PULSAR_MODEL==1
@@ -4361,23 +4354,17 @@ void main(void)
 
         /* Set the display state to time reading. */
 
-        g_sDSGPR1 = DISP_STATE_TIME;
+        g_uDispState = DISP_STATE_TIME;
 
   #else
 
         /* Set the display state to blank. */
 
-        g_sDSGPR1 = DISP_STATE_BLANK;
+        g_uDispState = DISP_STATE_BLANK;
 
   #endif
-
-        /* Store the two state variable in non-volatile
-         * registers, that will survive deep sleep. */
-
-        DSGPR0 = g_sDSGPR0.ucRaw;
-        DSGPR1 = g_sDSGPR1;
     }
-
+    
     /* Enable global interrupts. */
 
     /* INTERRUPT CONTROL REGISTER */
@@ -4403,9 +4390,15 @@ void main(void)
     /* Init Multiplexing for digits. */
 
     g_ucMplexDigits = 0;
+    
+  #if APP_LIGHT_SENSOR_USAGE==1
+
     g_ucDimmingCnt = 0;
     g_ucDimming = 0;
+    g_ucDimmingRef = 0;
 
+  #endif
+    
     /* Init local variables. */
 
     ucstayawake = 0;
@@ -4492,7 +4485,7 @@ void main(void)
 
                         /* Display not in 'watch stalled' mode. */
                             
-                        (g_sDSGPR1 != DISP_STATE_SECONDS_STALLED))
+                        (g_uDispState != DISP_STATE_SECONDS_STALLED))
                     {
                         /* If no button is still pressed, turn the 'awake'
                          * timer off. */
@@ -4540,7 +4533,7 @@ void main(void)
         {
             /* Set blank mode. */
 
-            g_sDSGPR1 = DISP_STATE_BLANK;
+            g_uDispState = DISP_STATE_BLANK;
         }
 
       #else // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
@@ -4602,28 +4595,24 @@ void main(void)
 
             /* Set blank mode. */
 
-            g_sDSGPR1 = DISP_STATE_BLANK;
+            g_uDispState = DISP_STATE_BLANK;
 
-            /* Reset the button states */
-
-            g_sDSGPR0.PB0State = PB_STATE_IDLE;
-            g_sDSGPR0.PB1State = PB_STATE_IDLE;
-            g_sDSGPR0.PB2State = PB_STATE_IDLE;
-            g_sDSGPR0.PB3State = PB_STATE_IDLE;
+            /* Reset the buttons. */
+            
+            Init_Button_States();
 
             /* Reset timer values and states. */
-
-            g_sPB0Timer = 0;
-            g_sPB1Timer = 0;
-            g_sPB2Timer = 0;
-            g_sPB3Timer = 0;
 
             g_ucTimer0Usage = 0;
             g_ucTimer2Usage = 0;
 
             /* If entering sleep, ensure the light sensor value to be zero. */
 
+          #if APP_LIGHT_SENSOR_USAGE==1
+
             g_ucLightSensor = 0;
+            
+          #endif
 
             /* Init Multiplexing for digits. */
 
@@ -4737,14 +4726,13 @@ void main(void)
             urollover = 1;
             udivider = 0;
 
+          #if APP_LIGHT_SENSOR_USAGE==1
+
             g_ucDimming = 0;
             g_ucDimmingCnt = 0;
+            g_ucDimmingRef = 0;
 
-           /* Restore the two state variable in non-volatile
-            * registers, that will survive deep sleep. */
-
-           g_sDSGPR0.ucRaw = DSGPR0;
-           g_sDSGPR1       = DSGPR1;
+          #endif
 
            /* Configure I/O. */
 
