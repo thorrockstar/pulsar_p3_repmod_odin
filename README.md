@@ -35,6 +35,7 @@ This project features a MicroChip PIC18F24J11 MCU. The software can be compiled 
 
 ![Module Image](p3_odin.png)
 ![PCB Image](pulsar_pcb.png)
+![Module Image](p3_odin_second.png)
 
 In the main header file, select the right type of watch module. You find also ready compiled binaries for the 'Odin' and 'Loki' module.
 
@@ -42,6 +43,7 @@ In the main header file, select the right type of watch module. You find also re
 
 ![Module Image](p3_loki.png)
 ![PCB Image](pulsar_loki.png)
+![PCB Image](p3_loki_second.png)
 
 Important
 ==========
