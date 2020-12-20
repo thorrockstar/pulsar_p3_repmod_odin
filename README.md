@@ -80,6 +80,23 @@ Settings the Extra Features of the Firmware not included in the original P3
 
 The firmware for this replacement module adds two additional functions to the watch. It adds the weekday and the year. To set the weekday hold the DATE button pressed and forward the weekday by putting the magnet into the MIN recess. To set the year hold the DATE button pressed and wait until the year appears. Forward the year by putting the magnet into the HOUR recess.
 
+Optional Alarm Feature of the 'Loki Module'
+============================================
+
+This feature is only available for the 'Loki' modules, using the USSR made replacement displays. You can use the output RC2 of the micro controller in order to drive a disc piezo buzzer with a 820Ohm...1kOhm resistor in series. To use that feature turn the ALARM option on in the main.h header file and rebuild the binary.
+
+**Note:**
+
+Don't expect the alarm to be loud... it will not be loud enought to wake you up, simply because it is silenced by the massive metal case of the watch. :-)
+
+**Set Alarm**
+
+In order to set the alarm, press the TIME (hold) and then the DATE (hold) button in this exact order ands keep them pressed together. Now you can place the magnet in the HOUR or MIN recess to set the alarm.
+
+**Toggle Alarm (on/off)**
+
+To turn the alarm on or off press the TIME (hold) and then the DATE (hold) button in this exact order, then release the DATE button and press DATE again, while holding TIME still pressed, in order to toggle the alarm. A little dot on the right of the last AL304G display will indicate if the alarm is on or off.
+
 Light Sensor Readout
 ====================
 
