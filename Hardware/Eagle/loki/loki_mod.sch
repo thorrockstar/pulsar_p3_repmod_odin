@@ -9966,7 +9966,7 @@ This is public domain.</text>
 <instance part="1H" gate="G$1" x="12.7" y="-2.54" rot="R90"/>
 <instance part="10M" gate="G$1" x="12.7" y="-33.02" rot="R90"/>
 <instance part="1M" gate="G$1" x="12.7" y="-63.5" rot="R90"/>
-<instance part="R9" gate="G$1" x="22.86" y="-7.62" rot="R90"/>
+<instance part="R9" gate="G$1" x="25.4" y="-7.62" rot="R90"/>
 <instance part="BUZZER" gate="G$1" x="30.48" y="63.5"/>
 </instances>
 <busses>
@@ -10350,9 +10350,9 @@ This is public domain.</text>
 </segment>
 <segment>
 <pinref part="R9" gate="G$1" pin="2"/>
-<wire x1="22.86" y1="-2.54" x2="22.86" y2="12.7" width="0.1524" layer="91"/>
-<label x="22.86" y="12.7" size="1.778" layer="95"/>
-<junction x="22.86" y="-2.54"/>
+<wire x1="25.4" y1="-2.54" x2="25.4" y2="12.7" width="0.1524" layer="91"/>
+<label x="25.4" y="12.7" size="1.778" layer="95"/>
+<junction x="25.4" y="-2.54"/>
 </segment>
 </net>
 <net name="RA5/SW4" class="0">
@@ -10575,21 +10575,6 @@ This is public domain.</text>
 <junction x="7.62" y="-93.98"/>
 </segment>
 </net>
-<net name="N$1" class="0">
-<segment>
-<pinref part="1H" gate="G$1" pin="H"/>
-<wire x1="2.54" y1="-15.24" x2="2.54" y2="-12.7" width="0.1524" layer="91"/>
-<wire x1="2.54" y1="-12.7" x2="22.86" y2="-12.7" width="0.1524" layer="91"/>
-<pinref part="R9" gate="G$1" pin="1"/>
-<junction x="22.86" y="-12.7"/>
-<junction x="2.54" y="-15.24"/>
-<pinref part="1M" gate="G$1" pin="H"/>
-<wire x1="2.54" y1="-76.2" x2="2.54" y2="-71.12" width="0.1524" layer="91"/>
-<wire x1="2.54" y1="-71.12" x2="22.86" y2="-71.12" width="0.1524" layer="91"/>
-<wire x1="22.86" y1="-71.12" x2="22.86" y2="-12.7" width="0.1524" layer="91"/>
-<junction x="2.54" y="-76.2"/>
-</segment>
-</net>
 <net name="PIEZO" class="0">
 <segment>
 <pinref part="U$1" gate="A" pin="RC2/AN11/CTPLS/RP13"/>
@@ -10599,6 +10584,34 @@ This is public domain.</text>
 <label x="33.02" y="73.66" size="1.778" layer="95"/>
 <wire x1="30.48" y1="73.66" x2="30.48" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="BUZZER" gate="G$1" pin="TP"/>
+</segment>
+</net>
+<net name="N$6" class="0">
+<segment>
+<pinref part="10M" gate="G$1" pin="H"/>
+<wire x1="2.54" y1="-45.72" x2="2.54" y2="-40.64" width="0.1524" layer="91"/>
+<pinref part="1H" gate="G$1" pin="H"/>
+<wire x1="2.54" y1="-15.24" x2="2.54" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="-12.7" x2="20.32" y2="-12.7" width="0.1524" layer="91"/>
+<pinref part="R9" gate="G$1" pin="1"/>
+<junction x="25.4" y="-12.7"/>
+<junction x="2.54" y="-15.24"/>
+<pinref part="1M" gate="G$1" pin="H"/>
+<wire x1="2.54" y1="-76.2" x2="2.54" y2="-71.12" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="-71.12" x2="25.4" y2="-71.12" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-71.12" x2="25.4" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="2.54" y="-76.2"/>
+<pinref part="10H" gate="G$1" pin="H"/>
+<wire x1="25.4" y1="-40.64" x2="25.4" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="15.24" x2="2.54" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="20.32" x2="20.32" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="20.32" x2="20.32" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="-12.7" x2="25.4" y2="-12.7" width="0.1524" layer="91"/>
+<junction x="2.54" y="15.24"/>
+<junction x="25.4" y="-40.64"/>
+<wire x1="2.54" y1="-40.64" x2="25.4" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="2.54" y="-45.72"/>
+<junction x="20.32" y="-12.7"/>
 </segment>
 </net>
 </nets>
