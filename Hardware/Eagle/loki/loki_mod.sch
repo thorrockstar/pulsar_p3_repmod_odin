@@ -9915,6 +9915,9 @@ In the case of using an oscillator chip, connect its output to the OSI and leave
 Created by Roy Schneider 2020.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Loki Mod</text>
+<text x="25.4" y="50.8" size="1.778" layer="94">Note:
+Put a 820 to 1k resistor
+in series to the buzzer!</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>
@@ -10328,13 +10331,6 @@ This is public domain.</text>
 <label x="-91.44" y="-35.56" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="RA2/SW4" class="0">
-<segment>
-<pinref part="U$1" gate="A" pin="RA2/AN2/VREF-/CVREF/C2INB"/>
-<wire x1="-83.82" y1="96.52" x2="-96.52" y2="96.52" width="0.1524" layer="91"/>
-<label x="-99.06" y="96.52" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="VDDCORE/VCAP" class="0">
 <segment>
 <pinref part="U$1" gate="A" pin="VDDCORE/VCAP"/>
@@ -10483,6 +10479,7 @@ This is public domain.</text>
 <junction x="0" y="-33.02"/>
 <junction x="0" y="-63.5"/>
 <junction x="0" y="-93.98"/>
+<junction x="0" y="-7.62"/>
 </segment>
 </net>
 <net name="N$13" class="0">
@@ -10513,6 +10510,7 @@ This is public domain.</text>
 <junction x="2.54" y="-33.02"/>
 <junction x="2.54" y="-63.5"/>
 <junction x="2.54" y="-93.98"/>
+<junction x="2.54" y="-6.35"/>
 </segment>
 </net>
 <net name="N$7" class="0">
@@ -10543,6 +10541,7 @@ This is public domain.</text>
 <junction x="5.08" y="-33.02"/>
 <junction x="5.08" y="-63.5"/>
 <junction x="5.08" y="-93.98"/>
+<junction x="5.08" y="-5.08"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -10573,6 +10572,7 @@ This is public domain.</text>
 <junction x="7.62" y="-33.02"/>
 <junction x="7.62" y="-63.5"/>
 <junction x="7.62" y="-93.98"/>
+<junction x="7.62" y="-3.81"/>
 </segment>
 </net>
 <net name="PIEZO" class="0">
