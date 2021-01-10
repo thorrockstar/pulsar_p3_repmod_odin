@@ -175,6 +175,9 @@ const unsigned char g_weekday_7segment[16] =
 
 /**
  * BCD to decimal decoding table.
+ * 
+ * This table returns 0 if a BCD counter is
+ * on a not used tetrade.
  */
 
 const unsigned char g_bcd_decimal[160] =
@@ -199,6 +202,37 @@ const unsigned char g_bcd_decimal[160] =
     80,81,82,83,84,85,86,87,88,89,0,0,0,0,0,0,
     // 90..99 [0x90..0x99 - 0x9A..0x9F]
     90,91,92,93,94,95,96,97,98,99,0,0,0,0,0,0,
+};
+
+/**
+ * BCD to decimal decoding and testing table.
+ * 
+ * This table returns 127 if a BCD counter is
+ * on a not used tetrade.
+ */
+
+const unsigned char g_bcd_decimal_testing[160] =
+{
+    // 0..9 [0x00..0x09 - 0x0A..0x0F]
+    0,1,2,3,4,5,6,7,8,9,127,127,127,127,127,127,
+    // 10..19 [0x10..0x19 - 0x1A..0x1F]
+    10,11,12,13,14,15,16,17,18,19,127,127,127,127,127,127,
+    // 20..29 [0x20..0x29 - 0x2A..0x2F]
+    20,21,22,23,24,25,26,27,28,29,127,127,127,127,127,127,
+    // 30..39 [0x30..0x39 - 0x3A..0x3F]
+    30,31,32,33,34,35,36,37,38,39,127,127,127,127,127,127,
+    // 40..49 [0x40..0x49 - 0x4A..0x4F]
+    40,41,42,43,44,45,46,47,48,49,127,127,127,127,127,127,
+    // 50..59 [0x50..0x59 - 0x5A..0x5F]
+    50,51,52,53,54,55,56,57,58,59,127,127,127,127,127,127,
+    // 60..69 [0x60..0x69 - 0x6A..0x6F]
+    60,61,62,63,64,65,66,67,68,69,127,127,127,127,127,127,
+    // 70..79 [0x70..0x79 - 0x7A..0x7F]
+    70,71,72,73,74,75,76,77,78,79,127,127,127,127,127,127,
+    // 80..89 [0x80..0x89 - 0x8A..0x8F]
+    80,81,82,83,84,85,86,87,88,89,127,127,127,127,127,127,
+    // 90..99 [0x90..0x99 - 0x9A..0x9F]
+    90,91,92,93,94,95,96,97,98,99,127,127,127,127,127,127,
 };
 
 /**
@@ -259,7 +293,7 @@ const unsigned char g_div10[100] =
  * Table for animating the dot.
  */
 
-#if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+#if APP_DATE_SPECIAL_DOT_ANIMATION==1
 
 const unsigned char g_dot_banner[60] =
 {
@@ -273,7 +307,7 @@ const unsigned char g_dot_banner[60] =
 
 unsigned char g_dot_banner_index = 0;
 
-#endif // #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+#endif // #if APP_DATE_SPECIAL_DOT_ANIMATION==1
 
 /**
  * Global button state variables. */
@@ -597,7 +631,7 @@ inline void Configure_Real_Time_Clock(void)
     RTCCFG |= 3;        // Highest RTC address
 
     ucTemp = RTCVALL; // Year
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if (ucValue > 99)
     {
         ucRTCInval = 1;
@@ -606,42 +640,42 @@ inline void Configure_Real_Time_Clock(void)
     ucTemp = RTCVALH; // reserved, dummy for decrement
 
     ucTemp = RTCVALL; // Day
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if (ucValue > 31)
     {
         ucRTCInval = 1;
     }
 
     ucTemp = RTCVALH; // Month
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if ((ucValue < 1) || (ucValue > 12))
     {
         ucRTCInval = 1;
     }
 
     ucTemp = RTCVALL; // Hour
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if (ucValue > 23)
     {
         ucRTCInval = 1;
     }
 
     ucTemp = RTCVALH; // Weekday
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if (ucValue > 6)
     {
         ucRTCInval = 1;
     }
 
     ucTemp = RTCVALL; // Second
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if (ucValue > 59)
     {
         ucRTCInval = 1;
     }
 
     ucTemp = RTCVALH; // Minute
-    ucValue = g_bcd_decimal[ucTemp];
+    ucValue = g_bcd_decimal_testing[ucTemp];
     if (ucValue > 59)
     {
         ucRTCInval = 1;
@@ -664,7 +698,7 @@ inline void Configure_Real_Time_Clock(void)
 
 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
         
-        RTCVALL = 12; // Hour
+        RTCVALL = g_decimal_bcd[12]; // Hour
 
 #else // #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
 
@@ -677,7 +711,7 @@ inline void Configure_Real_Time_Clock(void)
         RTCVALL = 0; // Seconds
         RTCVALH = 0; // Minutes
         
-        /* Initialize alarm registers. */
+        /* Initialize all alarm registers. */
 
         ALRMCFGbits.ALRMPTR0 = 0;
         ALRMCFGbits.ALRMPTR1 = 1;
@@ -691,7 +725,63 @@ inline void Configure_Real_Time_Clock(void)
         ALRMVALL = 0; // Seconds
         ALRMVALH = 0; // Minutes
     }
+    else // RTC time/date was valid
+    {
+        /* Check alarm time only, if clock time/date was valid. */
+        
+        ucRTCInval = 0;
 
+        ALRMCFGbits.ALRMPTR0 = 1;
+        ALRMCFGbits.ALRMPTR1 = 0;
+        
+        ucTemp = ALRMVALL; // Hour
+        ucValue = g_bcd_decimal_testing[ucTemp];
+        if (ucValue > 23)
+        {
+            ucRTCInval = 1;
+        }
+
+        ucTemp = ALRMVALH; // Dummy to decrement address.
+
+        ucTemp = ALRMVALH; // Minute
+        ucValue = g_bcd_decimal_testing[ucTemp];
+        if (ucValue > 59)
+        {
+            ucRTCInval = 1;
+        }
+
+        /* Initialize alarm registers. */
+
+        if (ucRTCInval)
+        {
+            /* Initialize all alarm registers. */
+
+            ALRMCFGbits.ALRMPTR0 = 0;
+            ALRMCFGbits.ALRMPTR1 = 1;
+
+            ALRMVALL = 1; // Day
+            ALRMVALH = 1; // Month
+
+            ALRMVALL = 0; // Hour
+            ALRMVALH = 1; // Weekday
+
+            ALRMVALL = 0; // Seconds
+            ALRMVALH = 0; // Minutes
+        }
+        else // RTC alarm time was valid
+        {
+            /* Initialize only not used alarm registers. */
+            
+            ALRMCFGbits.ALRMPTR0 = 0;
+            ALRMCFGbits.ALRMPTR1 = 1;
+
+            ALRMVALL = 1; // Day
+            ALRMVALH = 1; // Month, auto-decrement!
+            ALRMVALH = 1; // Weekday, auto-decrement!
+            ALRMVALL = 0; // Seconds
+        }
+    }
+    
     while(RTCCFGbits.RTCSYNC);
 
     /* Enable setting pointers to read MIN and SEC. */
@@ -2378,7 +2468,7 @@ void HoldPB2(void)
         ALRMCFGbits.ALRMPTR1 = 1;
 
         ALRMVALL = 1; // Day
-        ALRMVALH = 1; // Month
+        ALRMVALH = 1; // Month, auto-decrement!
         ALRMVALH = 1; // Weekday
 
         /* Enable the RTC operation again.*/
@@ -2695,7 +2785,7 @@ void HoldPB3(void)
         ALRMCFGbits.ALRMPTR1 = 1;
 
         ALRMVALL = 1; // Day
-        ALRMVALH = 1; // Month, auto-increment!
+        ALRMVALH = 1; // Month, auto-decrement!
         ALRMVALH = 1; // Weekday
 
         /* Enable the RTC operation again.*/
@@ -3206,11 +3296,11 @@ void Display_Digits(void)
 
                  #else
 
-                   #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+                   #if APP_DATE_SPECIAL_DOT_ANIMATION==1
 
                         if (g_ucAlarm)
                         {
-                            g_ucDots = g_dot_banner[g_dot_banner_index];
+                            g_ucDots = g_dot_banner[g_dot_banner_index >> 2];
                         }
 
                    #endif
@@ -4531,7 +4621,7 @@ void main(void)
             
             /* Initialize dot animation. */
             
-    #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+    #if APP_DATE_SPECIAL_DOT_ANIMATION==1
             
             g_dot_banner_index = 0;
             
@@ -4577,13 +4667,13 @@ void main(void)
                         
                         /* Do the dot animation. */
             
-                    #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+                    #if APP_DATE_SPECIAL_DOT_ANIMATION==1
 
                         unsigned char udot = g_dot_banner_index;
                         
                         udot++;
                         
-                        if (udot >= sizeof(g_dot_banner_index))
+                        if (udot >= (sizeof(g_dot_banner) << 2))
                         {
                             udot = 0;
                         }
