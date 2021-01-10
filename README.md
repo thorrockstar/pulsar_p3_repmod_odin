@@ -11,7 +11,7 @@ ftp://ftp.cadsoft.de/eagle/program/6.6/
 Module Types
 ============
 
-This project contains the 'Odin' board, that can be used, if the original Litronix dotty LED display could be rescued. The 'Loki' module can be used if the original display is broken and shall be replaced with four USSR made ALS314A single digit displays.
+This project contains two different boards. The 'Odin' board, that can be used, if the original Litronix dotty LED display could be rescued. The 'Loki' board, that can be used if the original display is broken and shall be replaced with four USSR made ALS314A single digit displays with common cathodes. You can also compile the firmware binary for the 'Loki' board for using AL304G single digit displays with common anodes instead. If using the AL304G displays use resistors with about 140 Ohms instead of 105 Ohms. See the comments in the schematics.
 
 License Agreement
 =================

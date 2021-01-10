@@ -110,6 +110,7 @@
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
+  #define APP_DATE_SPECIAL_DOT_ANIMATION             0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
 
@@ -117,6 +118,7 @@
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
   #define APP_BUZZER_ALARM_USAGE                     1
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
+  #define APP_DATE_SPECIAL_DOT_ANIMATION             1
 
 #elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
 
@@ -124,6 +126,7 @@
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
+  #define APP_DATE_SPECIAL_DOT_ANIMATION             0
 
 #else
 
@@ -131,6 +134,7 @@
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
+  #define APP_DATE_SPECIAL_DOT_ANIMATION             0
 
 #endif
 

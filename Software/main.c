@@ -256,6 +256,26 @@ const unsigned char g_div10[100] =
 };
 
 /**
+ * Table for animating the dot.
+ */
+
+#if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+
+const unsigned char g_dot_banner[60] =
+{
+    4,4,4,4,4,4,4,4,4,4,
+    1,1,1,1,1,1,1,1,1,1,
+    8,8,8,8,8,8,8,8,8,8,
+    2,2,2,2,2,2,2,2,2,2,
+    8,8,8,8,8,8,8,8,8,8,
+    1,1,1,1,1,1,1,1,1,1,
+};
+
+unsigned char g_dot_banner_index = 0;
+
+#endif // #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+
+/**
  * Global button state variables. */
 
 ButtonStateType g_ucPB0TIMEState = PB_STATE_IDLE; // TIME
@@ -635,14 +655,23 @@ inline void Configure_Real_Time_Clock(void)
 
         RTCCFG |= 3;
 
-        RTCVALL = g_decimal_bcd[20]; // Year
+        RTCVALL = g_decimal_bcd[21]; // Year 2021
 
         ucRTCInval = RTCVALH; // Dummy for decrement
 
         RTCVALL = 1; // Day
         RTCVALH = 1; // Month
 
+#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+        
+        RTCVALL = 12; // Hour
+
+#else // #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+
         RTCVALL = 0; // Hour
+        
+#endif // else #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+
         RTCVALH = 3; // Weekday (1.1.2020 was a Wednesday)
 
         RTCVALL = 0; // Seconds
@@ -2666,7 +2695,7 @@ void HoldPB3(void)
         ALRMCFGbits.ALRMPTR1 = 1;
 
         ALRMVALL = 1; // Day
-        ALRMVALH = 1; // Month
+        ALRMVALH = 1; // Month, auto-increment!
         ALRMVALH = 1; // Weekday
 
         /* Enable the RTC operation again.*/
@@ -3175,6 +3204,17 @@ void Display_Digits(void)
 
                         g_ucDots = 3; // Show both dots.
 
+                 #else
+
+                   #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+
+                        if (g_ucAlarm)
+                        {
+                            g_ucDots = g_dot_banner[g_dot_banner_index];
+                        }
+
+                   #endif
+
                  #endif
                     break;
 
@@ -3548,6 +3588,8 @@ void Display_Digits(void)
                     }
                     else if (ucPlex == 3)
                     {
+               #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+
                         /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
                          * them. */
@@ -3573,30 +3615,8 @@ void Display_Digits(void)
 
                         /* Turn all segment outputs off. */
 
-                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                        PORTC |= 0xF0;
-                        PORTB |= 0x2C;
-
-                   #if APP_DATE_SPECIAL_DOT_USAGE==1
-
-                        PORTA |= 0x40;
-
-                   #endif
-
-                 #else
                         PORTC &= 0;
                         PORTB &= 1;
-
-                   #if APP_DATE_SPECIAL_DOT_USAGE==1
-
-                        PORTA &= 0xBF;
-
-                   #endif
-
-                 #endif
-
-               #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
 
                         /* Ten hour digit and dots */
 
@@ -3663,6 +3683,54 @@ void Display_Digits(void)
 
                         ucTemp = g_div10[g_ucLeftVal];
                         ucTemp = *(pb + ucTemp);
+
+                 #endif
+
+                        /* Turn all common pins off by setting the outputs
+                         * to tri-state high impedance by making inputs out of
+                         * them. */
+
+                        /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
+
+                        TRISB = 0x53;
+
+                 #if APP_BUZZER_ALARM_USAGE==1
+
+                        /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                        TRISC = 0x08;
+
+                 #else
+
+                        /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                         * as input. */
+
+                        TRISC = 0x0C;
+
+                 #endif
+
+                        /* Turn all segment outputs off. */
+
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                        PORTC |= 0xF0;
+                        PORTB |= 0x2C;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA |= 0x40;
+
+                   #endif
+
+                 #else
+                        PORTC &= 0;
+                        PORTB &= 1;
+
+                   #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                        PORTA &= 0xBF;
+
+                   #endif
 
                  #endif
 
@@ -3738,6 +3806,26 @@ void Display_Digits(void)
                                 LED_AG = 1;
                  #endif
                             }
+
+                 #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                    #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                           if (g_ucDots & 4)
+                           {
+                               LED_DATE_DOT = 0;
+                           }
+
+                    #else
+
+                           if (g_ucDots & 4)
+                           {
+                               LED_DATE_DOT = 1;
+                           }
+
+                    #endif
+
+                 #endif
 
                  #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
@@ -4055,8 +4143,6 @@ void Display_Digits(void)
                                         ucTemp = 0;
                                         break;
 
-                                        /* No break - Fall thru! */
-
                                     default:
                                         ucTemp = *pb; // '0'
                                         break;
@@ -4195,6 +4281,26 @@ void Display_Digits(void)
                                 LED_AG = 1;
                  #endif
                             }
+
+                 #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                    #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                           if (g_ucDots & 8)
+                           {
+                               LED_DATE_DOT = 0;
+                           }
+
+                    #else
+
+                           if (g_ucDots & 8)
+                           {
+                               LED_DATE_DOT = 1;
+                           }
+
+                    #endif
+
+                 #endif
 
              #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
@@ -4422,6 +4528,14 @@ void main(void)
             /* Turn the alarm buzzer on. */
 
             Turn_Buzzer_On();
+            
+            /* Initialize dot animation. */
+            
+    #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+            
+            g_dot_banner_index = 0;
+            
+    #endif
         }
 
       #endif // #if APP_BUZZER_ALARM_USAGE==1
@@ -4460,6 +4574,23 @@ void main(void)
                     else
                     {
                         Turn_Buzzer_Fancy((ualarm >> 6) & 0x07);
+                        
+                        /* Do the dot animation. */
+            
+                    #if APP_DATE_SPECIAL_DOT_ANIMATION == 1
+
+                        unsigned char udot = g_dot_banner_index;
+                        
+                        udot++;
+                        
+                        if (udot >= sizeof(g_dot_banner_index))
+                        {
+                            udot = 0;
+                        }
+                        
+                        g_dot_banner_index = udot;
+
+                    #endif
                     }
 
                     /* If there is still the alarm buzzer activated,
