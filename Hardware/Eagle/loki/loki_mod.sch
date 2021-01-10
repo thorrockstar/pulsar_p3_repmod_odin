@@ -9443,22 +9443,21 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </package>
 </packages>
 <symbols>
-<symbol name="PPAD">
-<wire x1="0" y1="-2.54" x2="1.27" y2="-1.27" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="-1.27" x2="0" y2="0" width="0.1524" layer="94"/>
-<wire x1="0" y1="0" x2="-1.27" y2="-1.27" width="0.1524" layer="94"/>
-<wire x1="-1.27" y1="-1.27" x2="0" y2="-2.54" width="0.1524" layer="94"/>
-<circle x="0" y="-1.27" radius="0.635" width="0.1524" layer="94"/>
-<text x="-2.54" y="-4.445" size="1.778" layer="95">&gt;NAME</text>
-<text x="2.54" y="-1.27" size="1.778" layer="97">&gt;TP_SIGNAL_NAME</text>
-<pin name="TP" x="0" y="2.54" visible="off" length="short" direction="in" rot="R270"/>
+<symbol name="TP">
+<wire x1="-0.762" y1="-0.762" x2="0" y2="0" width="0.254" layer="94"/>
+<wire x1="0" y1="0" x2="0.762" y2="-0.762" width="0.254" layer="94"/>
+<wire x1="0.762" y1="-0.762" x2="0" y2="-1.524" width="0.254" layer="94"/>
+<wire x1="0" y1="-1.524" x2="-0.762" y2="-0.762" width="0.254" layer="94"/>
+<text x="-1.27" y="1.27" size="1.778" layer="95">&gt;NAME</text>
+<text x="1.27" y="-1.27" size="1.778" layer="97">&gt;TP_SIGNAL_NAME</text>
+<pin name="TP" x="0" y="-2.54" visible="off" length="short" direction="in" rot="R90"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="TPSQ" prefix="TP">
+<deviceset name="TP" prefix="TP">
 <description>&lt;b&gt;Test pad&lt;/b&gt;</description>
 <gates>
-<gate name="G$1" symbol="PPAD" x="0" y="0"/>
+<gate name="G$1" symbol="TP" x="0" y="0"/>
 </gates>
 <devices>
 <device name="B1,27" package="B1,27">
@@ -9903,7 +9902,8 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="10M" library="l104g" deviceset="L104G" device=""/>
 <part name="1M" library="l104g" deviceset="L104G" device=""/>
 <part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="BUZZER" library="testpad" deviceset="TPSQ" device="TP10SQ"/>
+<part name="R10" library="resistor" deviceset="R-EU_" device="R0402" value="820"/>
+<part name="BUZZER" library="testpad" deviceset="TP" device="TP06SQ"/>
 </parts>
 <sheets>
 <sheet>
@@ -9915,9 +9915,6 @@ In the case of using an oscillator chip, connect its output to the OSI and leave
 Created by Roy Schneider 2020.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Loki Mod</text>
-<text x="25.4" y="50.8" size="1.778" layer="94">Note:
-Put a 820 to 1k resistor
-in series to the buzzer!</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>
@@ -9970,7 +9967,8 @@ in series to the buzzer!</text>
 <instance part="10M" gate="G$1" x="12.7" y="-33.02" rot="R90"/>
 <instance part="1M" gate="G$1" x="12.7" y="-63.5" rot="R90"/>
 <instance part="R9" gate="G$1" x="25.4" y="-7.62" rot="R90"/>
-<instance part="BUZZER" gate="G$1" x="30.48" y="63.5"/>
+<instance part="R10" gate="G$1" x="35.56" y="66.04"/>
+<instance part="BUZZER" gate="G$1" x="40.64" y="60.96" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -10583,7 +10581,7 @@ in series to the buzzer!</text>
 <wire x1="48.26" y1="73.66" x2="30.48" y2="73.66" width="0.1524" layer="91"/>
 <label x="33.02" y="73.66" size="1.778" layer="95"/>
 <wire x1="30.48" y1="73.66" x2="30.48" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="BUZZER" gate="G$1" pin="TP"/>
+<pinref part="R10" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -10612,6 +10610,13 @@ in series to the buzzer!</text>
 <wire x1="2.54" y1="-40.64" x2="25.4" y2="-40.64" width="0.1524" layer="91"/>
 <junction x="2.54" y="-45.72"/>
 <junction x="20.32" y="-12.7"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="BUZZER" gate="G$1" pin="TP"/>
+<pinref part="R10" gate="G$1" pin="2"/>
+<wire x1="40.64" y1="63.5" x2="40.64" y2="66.04" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
