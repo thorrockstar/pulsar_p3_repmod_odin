@@ -1096,15 +1096,17 @@ inline void enterSleep(void)
 
 /**
  * This function will turn the alarm buzzer on again.
+ *
+ * @param duration  Duration in ticks.
  */
 
 #if APP_BUZZER_ALARM_USAGE==1
 
-void Turn_Buzzer_On(void)
+void Turn_Buzzer_On(int duration)
 {
     /* Alarm counter used to keep the buzzer on. */
 
-    g_ucAlarm = 6000;
+    g_ucAlarm = duration;
 
     /* Set the display state to time reading. */
 
@@ -4551,6 +4553,14 @@ void main(void)
         /* Set the display state to time reading. */
 
         g_uDispState = DISP_STATE_TIME;
+        
+#if APP_BUZZER_ALARM_USAGE==1
+
+        /* Turn the alarm buzzer on. */
+
+        Turn_Buzzer_On(448/*duration*/);
+
+#endif // #if APP_BUZZER_ALARM_USAGE==1
 
   #else
 
@@ -4617,7 +4627,7 @@ void main(void)
 
             /* Turn the alarm buzzer on. */
 
-            Turn_Buzzer_On();
+            Turn_Buzzer_On(6000/*duration*/);
             
             /* Initialize dot animation. */
             
