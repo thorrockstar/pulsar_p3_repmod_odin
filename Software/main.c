@@ -98,7 +98,7 @@
  * 24 hour to 12 hour system conversion for the original Litronix display.
  */
 
-#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
 const unsigned char g_24_to_12_hours[] = { /* AM */12, 1, 2, 3, 4, 5, 6, \
                                                     7, 8, 9, 10, 11, \
@@ -293,7 +293,7 @@ const unsigned char g_div10[100] =
  * Table for animating the dot.
  */
 
-#if APP_DATE_SPECIAL_DOT_ANIMATION==1
+#if APP_ALARM_SPECIAL_DOT_ANIMATION==1
 
 const unsigned char g_dot_banner[60] =
 {
@@ -307,7 +307,7 @@ const unsigned char g_dot_banner[60] =
 
 unsigned char g_dot_banner_index = 0;
 
-#endif // #if APP_DATE_SPECIAL_DOT_ANIMATION==1
+#endif // #if APP_ALARM_SPECIAL_DOT_ANIMATION==1
 
 /**
  * Global button state variables. */
@@ -696,15 +696,15 @@ inline void Configure_Real_Time_Clock(void)
         RTCVALL = 1; // Day
         RTCVALH = 1; // Month
 
-#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+#if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
         
         RTCVALL = g_decimal_bcd[12]; // Hour
 
-#else // #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+#else // #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
 
         RTCVALL = 0; // Hour
         
-#endif // else #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+#endif // else #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
 
         RTCVALH = 3; // Weekday (1.1.2020 was a Wednesday)
 
@@ -1102,7 +1102,7 @@ inline void enterSleep(void)
 
 #if APP_BUZZER_ALARM_USAGE==1
 
-void Turn_Buzzer_On(int duration)
+void Turn_Buzzer_On(unsigned short duration)
 {
     /* Alarm counter used to keep the buzzer on. */
 
@@ -1953,7 +1953,7 @@ void PressPB1(void)
         *pb = DISP_STATE_DATE;
     }
 
-  #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+  #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
     else if (*pb == DISP_STATE_TIME)
     {
@@ -2296,7 +2296,7 @@ void HoldPB2(void)
 
         RTCCFGbits.RTCEN = 0;
 
-      #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+      #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
         ucExtra = 1;
 
@@ -3275,7 +3275,7 @@ void Display_Digits(void)
 
                         /* 24h -> 12h system */
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
                         g_ucLeftVal = g_24_to_12_hours[g_ucLeftVal];
 
@@ -3292,13 +3292,13 @@ void Display_Digits(void)
                             g_ucRightVal = 0;
                         }
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
                         g_ucDots = 3; // Show both dots.
 
                  #else
 
-                   #if APP_DATE_SPECIAL_DOT_ANIMATION==1
+                   #if APP_ALARM_SPECIAL_DOT_ANIMATION==1
 
                         if (g_ucAlarm)
                         {
@@ -3361,7 +3361,7 @@ void Display_Digits(void)
 
                         /* 24h -> 12h system */
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
                         /* Hours to indicate AM/PM dot. */
 
@@ -3378,7 +3378,7 @@ void Display_Digits(void)
 
                         g_ucDots = g_24_to_AMPM[ucTemp]; // AM/PM dot
 
-                 #elif APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+                 #elif APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
 
                         g_ucDots = 1;
 
@@ -3404,7 +3404,7 @@ void Display_Digits(void)
                             g_ucRightVal = 0;
                         }
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
                         g_ucLeftVal = 255;    // Show year with two digits.
 
@@ -3464,7 +3464,7 @@ void Display_Digits(void)
 
                         /* Alarm on/off */
 
-                      #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+                      #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
 
                         g_ucDots = ALRMCFGbits.ALRMEN ? 2 : 0;
 
@@ -3680,7 +3680,7 @@ void Display_Digits(void)
                     }
                     else if (ucPlex == 3)
                     {
-               #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+               #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
                         /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
@@ -3737,7 +3737,7 @@ void Display_Digits(void)
 
                         /* Ten hour digit */
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
 
                         if (g_ucLeftVal < 10)
                         {
@@ -3826,7 +3826,7 @@ void Display_Digits(void)
 
                  #endif
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
                         if (ucTemp)
                         {
                  #endif
@@ -3958,7 +3958,7 @@ void Display_Digits(void)
 
                  #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO
+                 #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
                         }
                  #endif
 
@@ -4631,7 +4631,7 @@ void main(void)
             
             /* Initialize dot animation. */
             
-    #if APP_DATE_SPECIAL_DOT_ANIMATION==1
+    #if APP_ALARM_SPECIAL_DOT_ANIMATION==1
             
             g_dot_banner_index = 0;
             
@@ -4677,7 +4677,7 @@ void main(void)
                         
                         /* Do the dot animation. */
             
-                    #if APP_DATE_SPECIAL_DOT_ANIMATION==1
+                    #if APP_ALARM_SPECIAL_DOT_ANIMATION==1
 
                         unsigned char udot = g_dot_banner_index;
                         

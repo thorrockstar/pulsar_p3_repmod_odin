@@ -49,9 +49,9 @@
  */
 
 // Original Litronix display using common cathodes.
-#define APP_PULSAR_WRIST_WATCH_12H_NON_AUTO        0 // Pulsar P3 Odin module.
+#define APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD        0 // Pulsar P3 Odin module.
 // USSR made L104G display using common anodes.
-#define APP_PULSAR_WRIST_WATCH_24H_NON_AUTO        1 // Pulsar P3 Loki module.
+#define APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD        1 // Pulsar P3 Loki module.
 // Using Litronix/Siemens bubble display.
 #define APP_PROTOTYPE_BREAD_BOARD                  2 // Just my breadboard.
 // Using VFD tubes.
@@ -61,7 +61,7 @@
  * Choose watch module type, that shall be build.
  */
  
-#define APP_WATCH_TYPE_BUILD    APP_PULSAR_WRIST_WATCH_12H_NON_AUTO
+#define APP_WATCH_TYPE_BUILD    APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD
 
 /**
  * Define if the LED display has common cathode or anode. Basically
@@ -73,69 +73,59 @@
 #define APP_WATCH_COMMON_CATHODE    0
 #define APP_WATCH_COMMON_ANODE      1
 
-#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
-
-    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
-    #define APP_WATCH_ANY_PULSAR_MODEL  1
-
-#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
-
-    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
-
-    #define APP_WATCH_ANY_PULSAR_MODEL  1
-
-#elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
-
-    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
-    #define APP_WATCH_ANY_PULSAR_MODEL  0
-
-#elif (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH))
-
-    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
-    #define APP_WATCH_ANY_PULSAR_MODEL  0
-
-#else
-
-    #define APP_WATCH_COMMON_PIN_USING  APP_WATCH_COMMON_CATHODE
-    #define APP_WATCH_ANY_PULSAR_MODEL  0
-
-#endif
-
 /**
  * Define to turn on display dimming via a LDR and the alarm feature.
  */
 
-#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
-
+#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD)
+  // Odin
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 1
   #define APP_LIGHT_SENSOR_USAGE                     1
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
-  #define APP_DATE_SPECIAL_DOT_ANIMATION             0
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
 
-#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
-
+#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD)
+  // Loki
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 1
   #define APP_LIGHT_SENSOR_USAGE                     0
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
   #define APP_BUZZER_ALARM_USAGE                     1
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
-  #define APP_DATE_SPECIAL_DOT_ANIMATION             1
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            1
 
 #elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
-
+  // VFD table watch
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 0
   #define APP_LIGHT_SENSOR_USAGE                     1
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
-  #define APP_DATE_SPECIAL_DOT_ANIMATION             0
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
 
-#else
-
+#elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
+  // Bread board
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 0
   #define APP_LIGHT_SENSOR_USAGE                     1
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
-  #define APP_DATE_SPECIAL_DOT_ANIMATION             0
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
+
+#else
+  // Generic
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 0
+  #define APP_LIGHT_SENSOR_USAGE                     1
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
+  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 0
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
 
 #endif
 
@@ -200,7 +190,7 @@ typedef void(*ButtonHandlerType)(void);
 /**
 * Button port definitions */
 
-#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_NON_AUTO)
+#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_ODIN_MOD)
 
 // Pulsar P2/3 with original display
 
@@ -217,7 +207,7 @@ typedef void(*ButtonHandlerType)(void);
     #define PB3_PORT_BITS   PORTAbits
     #define PB3_PIN         RA0
 
-#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_NON_AUTO)
+#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD)
 
 // Pulsar P2/3 with replacement display
 
