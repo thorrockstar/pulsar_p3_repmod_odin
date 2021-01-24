@@ -9177,7 +9177,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="U$1" library="pic18f24j11" deviceset="PIC18F24J11-I/ML" device=""/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0402" value="10K"/>
 <part name="C2" library="resistor" deviceset="C-EU" device="C0603" value="0.1 uF"/>
-<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="10 uF"/>
+<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="1 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
 <part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="120"/>
