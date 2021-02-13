@@ -341,12 +341,13 @@ typedef enum DisplayStateEnum
     DISP_STATE_SET_YEAR = 11,
     DISP_STATE_SET_WEEKDAY = 12,
     DISP_STATE_SET_SECONDS = 13,
+    DISP_STATE_SET_CALIBRA = 14,
     // Alarm on/off
-    DISP_STATE_TOGGLE_ALARM = 14,
+    DISP_STATE_TOGGLE_ALARM = 15,
     // Wait for starting the seconds again.
-    DISP_STATE_SECONDS_STALLED = 15,
+    DISP_STATE_SECONDS_STALLED = 16,
     // Debug
-    DISP_STATE_LIGHT_SENSOR = 16
+    DISP_STATE_LIGHT_SENSOR = 17
 
 } DisplayStateEnum;
 

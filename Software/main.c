@@ -133,7 +133,7 @@ const unsigned char g_numerical_7segment[16] =
     MAKE_7SEG(1,1,1,0,0,0,0),   // 7
     MAKE_7SEG(1,1,1,1,1,1,1),   // 8
     MAKE_7SEG(1,1,1,1,0,1,1),   // 9
-    MAKE_7SEG(0,0,0,0,0,0,1),   // 10
+    MAKE_7SEG(0,0,0,0,0,0,1),   // 10 (Minus))
     MAKE_7SEG(0,0,0,0,0,0,1),   // 11
     MAKE_7SEG(0,0,0,0,0,0,1),   // 12
     MAKE_7SEG(0,0,0,0,0,0,1),   // 13
@@ -169,7 +169,7 @@ const unsigned char g_weekday_7segment[16] =
     MAKE_7SEG(1,0,1,1,0,1,1),   // S
     MAKE_7SEG(1,1,1,0,1,1,1),   // A
     \
-    MAKE_7SEG(0,0,0,0,0,0,1),   // -
+    MAKE_7SEG(0,0,0,0,0,0,0),   // [blank]
     MAKE_7SEG(0,0,0,0,0,0,1),   // -
 };
 
@@ -1888,9 +1888,16 @@ void HoldPB0(void)
     if ((g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
-        if (g_uDispState == DISP_STATE_TIME)
+        DisplayStateType istate = g_uDispState;
+    
+        if (istate == DISP_STATE_TIME)
         {
             g_uDispState = DISP_STATE_SECONDS;
+        }
+        else if ((istate == DISP_STATE_YEAR) || \
+                 (istate == DISP_STATE_LIGHT_SENSOR))
+        {
+            g_uDispState = DISP_STATE_SET_CALIBRA;
         }
     }
 }
@@ -2743,6 +2750,67 @@ void HoldPB3(void)
 
         Lock_RTCC();
     }
+    else if (ust == DISP_STATE_SET_CALIBRA)
+    {
+        /* Unlock write access to the RTC and disable the clock. */
+
+        Unlock_RTCC();
+
+        /* Enable writing to the RTC */
+
+        RTCCFGbits.RTCWREN = 1;
+
+        /* Stop RTC operation. */
+
+        RTCCFGbits.RTCEN = 0;
+
+        /* Forward the calibration register and turn around on max. */
+
+        ucTemp = RTCCAL;
+        
+        /* Check if passing the maximum absolute value. */
+        
+        if (ucTemp & 0x80)
+        {
+            /* Negative calibration for clocks running too fast. */
+            
+            if (ucTemp >= 0xFE)
+            {
+                /* Turn around to zero value. */
+
+                ucTemp = 0;
+            }
+            else
+            {
+                ucTemp += 2;
+            }
+        }
+        else // if (ucTemp & 0x80)
+        {
+            /* Positive calibration for clocks running too slow. */
+
+            if (ucTemp >= 0x7E)
+            {
+                /* Turn around to maximum negative value. */
+
+                ucTemp = 0x82;
+            }
+            else
+            {
+                ucTemp += 2;
+            }
+        }
+        
+        RTCCAL = ucTemp;
+
+        /* Enable the RTC operation again.*/
+
+        RTCCFGbits.RTCEN = 1;
+
+        /* Lock writing to the RTCC. */
+
+        Lock_RTCC();
+    }
 
   #if APP_BUZZER_ALARM_USAGE==1
 
@@ -3325,6 +3393,29 @@ void Display_Digits(void)
                         }
                     break;
 
+                    case DISP_STATE_SET_CALIBRA:
+                        ucTemp = RTCCAL;
+                        
+                        /* Check the value to be negative.
+                         * If yes show a minus. */
+                        
+                        if (ucTemp & 0x80) // MSB
+                        {
+                            g_ucLeftVal = 128; /*Minus*/
+
+                            ucTemp ^= 0xFF; // 1-compliment
+                            ucTemp++;       // 2-compliment
+                        }
+                        else
+                        {
+                            g_ucLeftVal = 255; /*Blank*/
+                        }
+
+                        /* Show the absolute value on the right digits. */
+
+                        g_ucRightVal = ucTemp >> 1;
+                    break;
+                    
                   #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
                     case DISP_STATE_LIGHT_SENSOR:
@@ -3501,13 +3592,22 @@ void Display_Digits(void)
             {
                 /* Hide the left two digits? */
 
-                if (g_ucLeftVal != 255)
+                ucTemp = g_ucLeftVal;
+                
+                if (ucTemp != 255)
                 {
                     /* One hour digit */
 
                     if (ucPlex == 2)
                     {
-                        ucTemp = *(pb + (g_mod10[g_ucLeftVal]));
+                        if (ucTemp == 128)
+                        {
+                            ucTemp = *(pb + 10 /*Minus*/);
+                        }
+                        else
+                        {
+                            ucTemp = *(pb + (g_mod10[ucTemp]));
+                        }
 
                         /* Turn all common pins off by setting the outputs
                          * to tri-state high impedance by making inputs out of
@@ -3712,7 +3812,7 @@ void Display_Digits(void)
 
                         /* Ten hour digit and dots */
 
-                        if (g_ucLeftVal >= 10)
+                        if ((ucTemp >= 10) && (ucTemp <= 12))
                         {
                             LED_AA_B = 1;
                             LED_AD_C = 1;
@@ -3739,7 +3839,7 @@ void Display_Digits(void)
 
                  #if APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_24H_LOKI_MOD
 
-                        if (g_ucLeftVal < 10)
+                        if (ucTemp < 10)
                         {
                             switch(g_uDispStateBackup)
                             {
@@ -3749,14 +3849,14 @@ void Display_Digits(void)
                                 case DISP_STATE_SET_MINUTES:
                                 case DISP_STATE_SET_MONTH:
                                 case DISP_STATE_SET_DAY:
-                                    ucTemp = 0;
+                                    ucTemp = 0; // blank
                                     break;
 
                         #if APP_BUZZER_ALARM_USAGE==1
 
                                 case DISP_STATE_ALARM:
                                 case DISP_STATE_TOGGLE_ALARM:
-                                    ucTemp = 0;
+                                    ucTemp = 0; // blank
                                     break;
                         #endif
 
@@ -3765,9 +3865,13 @@ void Display_Digits(void)
                                     break;
                             }
                         }
+                        else if (ucTemp == 128)
+                        {
+                            ucTemp = 0; // blank
+                        }
                         else
                         {
-                            ucTemp = g_div10[g_ucLeftVal];
+                            ucTemp = g_div10[ucTemp];
                             ucTemp = *(pb + ucTemp);
                         }
 
@@ -4018,7 +4122,9 @@ void Display_Digits(void)
             {
                 /* Right two digits. */
 
-                if (g_ucRightVal != 255)
+                ucTemp = g_ucRightVal;
+                
+                if (ucTemp != 255)
                 {
                     /* One minute digit */
 
@@ -4026,11 +4132,11 @@ void Display_Digits(void)
                     {
                         if (pb == g_weekday_7segment)
                         {
-                            ucTemp = *(pb + (g_ucRightVal << 1) + 1);
+                            ucTemp = *(pb + (ucTemp << 1) + 1);
                         }
                         else
                         {
-                            ucTemp = *(pb + (g_mod10[g_ucRightVal]));
+                            ucTemp = *(pb + (g_mod10[ucTemp]));
                         }
 
                         /* Turn all common pins off by setting the outputs
@@ -4218,21 +4324,21 @@ void Display_Digits(void)
 
                         if (pb == g_weekday_7segment)
                         {
-                            ucTemp = *(pb + (g_ucRightVal << 1));
+                            ucTemp = *(pb + (ucTemp << 1));
                         }
                         else
                         {
 
                  #if APP_WATCH_ANY_PULSAR_MODEL==1
 
-                            if (g_ucRightVal < 10)
+                            if (ucTemp < 10)
                             {
                                 switch(g_uDispStateBackup)
                                 {
                                     case DISP_STATE_DATE:
                                     case DISP_STATE_SET_MONTH:
                                     case DISP_STATE_SET_DAY:
-                                        ucTemp = 0;
+                                        ucTemp = 0; // blank
                                         break;
 
                                     default:
@@ -4242,13 +4348,13 @@ void Display_Digits(void)
                             }
                             else
                             {
-                                ucTemp = g_div10[g_ucRightVal];
+                                ucTemp = g_div10[ucTemp];
                                 ucTemp = *(pb + ucTemp);
                             }
 
                  #else // No Pulsar wrist watch.
 
-                            ucTemp = g_div10[g_ucRightVal];
+                            ucTemp = g_div10[ucTemp];
                             ucTemp = *(pb + ucTemp);
 
                  #endif

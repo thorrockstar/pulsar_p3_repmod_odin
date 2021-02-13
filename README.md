@@ -60,7 +60,7 @@ Dipl.-Ing.(FH) Roy Schneider
 Useful Information
 ==================
 
-More information about old PulsarLED watches, can be found here:
+More information about old Pulsar LED watches, can be found here:
 
 Pulsar LED Watch Forum:
 http://www.oldpulsars.com/
@@ -87,7 +87,7 @@ This feature is only available for the 'Loki' modules, using the USSR made repla
 
 **Note:**
 
-Don't expect the alarm to be loud... it will not be loud enought to wake you up, simply because it is silenced by the massive metal case of the watch. :-)
+Don't expect the alarm to be loud... it will not be loud enough to wake you up, simply because it is silenced by the massive metal case of the watch. :-)
 
 **Set Alarm**
 
@@ -101,3 +101,8 @@ Light Sensor Readout
 ====================
 
 This applies only to the 'Odin' modules, if the light sensor option has been turned on. If you hold the DATE button pressed for more than a second, the watch will show the weekday and then, if you still keep the button pressed, the year. If you keep the button even longer pressed, a number will appear, that reflects the light sensor value. On normal daylight, that value shall be between two and four. On strong sun light five to six. If you are in dim light, the watch shall show one or zero. This readout is meant to make it easy to check, if the light sensor is working correctly.
+
+Calibration
+===========
+
+The real-time crystal signal can be calibrated, so that the watch can provide an error of less than three seconds per month. If using the vintage original crystal, you will have easily 5 to 20 seconds drift per week, as those crystals are often hopelessly out tuned. By pressing the DATE button and holding it pressed, until the year or light sensor read out appears and then pressing the TIME button as well for a second, you will enter the drift calibration mode. You can now release the TIME button and use the magnet in the MIN recess to forward the calibration value. Once it has reached 63 it will flip over to minus 63 and then counts to zero again. A positive value will speed up the watch by x\*2.5 seconds per week. A negative value will slow down the watch by x\*2.5 seconds by week.
