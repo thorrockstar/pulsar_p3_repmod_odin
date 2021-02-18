@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.0125" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.00625" altunitdist="inch" altunit="inch"/>
+<grid distance="0.002" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.001" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -60,8 +60,8 @@
 <package name="PULSAR_P3_LED_DISPLAY">
 <description>Pulsar P3 Display made by Litronix in '72.</description>
 <smd name="P$9_KATHODE_10_MIN" x="0.635" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
-<smd name="P$10_KATHODE_1_HOUR" x="0.47625" y="2.69875" dx="1.651" dy="1.143" layer="1"/>
-<smd name="P$11_KATHODE_10_HOUR" x="0.47625" y="0.635" dx="1.651" dy="1.143" layer="1"/>
+<smd name="P$10_KATHODE_1_HOUR" x="0.47625" y="2.80035" dx="1.651" dy="1.143" layer="1"/>
+<smd name="P$11_KATHODE_10_HOUR" x="0.47625" y="0.7874" dx="1.651" dy="1.143" layer="1"/>
 <smd name="P$12" x="9.525" y="0.47625" dx="1.143" dy="1.651" layer="1"/>
 <smd name="P$8_KATHODE_1_MIN" x="2.460625" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
 <smd name="P$7_ANODE_G" x="4.28625" y="4.92125" dx="1.143" dy="1.651" layer="1"/>

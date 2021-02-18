@@ -5670,8 +5670,8 @@ DIN A4, with small doc field</description>
 <package name="PULSAR_P3_LED_DISPLAY">
 <description>Pulsar P3 Display made by Litronix in '72.</description>
 <smd name="P$9_KATHODE_10_MIN" x="0.635" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
-<smd name="P$10_KATHODE_1_HOUR" x="0.47625" y="2.69875" dx="1.651" dy="1.143" layer="1"/>
-<smd name="P$11_KATHODE_10_HOUR" x="0.47625" y="0.635" dx="1.651" dy="1.143" layer="1"/>
+<smd name="P$10_KATHODE_1_HOUR" x="0.47625" y="2.80035" dx="1.651" dy="1.143" layer="1"/>
+<smd name="P$11_KATHODE_10_HOUR" x="0.47625" y="0.7874" dx="1.651" dy="1.143" layer="1"/>
 <smd name="P$12" x="9.525" y="0.47625" dx="1.143" dy="1.651" layer="1"/>
 <smd name="P$8_KATHODE_1_MIN" x="2.460625" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
 <smd name="P$7_ANODE_G" x="4.28625" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
