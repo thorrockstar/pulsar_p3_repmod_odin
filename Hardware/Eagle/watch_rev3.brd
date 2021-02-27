@@ -2564,13 +2564,13 @@ design rules under a new name.</description>
 <element name="R1" library="rcl" package="R0402" value="10K" x="2.54" y="5.334" rot="R90"/>
 <element name="C2" library="resistor" package="C0603" value="0.1 uF" x="4.572" y="2.286" rot="R135"/>
 <element name="CEFC" library="resistor" package="C0603" value="1 uF" x="17.145" y="2.54" rot="R45"/>
-<element name="R2" library="resistor" package="R0402" value="120" x="17.5514" y="18.669" rot="R270"/>
-<element name="R3" library="resistor" package="R0402" value="120" x="15.7226" y="18.669" rot="R270"/>
-<element name="R4" library="resistor" package="R0402" value="120" x="13.9446" y="18.6436" rot="R270"/>
-<element name="R5" library="resistor" package="R0402" value="120" x="12.0904" y="18.6182" rot="R270"/>
-<element name="R6" library="resistor" package="R0402" value="120" x="10.287" y="18.6182" rot="R270"/>
-<element name="R7" library="resistor" package="R0402" value="120" x="8.4582" y="18.6182" rot="R270"/>
-<element name="R8" library="resistor" package="R0402" value="120" x="6.6294" y="18.6182" rot="R270"/>
+<element name="R2" library="resistor" package="R0402" value="100" x="17.5514" y="18.669" rot="R270"/>
+<element name="R3" library="resistor" package="R0402" value="100" x="15.7226" y="18.669" rot="R270"/>
+<element name="R4" library="resistor" package="R0402" value="100" x="13.9446" y="18.6436" rot="R270"/>
+<element name="R5" library="resistor" package="R0402" value="100" x="12.0904" y="18.6182" rot="R270"/>
+<element name="R6" library="resistor" package="R0402" value="100" x="10.287" y="18.6182" rot="R270"/>
+<element name="R7" library="resistor" package="R0402" value="100" x="8.4582" y="18.6182" rot="R270"/>
+<element name="R8" library="resistor" package="R0402" value="100" x="6.6294" y="18.6182" rot="R270"/>
 <element name="R14" library="resistor" package="R0402" value="4.7k" x="5.08" y="5.715" rot="R90"/>
 <element name="R15" library="resistor" package="R0402" value="4.7k" x="0.762" y="12.2936" rot="R90"/>
 <element name="C4" library="resistor" package="C0603" value="12 pF" x="13.8684" y="21.6154" rot="R180"/>
