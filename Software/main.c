@@ -2206,9 +2206,9 @@ void HoldPB2(void)
 
     /* Check if setting hours, minutes, month or day. */
 
-    const DisplayStateType ustate = g_uDispState;
+    const DisplayStateType ust = g_uDispState;
 
-    if (ustate == DISP_STATE_SET_HOURS)
+    if (ust == DISP_STATE_SET_HOURS)
     {
         /* Unlock write access to the RTC and disable the clock. */
 
@@ -2247,7 +2247,7 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
-    else if (ustate == DISP_STATE_SET_MONTH)
+    else if (ust == DISP_STATE_SET_MONTH)
     {
         /* Unlock write access to the RTC and disable the clock. */
 
@@ -2289,7 +2289,7 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
-    else if (ustate == DISP_STATE_SET_DAY)
+    else if (ust == DISP_STATE_SET_DAY)
     {
         /* Unlock write access to the RTC and disable the clock. */
 
@@ -2397,7 +2397,7 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
-    else if (ustate == DISP_STATE_SET_YEAR)
+    else if (ust == DISP_STATE_SET_YEAR)
     {
         /* Unlock write access to the RTC and disable the clock. */
 
@@ -2437,11 +2437,72 @@ void HoldPB2(void)
 
         Lock_RTCC();
     }
+    else if (ust == DISP_STATE_SET_CALIBRA)
+    {
+        /* Unlock write access to the RTC and disable the clock. */
+
+        Unlock_RTCC();
+
+        /* Enable writing to the RTC */
+
+        RTCCFGbits.RTCWREN = 1;
+
+        /* Stop RTC operation. */
+
+        RTCCFGbits.RTCEN = 0;
+
+        /* Forward the calibration register and turn around on max. */
+
+        ucTemp = RTCCAL;
+        
+        /* Check if passing the maximum absolute value. */
+        
+        if (ucTemp & 0x80)
+        {
+            /* Negative calibration for clocks running too fast. */
+            
+            if (ucTemp <= 0x81)
+            {
+                /* Turn around to zero value. */
+
+                ucTemp = 0x7E;
+            }
+            else
+            {
+                ucTemp -= 2;
+            }
+        }
+        else // if (ucTemp & 0x80)
+        {
+            /* Positive calibration for clocks running too slow. */
+
+            if (ucTemp <= 0x01)
+            {
+                /* Turn around to maximum negative value. */
+
+                ucTemp = 0xFE;
+            }
+            else
+            {
+                ucTemp -= 2;
+            }
+        }
+        
+        RTCCAL = ucTemp;
+
+        /* Enable the RTC operation again.*/
+
+        RTCCFGbits.RTCEN = 1;
+
+        /* Lock writing to the RTCC. */
+
+        Lock_RTCC();
+    }
 
   #if APP_BUZZER_ALARM_USAGE==1
 
-    else if ((ustate == DISP_STATE_ALARM) || \
-             (ustate == DISP_STATE_TOGGLE_ALARM))
+    else if ((ust == DISP_STATE_ALARM) || \
+             (ust == DISP_STATE_TOGGLE_ALARM))
     {
         /* Unlock write access to the RTC and disable the clock. */
 
@@ -2983,9 +3044,9 @@ void ReleasePB3(void)
     /* For Pulsar P2/P3/P4 compatibility, indicate to stop/stall the RTC,
      * until the time readout button has been pressed the first time. */
 
-    const DisplayStateType ustate = g_uDispState;
+    const DisplayStateType ust = g_uDispState;
 
-    if (ustate == DISP_STATE_SET_MINUTES)
+    if (ust == DISP_STATE_SET_MINUTES)
     {
         g_uDispState = DISP_STATE_SECONDS_STALLED;
     }
