@@ -9177,7 +9177,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="U$1" library="pic18f24j11" deviceset="PIC18F24J11-I/ML" device=""/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0402" value="10K"/>
 <part name="C2" library="resistor" deviceset="C-EU" device="C0603" value="0.1 uF"/>
-<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="1 uF"/>
+<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="4.7-10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
 <part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
@@ -9240,10 +9240,10 @@ anode to LIGHTOUT.</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>
-<instance part="R1" gate="G$1" x="-116.84" y="121.92" rot="R270"/>
+<instance part="R1" gate="G$1" x="-119.38" y="121.92" rot="R270"/>
 <instance part="C2" gate="G$1" x="-93.98" y="50.8" rot="R180"/>
-<instance part="CEFC" gate="G$1" x="-109.22" y="109.22"/>
-<instance part="SUPPLY2" gate="GND" x="-109.22" y="101.6"/>
+<instance part="CEFC" gate="G$1" x="-114.3" y="109.22"/>
+<instance part="SUPPLY2" gate="GND" x="-114.3" y="101.6"/>
 <instance part="SUPPLY3" gate="GND" x="-104.14" y="53.34"/>
 <instance part="R2" gate="G$1" x="-45.72" y="22.86"/>
 <instance part="R3" gate="G$1" x="-45.72" y="15.24"/>
@@ -9356,10 +9356,10 @@ anode to LIGHTOUT.</text>
 <pinref part="U$1" gate="A" pin="~MCLR"/>
 <wire x1="-83.82" y1="106.68" x2="-101.6" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="-101.6" y1="106.68" x2="-101.6" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="-101.6" y1="96.52" x2="-116.84" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="-101.6" y1="96.52" x2="-119.38" y2="96.52" width="0.1524" layer="91"/>
 <label x="-99.06" y="106.68" size="1.778" layer="95"/>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="-116.84" y1="96.52" x2="-116.84" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="-119.38" y1="96.52" x2="-119.38" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="33.02" x2="-106.68" y2="33.02" width="0.1524" layer="91"/>
@@ -9477,8 +9477,8 @@ anode to LIGHTOUT.</text>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="-116.84" y1="127" x2="-116.84" y2="132.08" width="0.1524" layer="91"/>
-<label x="-116.84" y="132.08" size="1.778" layer="95"/>
+<wire x1="-119.38" y1="127" x2="-119.38" y2="132.08" width="0.1524" layer="91"/>
+<label x="-119.38" y="132.08" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="VDD"/>
@@ -9696,18 +9696,11 @@ anode to LIGHTOUT.</text>
 <label x="-91.44" y="-35.56" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="RA2/SW4" class="0">
-<segment>
-<pinref part="U$1" gate="A" pin="RA2/AN2/VREF-/CVREF/C2INB"/>
-<wire x1="-83.82" y1="96.52" x2="-96.52" y2="96.52" width="0.1524" layer="91"/>
-<label x="-99.06" y="96.52" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="VDDCORE/VCAP" class="0">
 <segment>
 <pinref part="U$1" gate="A" pin="VDDCORE/VCAP"/>
 <pinref part="CEFC" gate="G$1" pin="1"/>
-<wire x1="-83.82" y1="111.76" x2="-109.22" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="-83.82" y1="111.76" x2="-114.3" y2="111.76" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$1" class="0">

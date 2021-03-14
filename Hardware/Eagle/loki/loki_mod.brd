@@ -2570,14 +2570,14 @@ design rules under a new name.</description>
 </element>
 <element name="R1" library="rcl" package="R0402" value="10K" x="2.54" y="5.334" rot="R90"/>
 <element name="C2" library="resistor" package="C0603" value="0.1 uF" x="4.4704" y="2.159" rot="R135"/>
-<element name="CEFC" library="resistor" package="C0603" value="1 uF" x="18.1102" y="2.6924" rot="R45"/>
-<element name="R2" library="resistor" package="R0402" value="105" x="19.4564" y="20.8788" rot="R90"/>
-<element name="R3" library="resistor" package="R0402" value="105" x="16.6624" y="19.5834" rot="R180"/>
-<element name="R4" library="resistor" package="R0402" value="105" x="17.018" y="6.2992" rot="R90"/>
+<element name="CEFC" library="resistor" package="C0603" value="4.7-10 uF" x="18.1102" y="2.6924" rot="R45"/>
+<element name="R2" library="resistor" package="R0402" value="105/140" x="19.4564" y="20.8788" rot="R90"/>
+<element name="R3" library="resistor" package="R0402" value="105/140" x="16.6624" y="19.5834" rot="R180"/>
+<element name="R4" library="resistor" package="R0402" value="105/140" x="17.018" y="6.2992" rot="R90"/>
 <element name="R5" library="resistor" package="R0402" value="105" x="12.2174" y="19.5326" rot="R180"/>
-<element name="R6" library="resistor" package="R0402" value="105" x="16.8148" y="9.271"/>
-<element name="R7" library="resistor" package="R0402" value="105" x="2.794" y="20.8788" rot="R90"/>
-<element name="R8" library="resistor" package="R0402" value="105" x="6.096" y="19.5326" rot="R180"/>
+<element name="R6" library="resistor" package="R0402" value="105/140" x="16.8148" y="9.271"/>
+<element name="R7" library="resistor" package="R0402" value="105/140" x="2.794" y="20.8788" rot="R90"/>
+<element name="R8" library="resistor" package="R0402" value="105/140" x="6.096" y="19.5326" rot="R180"/>
 <element name="R14" library="resistor" package="R0402" value="4.7k" x="4.5974" y="6.1976" rot="R90"/>
 <element name="R15" library="resistor" package="R0402" value="4.7k" x="4.8768" y="9.2202" rot="R180"/>
 <element name="C4" library="resistor" package="C0603" value="12 pF" x="14.1732" y="21.59" rot="R180"/>
@@ -2603,8 +2603,8 @@ design rules under a new name.</description>
 <element name="1H" library="l104g" package="L104G" value="L104G" x="5.715" y="11.4046"/>
 <element name="10M" library="l104g" package="L104G" value="L104G" x="11.1506" y="11.4046"/>
 <element name="1M" library="l104g" package="L104G" value="L104G" x="16.5862" y="11.43"/>
-<element name="R9" library="resistor" package="R0402" value="105" x="6.0452" y="3.175" rot="R135"/>
-<element name="R10" library="resistor" package="R0402" value="820" x="15.5956" y="2.794" rot="R45"/>
+<element name="R9" library="resistor" package="R0402" value="105/140" x="6.0452" y="3.175" rot="R135"/>
+<element name="R10" library="resistor" package="R0402" value="680" x="15.5956" y="2.794" rot="R45"/>
 <element name="BUZZER" library="testpad" package="TP06SQ" value="TPTP06SQ" x="16.6878" y="3.7084" rot="R45">
 <attribute name="TP_SIGNAL_NAME" value="" x="16.6878" y="3.7084" size="1.778" layer="27" rot="R45" display="off"/>
 </element>

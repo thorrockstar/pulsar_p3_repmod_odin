@@ -9858,16 +9858,16 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$1" library="pic18f24j11" deviceset="PIC18F24J11-I/ML" device=""/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0402" value="10K"/>
 <part name="C2" library="resistor" deviceset="C-EU" device="C0603" value="0.1 uF"/>
-<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="1 uF"/>
+<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="4.7-10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
 <part name="R14" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="R15" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
@@ -9901,8 +9901,8 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="1H" library="l104g" deviceset="L104G" device=""/>
 <part name="10M" library="l104g" deviceset="L104G" device=""/>
 <part name="1M" library="l104g" deviceset="L104G" device=""/>
-<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R10" library="resistor" deviceset="R-EU_" device="R0402" value="820"/>
+<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R10" library="resistor" deviceset="R-EU_" device="R0402" value="680"/>
 <part name="BUZZER" library="testpad" deviceset="TP" device="TP06SQ"/>
 </parts>
 <sheets>
@@ -9918,13 +9918,16 @@ This is public domain.</text>
 <text x="-77.978" y="-11.43" size="1.778" layer="94">Use 105 Ohm for ALS314A common
 cathode and 140 Ohm for AL304G
 with common anode.</text>
+<text x="39.37" y="-32.258" size="1.778" layer="94" rot="R90">Use 105 Ohm for ALS314A common
+cathode and 140 Ohm for AL304G
+with common anode.</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>
-<instance part="R1" gate="G$1" x="-116.84" y="121.92" rot="R270"/>
+<instance part="R1" gate="G$1" x="-119.38" y="121.92" rot="R270"/>
 <instance part="C2" gate="G$1" x="-93.98" y="50.8" rot="R180"/>
-<instance part="CEFC" gate="G$1" x="-109.22" y="109.22"/>
-<instance part="SUPPLY2" gate="GND" x="-109.22" y="101.6"/>
+<instance part="CEFC" gate="G$1" x="-114.3" y="109.22"/>
+<instance part="SUPPLY2" gate="GND" x="-114.3" y="101.6"/>
 <instance part="SUPPLY3" gate="GND" x="-104.14" y="53.34"/>
 <instance part="R2" gate="G$1" x="-53.34" y="22.86"/>
 <instance part="R3" gate="G$1" x="-53.34" y="15.24"/>
@@ -10035,10 +10038,10 @@ with common anode.</text>
 <pinref part="U$1" gate="A" pin="~MCLR"/>
 <wire x1="-83.82" y1="106.68" x2="-101.6" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="-101.6" y1="106.68" x2="-101.6" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="-101.6" y1="96.52" x2="-116.84" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="-101.6" y1="96.52" x2="-119.38" y2="96.52" width="0.1524" layer="91"/>
 <label x="-99.06" y="106.68" size="1.778" layer="95"/>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="-116.84" y1="96.52" x2="-116.84" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="-119.38" y1="96.52" x2="-119.38" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="33.02" x2="-106.68" y2="33.02" width="0.1524" layer="91"/>
@@ -10093,8 +10096,8 @@ with common anode.</text>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="-116.84" y1="127" x2="-116.84" y2="132.08" width="0.1524" layer="91"/>
-<label x="-116.84" y="132.08" size="1.778" layer="95"/>
+<wire x1="-119.38" y1="127" x2="-119.38" y2="132.08" width="0.1524" layer="91"/>
+<label x="-119.38" y="132.08" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="VDD"/>
@@ -10336,7 +10339,7 @@ with common anode.</text>
 <segment>
 <pinref part="U$1" gate="A" pin="VDDCORE/VCAP"/>
 <pinref part="CEFC" gate="G$1" pin="1"/>
-<wire x1="-83.82" y1="111.76" x2="-109.22" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="-83.82" y1="111.76" x2="-114.3" y2="111.76" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="OSC2/RA6" class="0">
