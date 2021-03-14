@@ -9180,13 +9180,13 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="1 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
-<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
-<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
-<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="100"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
 <part name="R14" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="R15" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
