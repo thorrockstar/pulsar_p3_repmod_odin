@@ -2,14 +2,14 @@ EAGLE AutoRouter Statistics:
 
 Job           : D:/Projekte/Privat/Watch/Pulsar_P3_Odin/Hardware/Eagle/loki/loki_mod.brd
 
-Start at      : 01:14:41 (01.12.2020)
-End at        : 01:14:43 (01.12.2020)
+Start at      : 22:55:40 (05.05.2021)
+End at        : 22:55:41 (05.05.2021)
 Elapsed time  : 00:00:01
 
-Signals       :    34   RoutingGrid: 1 mil  Layers: 2
-Connections   :    81   predefined:  81 ( 94 Vias )
+Signals       :    35   RoutingGrid: 1 mil  Layers: 2
+Connections   :    85   predefined:  85 ( 97 Vias )
 
-Router memory :   4546620
+Router memory :   4608000
 
 Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 

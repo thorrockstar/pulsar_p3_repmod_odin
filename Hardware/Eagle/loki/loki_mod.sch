@@ -9858,16 +9858,16 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="U$1" library="pic18f24j11" deviceset="PIC18F24J11-I/ML" device=""/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0402" value="10K"/>
 <part name="C2" library="resistor" deviceset="C-EU" device="C0603" value="0.1 uF"/>
-<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="4.7-10 uF"/>
+<part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
-<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="105"/>
-<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
-<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
 <part name="R14" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="R15" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
@@ -9901,7 +9901,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="1H" library="l104g" deviceset="L104G" device=""/>
 <part name="10M" library="l104g" deviceset="L104G" device=""/>
 <part name="1M" library="l104g" deviceset="L104G" device=""/>
-<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="105/140"/>
+<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
 <part name="R10" library="resistor" deviceset="R-EU_" device="R0402" value="680"/>
 <part name="BUZZER" library="testpad" deviceset="TP" device="TP06SQ"/>
 </parts>
@@ -9910,16 +9910,17 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <description>Pulsar P3 Replacement Module</description>
 <plain>
 <text x="-120.904" y="143.002" size="1.778" layer="94">You might use a classical Xtal or a Low Power oscillator chip here.
-In the case of using an oscillator chip, connect its output to the OSI and leave OSO open.</text>
+In the case of using an oscillator chip, connect its output to the OSI and leave OSO open.
+You may want to remove the 12pF capacitors in that case as well.</text>
 <text x="-76.2" y="-76.2" size="1.778" layer="94">Pulsar P3 Replacement module 'Loki'.
 Created by Roy Schneider 2020.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Loki Mod</text>
-<text x="-77.978" y="-11.43" size="1.778" layer="94">Use 105 Ohm for ALS314A common
-cathode and 140 Ohm for AL304G
+<text x="-77.978" y="-11.43" size="1.778" layer="94">Use 100 Ohm for ALS314A common
+cathode and 130 Ohm for AL304G
 with common anode.</text>
-<text x="39.37" y="-32.258" size="1.778" layer="94" rot="R90">Use 105 Ohm for ALS314A common
-cathode and 140 Ohm for AL304G
+<text x="39.37" y="-32.258" size="1.778" layer="94" rot="R90">Use 100 Ohm for ALS314A common
+cathode and 130 Ohm for AL304G
 with common anode.</text>
 </plain>
 <instances>

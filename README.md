@@ -5,13 +5,13 @@ This project bundles my source code, binary, schematics and PCB layout files for
 
 The PCB layout is made in a way, allowing it to be opened and edited with the free Eagle version. I prefer the older Eagle 6.6 release, that still was made by CADSoft.
 
-The free trial version of the CAD-Soft Eagle software can be found here:
+The free trial version of the CAD-Soft Eagle software can be found on CAD-Softs's own FTP server:
 ftp://ftp.cadsoft.de/eagle/program/6.6/
 
 Module Types
 ============
 
-This project contains two different boards. The 'Odin' board, that can be used, if the original Litronix dotty LED display could be rescued. The 'Loki' board, that can be used if the original display is broken and shall be replaced with four USSR made ALS314A single digit displays with common cathodes. You can also compile the firmware binary for the 'Loki' board for using AL304G single digit displays with common anodes instead. If using the AL304G displays use resistors with about 140 Ohms instead of 105 Ohms. See the comments in the schematics.
+This project contains two different boards. The 'Odin' board, that can be used, if the original Litronix dotty LED display could be rescued. The 'Loki' board, that can be used if the original display is broken and shall be replaced with four USSR made ALS314A single digit displays with common cathodes. You can also compile the firmware binary for the 'Loki' board for using AL304G single digit displays with common anodes instead. If using the AL304G displays use resistors with about 130 Ohms (AL304G) instead of 100 Ohms (ALS314A). See the comments in the schematics.
 
 License Agreement
 =================
