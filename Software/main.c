@@ -1726,10 +1726,27 @@ unsigned char DebounceButtons(void)
                     switch(ibtns)
                     {
                         case 0: // TIME
+                     #if APP_WATCH_ANY_PULSAR_MODEL == APP_WATCH_PULSAR_AUTO_SET
+                            if (g_uDispState >= DISP_STATE_AUTOSET_TIME)
+                            {
+                                ltime = T0_REPEAT_QUICK;
+                            }
+                     #endif
                         break;
 
                         case 1: // DATE
+                     #if APP_WATCH_ANY_PULSAR_MODEL == APP_WATCH_PULSAR_AUTO_SET
+                            if (g_uDispState >= DISP_STATE_AUTOSET_TIME)
+                            {
+                                ltime = T0_REPEAT_QUICK;
+                            }
+                            else
+                            {
+                                ltime = T0_HOLD;
+                            }
+                     #else
                             ltime = T0_HOLD;
+                     #endif
                         break;
 
                         case 2: // HOUR
@@ -4734,7 +4751,7 @@ void Display_Digits(void)
             }
             else // if (g_ucDimmingCnt)
             {
-                /* Start a new measurment */
+                /* Start a new measurment in another 100 cycles. */
 
                 g_ucDimmingCnt = 100;
 
@@ -4865,7 +4882,7 @@ void Display_Digits(void)
                     }
                     else
                     {
-                        uv = 2 - (uv >> 6);
+                        uv = 1;     // Used dimmed brightness.
                     }
 
                   #endif
@@ -6773,14 +6790,25 @@ void main(void)
 
         if (g_ucStayAwake)
         {
+          #if APP_LIGHT_SENSOR_USAGE==1
+
+            if ((g_ucDimming) || (udivider == 3))
+                
+          #else
+
             if (udivider == 3)
+                
+          #endif
+
             {
-                udivider = 0;
-
                 Display_Digits();
+                
+                udivider = 1;
             }
-
-            udivider++;
+            else
+            {
+                udivider++;
+            }
         }
         else
         {
