@@ -4668,6 +4668,9 @@ void Display_Digits(void)
 
     if (!ucPlex)
     {
+        /* Check if we shall feature the last measured value or
+         * if we are in need to measure again. */
+
         if (g_ucDimmingCnt)
         {
             g_ucDimmingCnt--;
@@ -4691,13 +4694,13 @@ void Display_Digits(void)
 
                 /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
 
-                TRISB = 0x52;
+                TRISB = 0x52; // without RB0
 
               #else
 
                 /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
 
-                TRISB = 0x53;
+                TRISB = 0x53; // with RB0
 
               #endif
 
@@ -4705,13 +4708,13 @@ void Display_Digits(void)
 
                 /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
-                TRISC = 0x08;
+                TRISC = 0x08; // RC2 is an output (piezo)
 
             #else
 
                 /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
-                TRISC = 0x0C;
+                TRISC = 0x0C; // RC2 is an input (light sensor))
 
             #endif
 
@@ -4739,7 +4742,7 @@ void Display_Digits(void)
                #endif
 
              #endif
-            }
+            } // if (uv > 0)
         }
         else // if (g_ucDimmingCnt)
         {
