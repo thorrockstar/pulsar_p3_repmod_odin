@@ -45,7 +45,10 @@
  */
  
 /**
- * Define all the possible watch types, supported by this WatchApp. */
+ * Define all the possible watch types, supported by this WatchApp.
+ * 
+ * Maximum output current by PORTB, PORTC and RA6 I/O pin is 25 mA.
+ */
 
 // P3 - Original Litronix P2/P3 display.
 #define APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD     0 // Pulsar P3 Odin module.

@@ -5289,6 +5289,8 @@ void Display_Digits(void)
 
                 if (ucPlex == 2)
                 {
+                    /* Setting the accuracy value? */
+                    
                     if (ucTemp == 128)
                     {
                         ucTemp = *(pb + 10 /*Minus*/);
@@ -5611,7 +5613,7 @@ void Display_Digits(void)
                                 break;
                         }
                     }
-                    else if (ucTemp == 128)
+                    else if (ucTemp == 128) // Setting the accuracy.
                     {
                         ucTemp = 0; // blank
                     }
