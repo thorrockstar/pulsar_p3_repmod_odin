@@ -11,7 +11,7 @@ ftp://ftp.cadsoft.de/eagle/program/6.6/
 Module Types
 ============
 
-This project contains two different boards. The 'Odin' board, that can be used, if the original Litronix dotty LED display could be rescued. The 'Loki' board, that can be used if the original display is broken and shall be replaced with four USSR made ALS314A single digit displays with common cathodes. You can also compile the firmware binary for the 'Loki' board for using AL304G single digit displays with common anodes instead. If using the AL304G displays use resistors with about 130 Ohms (AL304G) instead of 100 Ohms (ALS314A). See the comments in the schematics.
+This project contains two different boards. The **Odin** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. You can also compile the firmware binary for using ALS314A single digit displays with common cathodes instead. But these are much dimmer and I recommend to use AL304G with common anodes for better readability. If using the brighter AL304G displays use resistors with about 130 Ohms (AL304G). For the dimmer ALS314A digits with common cathodes use 100 Ohms instead (ALS314A). The original display on the 'Odin' board features 82 Ohms resistors. See the comments in the schematics.
 
 License Agreement
 =================
@@ -68,7 +68,7 @@ http://www.oldpulsars.com/
 Energy Consumption
 ==================
 
-The watch currently draws about 13 µA (0.013 mA) of current, if the display is not lit up. Assuming your silver oxide batteries would have 160mAh, the battery life time would be still about a year, depending how often you use the display. You may use Alkaline batteries but I suggest to use Silver Oxide batteries having 1.55V and a larger capacity.
+The watch currently draws about 8 µA (0.008 mA) of current, if the display is not lit up. Assuming your silver oxide batteries would have 160mAh, the battery life time would be about a year, depending how often you use the display. You may use Alkaline batteries but I suggest to use Silver Oxide batteries having 1.55V and a larger capacity.
 
 Setting the Time & Date of the Replacement Module
 =================================================
