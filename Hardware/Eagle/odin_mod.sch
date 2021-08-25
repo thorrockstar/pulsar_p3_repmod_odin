@@ -5670,8 +5670,8 @@ DIN A4, with small doc field</description>
 <package name="PULSAR_P3_LED_DISPLAY">
 <description>Pulsar P3 Display made by Litronix in '72.</description>
 <smd name="P$9_KATHODE_10_MIN" x="0.635" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
-<smd name="P$10_KATHODE_1_HOUR" x="0.47625" y="2.80035" dx="1.651" dy="1.143" layer="1"/>
-<smd name="P$11_KATHODE_10_HOUR" x="0.47625" y="0.7874" dx="1.651" dy="1.143" layer="1"/>
+<smd name="P$10_KATHODE_1_HOUR" x="0.47625" y="2.80035" dx="1.651" dy="1.27" layer="1"/>
+<smd name="P$11_KATHODE_10_HOUR" x="0.47625" y="0.7874" dx="1.651" dy="1.27" layer="1"/>
 <smd name="P$12" x="9.525" y="0.47625" dx="1.143" dy="1.651" layer="1"/>
 <smd name="P$8_KATHODE_1_MIN" x="2.460625" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
 <smd name="P$7_ANODE_G" x="4.28625" y="4.92125" dx="1.143" dy="1.651" layer="1"/>
@@ -9300,21 +9300,26 @@ anode to LIGHTOUT.</text>
 <pinref part="SUPPLY3" gate="GND" pin="GND"/>
 <wire x1="-83.82" y1="58.42" x2="-104.14" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="-104.14" y1="58.42" x2="-104.14" y2="55.88" width="0.1524" layer="91"/>
+<junction x="-104.14" y="55.88"/>
 </segment>
 <segment>
 <pinref part="CEFC" gate="G$1" pin="2"/>
 <pinref part="SUPPLY2" gate="GND" pin="GND"/>
+<junction x="-114.3" y="104.14"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="VSS"/>
 <pinref part="C2" gate="G$1" pin="2"/>
 <wire x1="-83.82" y1="55.88" x2="-93.98" y2="55.88" width="0.1524" layer="91"/>
 <label x="-91.44" y="55.88" size="1.778" layer="95"/>
+<junction x="-93.98" y="55.88"/>
 </segment>
 <segment>
 <pinref part="SUPPLY6" gate="GND" pin="GND"/>
 <wire x1="-63.5" y1="-91.44" x2="-50.8" y2="-91.44" width="0.1524" layer="91"/>
 <pinref part="0V" gate="1" pin="P"/>
+<junction x="-63.5" y="-91.44"/>
+<junction x="-50.8" y="-91.44"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="EP"/>
@@ -9325,31 +9330,40 @@ anode to LIGHTOUT.</text>
 <pinref part="C4" gate="G$1" pin="2"/>
 <pinref part="SUPPLY7" gate="GND" pin="GND"/>
 <wire x1="-17.78" y1="134.62" x2="-17.78" y2="132.08" width="0.1524" layer="91"/>
+<junction x="-17.78" y="134.62"/>
+<junction x="-17.78" y="132.08"/>
 </segment>
 <segment>
 <pinref part="C5" gate="G$1" pin="2"/>
 <pinref part="SUPPLY8" gate="GND" pin="GND"/>
 <wire x1="15.24" y1="134.62" x2="15.24" y2="132.08" width="0.1524" layer="91"/>
+<junction x="15.24" y="132.08"/>
+<junction x="15.24" y="134.62"/>
 </segment>
 <segment>
 <pinref part="R14" gate="G$1" pin="2"/>
 <pinref part="SUPPLY1" gate="GND" pin="GND"/>
+<junction x="-93.98" y="-5.08"/>
 </segment>
 <segment>
 <pinref part="R15" gate="G$1" pin="2"/>
 <pinref part="SUPPLY5" gate="GND" pin="GND"/>
+<junction x="-93.98" y="-25.4"/>
 </segment>
 <segment>
 <pinref part="SUPPLY9" gate="GND" pin="GND"/>
 <pinref part="R16" gate="G$1" pin="2"/>
+<junction x="-93.98" y="-45.72"/>
 </segment>
 <segment>
 <pinref part="SUPPLY10" gate="GND" pin="GND"/>
 <pinref part="R17" gate="G$1" pin="2"/>
+<junction x="-93.98" y="-68.58"/>
 </segment>
 <segment>
 <pinref part="R9" gate="G$1" pin="1"/>
 <pinref part="SUPPLY4" gate="GND" pin="GND"/>
+<junction x="10.16" y="30.48"/>
 </segment>
 </net>
 <net name="MCLR" class="0">
@@ -9361,11 +9375,13 @@ anode to LIGHTOUT.</text>
 <label x="-99.06" y="106.68" size="1.778" layer="95"/>
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="-119.38" y1="96.52" x2="-119.38" y2="116.84" width="0.1524" layer="91"/>
+<junction x="-119.38" y="116.84"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="33.02" x2="-106.68" y2="33.02" width="0.1524" layer="91"/>
 <label x="-109.22" y="33.02" size="1.778" layer="95"/>
 <pinref part="PAD5" gate="1" pin="P"/>
+<junction x="-119.38" y="33.02"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -9375,6 +9391,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="10.16" x2="5.08" y2="10.16" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="10.16" x2="5.08" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="22.86" x2="-40.64" y2="22.86" width="0.1524" layer="91"/>
+<junction x="-40.64" y="22.86"/>
+<junction x="22.86" y="10.16"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -9384,6 +9402,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="5.08" x2="0" y2="5.08" width="0.1524" layer="91"/>
 <wire x1="0" y1="5.08" x2="0" y2="15.24" width="0.1524" layer="91"/>
 <wire x1="0" y1="15.24" x2="-40.64" y2="15.24" width="0.1524" layer="91"/>
+<junction x="-40.64" y="15.24"/>
+<junction x="22.86" y="5.08"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -9393,6 +9413,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="0" x2="-2.54" y2="0" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="0" x2="-2.54" y2="7.62" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="7.62" x2="-40.64" y2="7.62" width="0.1524" layer="91"/>
+<junction x="-40.64" y="7.62"/>
+<junction x="22.86" y="0"/>
 </segment>
 </net>
 <net name="N$7" class="0">
@@ -9402,6 +9424,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-5.08" x2="-5.08" y2="-5.08" width="0.1524" layer="91"/>
 <wire x1="-5.08" y1="-5.08" x2="-5.08" y2="0" width="0.1524" layer="91"/>
 <wire x1="-5.08" y1="0" x2="-40.64" y2="0" width="0.1524" layer="91"/>
+<junction x="-40.64" y="0"/>
+<junction x="22.86" y="-5.08"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -9411,6 +9435,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-10.16" x2="-5.08" y2="-10.16" width="0.1524" layer="91"/>
 <wire x1="-5.08" y1="-10.16" x2="-5.08" y2="-15.24" width="0.1524" layer="91"/>
 <wire x1="-5.08" y1="-15.24" x2="-40.64" y2="-15.24" width="0.1524" layer="91"/>
+<junction x="-40.64" y="-15.24"/>
+<junction x="22.86" y="-10.16"/>
 </segment>
 </net>
 <net name="N$9" class="0">
@@ -9420,6 +9446,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-15.24" x2="-2.54" y2="-15.24" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="-15.24" x2="-2.54" y2="-22.86" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="-22.86" x2="-40.64" y2="-22.86" width="0.1524" layer="91"/>
+<junction x="-40.64" y="-22.86"/>
+<junction x="22.86" y="-15.24"/>
 </segment>
 </net>
 <net name="N$10" class="0">
@@ -9429,6 +9457,8 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-20.32" x2="0" y2="-20.32" width="0.1524" layer="91"/>
 <wire x1="0" y1="-20.32" x2="0" y2="-30.48" width="0.1524" layer="91"/>
 <wire x1="0" y1="-30.48" x2="-40.64" y2="-30.48" width="0.1524" layer="91"/>
+<junction x="-40.64" y="-30.48"/>
+<junction x="22.86" y="-20.32"/>
 </segment>
 </net>
 <net name="RA0/SW1" class="0">
@@ -9439,6 +9469,7 @@ anode to LIGHTOUT.</text>
 <pinref part="PB_MIN" gate="1" pin="P"/>
 <wire x1="-106.68" y1="5.08" x2="-93.98" y2="5.08" width="0.1524" layer="91"/>
 <junction x="-93.98" y="5.08"/>
+<junction x="-106.68" y="5.08"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="RA0/AN0/C1INA/ULPWU/RP1"/>
@@ -9454,6 +9485,7 @@ anode to LIGHTOUT.</text>
 <pinref part="PB_HOUR" gate="1" pin="P"/>
 <wire x1="-106.68" y1="-15.24" x2="-93.98" y2="-15.24" width="0.1524" layer="91"/>
 <junction x="-93.98" y="-15.24"/>
+<junction x="-106.68" y="-15.24"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="RB0/AN12/INT0/RP3"/>
@@ -9475,11 +9507,16 @@ anode to LIGHTOUT.</text>
 <wire x1="-104.14" y1="-91.44" x2="-91.44" y2="-91.44" width="0.1524" layer="91"/>
 <junction x="-104.14" y="-91.44"/>
 <junction x="-104.14" y="-83.82"/>
+<junction x="-106.68" y="-91.44"/>
+<junction x="-106.68" y="-83.82"/>
+<junction x="-91.44" y="-83.82"/>
+<junction x="-91.44" y="-91.44"/>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="1"/>
 <wire x1="-119.38" y1="127" x2="-119.38" y2="132.08" width="0.1524" layer="91"/>
 <label x="-119.38" y="132.08" size="1.778" layer="95"/>
+<junction x="-119.38" y="127"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="A" pin="VDD"/>
@@ -9490,6 +9527,7 @@ anode to LIGHTOUT.</text>
 <pinref part="C2" gate="G$1" pin="1"/>
 <wire x1="-93.98" y1="48.26" x2="-83.82" y2="48.26" width="0.1524" layer="91"/>
 <label x="-88.9" y="48.26" size="1.778" layer="95"/>
+<junction x="-93.98" y="48.26"/>
 </segment>
 </net>
 <net name="RB2/LED_H2" class="0">
@@ -9502,6 +9540,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R8" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="-30.48" x2="-66.04" y2="-30.48" width="0.1524" layer="91"/>
 <label x="-66.04" y="-30.48" size="1.778" layer="95"/>
+<junction x="-50.8" y="-30.48"/>
 </segment>
 </net>
 <net name="RB3/LED_H3" class="0">
@@ -9514,6 +9553,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R4" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="7.62" x2="-66.04" y2="7.62" width="0.1524" layer="91"/>
 <label x="-66.04" y="7.62" size="1.778" layer="95"/>
+<junction x="-50.8" y="7.62"/>
 </segment>
 </net>
 <net name="RB4/LED_H4" class="0">
@@ -9528,6 +9568,7 @@ anode to LIGHTOUT.</text>
 <wire x1="5.08" y1="-30.48" x2="5.08" y2="-45.72" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="-45.72" x2="-66.04" y2="-45.72" width="0.1524" layer="91"/>
 <label x="-66.04" y="-45.72" size="1.778" layer="95"/>
+<junction x="22.86" y="-30.48"/>
 </segment>
 </net>
 <net name="RC3/LED_M4" class="0">
@@ -9542,6 +9583,7 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-25.4" x2="2.54" y2="-25.4" width="0.1524" layer="91"/>
 <wire x1="2.54" y1="-25.4" x2="2.54" y2="-38.1" width="0.1524" layer="91"/>
 <wire x1="2.54" y1="-38.1" x2="-66.04" y2="-38.1" width="0.1524" layer="91"/>
+<junction x="22.86" y="-25.4"/>
 </segment>
 </net>
 <net name="RC4/LED_M3" class="0">
@@ -9554,6 +9596,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R2" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="22.86" x2="-66.04" y2="22.86" width="0.1524" layer="91"/>
 <label x="-66.04" y="22.86" size="1.778" layer="95"/>
+<junction x="-50.8" y="22.86"/>
 </segment>
 </net>
 <net name="RC5/LED_M2" class="0">
@@ -9566,6 +9609,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R3" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="15.24" x2="-66.04" y2="15.24" width="0.1524" layer="91"/>
 <label x="-66.04" y="15.24" size="1.778" layer="95"/>
+<junction x="-50.8" y="15.24"/>
 </segment>
 </net>
 <net name="RC6/LED_M1" class="0">
@@ -9578,6 +9622,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="0" x2="-66.04" y2="0" width="0.1524" layer="91"/>
 <label x="-66.04" y="0" size="1.778" layer="95"/>
+<junction x="-50.8" y="0"/>
 </segment>
 </net>
 <net name="RC7/LED_M5" class="0">
@@ -9590,6 +9635,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R6" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="-15.24" x2="-66.04" y2="-15.24" width="0.1524" layer="91"/>
 <label x="-66.04" y="-15.24" size="1.778" layer="95"/>
+<junction x="-50.8" y="-15.24"/>
 </segment>
 </net>
 <net name="RB5/LED_H1" class="0">
@@ -9602,6 +9648,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R7" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="-22.86" x2="-66.04" y2="-22.86" width="0.1524" layer="91"/>
 <label x="-66.04" y="-22.86" size="1.778" layer="95"/>
+<junction x="-50.8" y="-22.86"/>
 </segment>
 </net>
 <net name="PGC/LED_M7" class="0">
@@ -9616,11 +9663,13 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-40.64" x2="10.16" y2="-40.64" width="0.1524" layer="91"/>
 <wire x1="10.16" y1="-40.64" x2="10.16" y2="-60.96" width="0.1524" layer="91"/>
 <wire x1="10.16" y1="-60.96" x2="-66.04" y2="-60.96" width="0.1524" layer="91"/>
+<junction x="22.86" y="-40.64"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="17.78" x2="-106.68" y2="17.78" width="0.1524" layer="91"/>
 <label x="-109.22" y="17.78" size="1.778" layer="95"/>
 <pinref part="PAD1" gate="1" pin="P"/>
+<junction x="-119.38" y="17.78"/>
 </segment>
 </net>
 <net name="PGD/RB7" class="0">
@@ -9633,6 +9682,7 @@ anode to LIGHTOUT.</text>
 <wire x1="-119.38" y1="25.4" x2="-106.68" y2="25.4" width="0.1524" layer="91"/>
 <label x="-109.22" y="25.4" size="1.778" layer="95"/>
 <pinref part="PAD2" gate="1" pin="P"/>
+<junction x="-119.38" y="25.4"/>
 </segment>
 </net>
 <net name="T1OSO" class="0">
@@ -9649,6 +9699,8 @@ anode to LIGHTOUT.</text>
 <wire x1="45.72" y1="124.46" x2="-12.7" y2="124.46" width="0.1524" layer="91"/>
 <pinref part="OSO" gate="1" pin="P"/>
 <wire x1="-12.7" y1="142.24" x2="-5.08" y2="142.24" width="0.1524" layer="91"/>
+<junction x="-17.78" y="142.24"/>
+<junction x="-5.08" y="142.24"/>
 </segment>
 </net>
 <net name="T1OSI" class="0">
@@ -9666,6 +9718,8 @@ anode to LIGHTOUT.</text>
 <pinref part="TRIM" gate="1" pin="P"/>
 <wire x1="30.48" y1="132.08" x2="30.48" y2="142.24" width="0.1524" layer="91"/>
 <junction x="30.48" y="142.24"/>
+<junction x="10.16" y="142.24"/>
+<junction x="30.48" y="132.08"/>
 </segment>
 </net>
 <net name="RB1/LED_M6" class="0">
@@ -9680,6 +9734,7 @@ anode to LIGHTOUT.</text>
 <wire x1="22.86" y1="-35.56" x2="7.62" y2="-35.56" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="-35.56" x2="7.62" y2="-53.34" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="-53.34" x2="-66.04" y2="-53.34" width="0.1524" layer="91"/>
+<junction x="22.86" y="-35.56"/>
 </segment>
 </net>
 <net name="RA1/SW3" class="0">
@@ -9695,6 +9750,7 @@ anode to LIGHTOUT.</text>
 <junction x="-93.98" y="-35.56"/>
 <wire x1="-93.98" y1="-35.56" x2="-81.28" y2="-35.56" width="0.1524" layer="91"/>
 <label x="-91.44" y="-35.56" size="1.778" layer="95"/>
+<junction x="-106.68" y="-35.56"/>
 </segment>
 </net>
 <net name="VDDCORE/VCAP" class="0">
@@ -9702,6 +9758,7 @@ anode to LIGHTOUT.</text>
 <pinref part="U$1" gate="A" pin="VDDCORE/VCAP"/>
 <pinref part="CEFC" gate="G$1" pin="1"/>
 <wire x1="-83.82" y1="111.76" x2="-114.3" y2="111.76" width="0.1524" layer="91"/>
+<junction x="-114.3" y="111.76"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -9714,6 +9771,7 @@ anode to LIGHTOUT.</text>
 <pinref part="R9" gate="G$1" pin="2"/>
 <wire x1="10.16" y1="40.64" x2="27.94" y2="40.64" width="0.1524" layer="91"/>
 <junction x="27.94" y="40.64"/>
+<junction x="10.16" y="40.64"/>
 </segment>
 </net>
 <net name="OSC2/RA6" class="0">
@@ -9726,6 +9784,7 @@ anode to LIGHTOUT.</text>
 <pinref part="LIGHTOUT" gate="1" pin="P"/>
 <wire x1="27.94" y1="30.48" x2="48.26" y2="30.48" width="0.1524" layer="91"/>
 <label x="35.56" y="30.48" size="1.778" layer="95"/>
+<junction x="27.94" y="30.48"/>
 </segment>
 </net>
 <net name="RA5/SW4" class="0">
@@ -9741,6 +9800,7 @@ anode to LIGHTOUT.</text>
 <wire x1="-93.98" y1="-58.42" x2="-81.28" y2="-58.42" width="0.1524" layer="91"/>
 <junction x="-93.98" y="-58.42"/>
 <label x="-91.44" y="-58.42" size="1.778" layer="95"/>
+<junction x="-106.68" y="-58.42"/>
 </segment>
 </net>
 </nets>
