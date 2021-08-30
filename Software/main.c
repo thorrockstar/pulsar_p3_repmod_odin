@@ -724,7 +724,7 @@ inline void Configure_Real_Time_Clock(void)
 
     ucTemp = RTCVALL; // Day
     ucValue = g_bcd_decimal_testing[ucTemp];
-    if (ucValue > 31)
+    if ((ucValue < 1) || (ucValue > 31))
     {
         ucRTCInval = 1;
     }
@@ -836,12 +836,12 @@ inline void Configure_Real_Time_Clock(void)
 
         /* Initialize alarm registers. */
 
+        ALRMCFGbits.ALRMPTR0 = 0;
+        ALRMCFGbits.ALRMPTR1 = 1;
+
         if (ucRTCInval)
         {
             /* Initialize all alarm registers. */
-
-            ALRMCFGbits.ALRMPTR0 = 0;
-            ALRMCFGbits.ALRMPTR1 = 1;
 
             ALRMVALL = 1; // Day
             ALRMVALH = 1; // Month
@@ -856,9 +856,6 @@ inline void Configure_Real_Time_Clock(void)
         {
             /* Initialize only not used alarm registers. */
             
-            ALRMCFGbits.ALRMPTR0 = 0;
-            ALRMCFGbits.ALRMPTR1 = 1;
-
             ALRMVALL = 1; // Day
             ALRMVALH = 1; // Month, auto-decrement!
             ALRMVALH = 1; // Weekday, auto-decrement!
