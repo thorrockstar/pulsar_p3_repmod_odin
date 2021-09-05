@@ -65,6 +65,11 @@ More information about old Pulsar LED watches, can be found here:
 Pulsar LED Watch Forum:
 http://www.oldpulsars.com/
 
+PCB
+===
+
+If you order your PCB at some manufacturer, go for the 1mm material thickness, not more. You need a thin PCB to ensure, you have enough clearance to the watch case glass, when the display has been installed. A traces thickness of 35 µm is good enough. Order the PCB with a solder stop mask. That simplifies soldering a lot. You usually do not need a silk screen. Order ENIG (Electroless Nickel Gold) surface (traces) for best solder results.
+
 Energy Consumption
 ==================
 
