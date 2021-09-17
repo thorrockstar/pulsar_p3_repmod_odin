@@ -83,7 +83,7 @@ To forward the hours, place the magnet in the HOURS recess. To forward the minut
 Settings the Extra Features of the Firmware not included in the original P3
 ===========================================================================
 
-The firmware for this replacement module adds two additional functions to the watch. It adds the weekday and the year. To set the weekday hold the DATE button pressed and forward the weekday by putting the magnet into the MIN recess. To set the year hold the DATE button pressed and wait until the year appears. Forward the year by putting the magnet into the HOUR recess.
+The firmware for this replacement module adds two additional functions to the watch. It adds the weekday and the year. To set the year hold the DATE and TIME button pressed and forward the year by putting the magnet into the MIN recess. To set the weekday hold only the DATE button pressed and forward the weekday by putting the magnet into the MIN recess. If you face the issue that you set the year instead of the weekday, then the magnet is very strong and engages not only the MIN but also the TIME reed contact. Try turning the magnet around in that case.
 
 Optional Alarm Feature of the 'Loki Module'
 ============================================
