@@ -63,7 +63,7 @@
  *
  * Segments:
  * There is a macro in the header file, that let you select these outputs
- * to be anodes or cathodes signals.
+ * to be anodes or cathodes.
  * RC4 'A' (but 'B' for the left most 10h digit of the Litronix display)
  * RC5 'B' (but 'top dot' in the middle of the Litronix display)
  * RC6 'C' (but 'lower dot' in the middle of the Litronix display)
@@ -71,23 +71,23 @@
  * RB2 'G'
  * RB3 'D' (but 'C' for the left most 10h digit of the Litronix display)
  * RB5 'F'
+ * RA6 for the date and alarm dots of the replacement ALS314A or AL304G display.
  *
  * Common:
  * There is a macro in the header file, that let you select these outputs
- * to be anodes or cathodes signals.
+ * to be anodes or cathodes.
  * RC3 for '1' minute
  * RB4 for '10' minute
  * RB1 for '1' hour
  * RB6 for '10' hour and the dots of the 12h Litronix display
- * RA6 for the date and alarm dots of the replacement ALS314A or AL304G display.
  *
  * Light sensor option
- * RA6 provides power to the light sensor, when measuring.
+ * RA6 provides power to the light sensor, when measuring
  * RC2 used as AN11 analogue input to measure the light indirectly
  *
  * Optional buzzer option (mutual exlude with the light sensor option)
  * RA6 used for the alarm dot
- * RC2 used as PWM to drive the piezo.
+ * RC2 used as PWM to drive the piezo
  * 
  * RC0 RTCC Xtal OSO
  * RC1 RTCC Xtal OSI

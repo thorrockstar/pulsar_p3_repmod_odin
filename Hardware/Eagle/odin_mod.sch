@@ -9238,6 +9238,9 @@ instead of the vintage
 LDR, use 6,8 k instead
 of 47 k. Connect the
 anode to LIGHTOUT.</text>
+<text x="-120.904" y="87.122" size="1.778" layer="94">Do not use
+less than
+10µF here!</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>

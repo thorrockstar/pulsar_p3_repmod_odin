@@ -9902,7 +9902,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="10M" library="l104g" deviceset="L104G" device=""/>
 <part name="1M" library="l104g" deviceset="L104G" device=""/>
 <part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R10" library="resistor" deviceset="R-EU_" device="R0402" value="680"/>
+<part name="R10" library="resistor" deviceset="R-EU_" device="R0402" value="470"/>
 <part name="BUZZER" library="testpad" deviceset="TP" device="TP06SQ"/>
 </parts>
 <sheets>
@@ -9922,6 +9922,9 @@ with common anode.</text>
 <text x="39.37" y="-32.258" size="1.778" layer="94" rot="R90">Use 100 Ohm for ALS314A common
 cathode and 130 Ohm for AL304G
 with common anode.</text>
+<text x="-118.364" y="87.122" size="1.778" layer="94">Do not use
+less than
+10µF here!</text>
 </plain>
 <instances>
 <instance part="U$1" gate="A" x="-27.94" y="88.9"/>
