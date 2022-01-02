@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2020-21 Roy Schneider
+ *  Copyright (c) 2020-22 Roy Schneider
  *
  *  main.c
  *
@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        19.04.2021
+ *  Last Change:        02.01.2022
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -355,6 +355,7 @@ ButtonStateType g_ucPB4FLICKState = PB_STATE_IDLE; // WRIST FLICK
 
 short g_sPB4Timer = 0;
 short g_FlickTimeSpan = 0;
+unsigned char g_WristFlick = 0;
 
 #endif // #if APP_WRIST_FLICK_USAGE==1
 
@@ -1374,15 +1375,15 @@ unsigned char DebounceButtons(void)
     ButtonHandlerType phold;
     ButtonHandlerType preleased;
 
-    /* Check for a frist flick event, if that feature has been enabled. */
+    /* Check for a wrist flick event, if that feature has been enabled. */
 
 #if APP_WRIST_FLICK_USAGE==1
     
-    static const unsigned char imaxb = 5;
+    static const unsigned char imaxb = 5; // Buttons and wrist flick.
 
 #else
     
-    static const unsigned char imaxb = 4;
+    static const unsigned char imaxb = 4; // Buttons only.
     
 #endif // #if APP_WRIST_FLICK_USAGE==1
 
@@ -2079,7 +2080,7 @@ void PressPB0(void)
     if (istate == DISP_STATE_AUTOSET_DATE)
     {
         /* Restart the time, the display will stay lit up. */
-        
+
         g_ucRollOver = 1;
 
         /* Unlock write access to the RTC and disable the clock. */
@@ -4576,7 +4577,7 @@ void ReleasePB3(void)
 #if APP_WRIST_FLICK_USAGE==1
 
 /**
- * Called when the Frist flick input peaks up and has been stable for
+ * Called when the Wrist flick input peaks up and has been stable for
  * some milliseconds.
  */
 
@@ -4589,7 +4590,7 @@ void PressPB4(void)
 }
 
 /**
- * Called when the Frist flick input peaks down and has been stable for
+ * Called when the Wrist flick input peaks down and has been stable for
  * some milliseconds.
  */
 
@@ -4635,9 +4636,17 @@ void ReleasePB4(void)
                   #endif
                    )
                 {
-                    /* Press virtuall the readout button for the time. */
+                    /* Press virtually the readout button for the time. */
 
                     PressPB0();
+                    
+                    /* Indicate, that the display is lit up by a wrist flick,
+                     * if the state has been altered to 'TIME'. */
+                    
+                    if (g_uDispState == DISP_STATE_TIME)
+                    {
+                        g_WristFlick = 1;
+                    }
                 }
             }
         }
@@ -6663,13 +6672,19 @@ void main(void)
                 const DisplayStateType istate = g_uDispState;
                 const unsigned short ulimit = \
 
-                            (istate >= DISP_STATE_AUTOSET_TIME) ? 1250 : 350;
+                            /* Using AutoSet, keep the display lit for long. */
+
+                            (istate >= DISP_STATE_AUTOSET_TIME) ? 1250 : \
+
+                            /* Grant more time on a wrist flick event. */
+                                
+                            g_WristFlick ? 500 : 375;
                 
                 if (++g_ucRollOver >= ulimit) // Rounds per second.
                 {
             #else
 
-                if (++g_ucRollOver >= 350) // Rounds per second.
+                if (++g_ucRollOver >= 375) // Rounds per second.
                 {
                     const DisplayStateType istate = g_uDispState;
 
@@ -6973,14 +6988,21 @@ void main(void)
 
             Lock_RTCC();
 
-      #if APP_BUZZER_ALARM_USAGE==1
+          #if APP_BUZZER_ALARM_USAGE==1
 
             /* Turn the alarm buzzer off. */
 
             Turn_Buzzer_Off();
 
-      #endif // #if APP_BUZZER_ALARM_USAGE==1
+          #endif // #if APP_BUZZER_ALARM_USAGE==1
 
+            /* Reset wrist flick indication. */
+            
+          #if APP_WRIST_FLICK_USAGE==1
+
+            g_WristFlick = 0;
+            
+          #endif
             /* PORTB Pull-up Disable bit
              * 
              * RBPU: PORTB Pull-up Enable bit

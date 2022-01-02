@@ -1,14 +1,14 @@
 /**
- *  Copyright (c) 2020-21 Roy Schneider
+ *  Copyright (c) 2020-22 Roy Schneider
  *
  *  main.h
  *
  *  Decllaration for the Pulsar P3 internal watch logic.
  *
- *  Project:            Pulsar Replacement module 'Odin'.
+ *  Project:            Pulsar Replacement module 'Odin & Loki' and 'Sif & Hel'.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        10.05.2021
+ *  Last Change:        02.01.2022
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -86,9 +86,10 @@
 
 /* Note:
  * 
- * If going for the Loki or Hel module, do not forget to select below, if
+ * If building for the Loki or Hel module, do not forget to select below, if
  * featuring a common cathode ALS314 or common anode AL304G replacement
- * display. */
+ * display. I do prefer the AL304G displays, because they are easier to read
+ * in daylight. */
 
 /* ======================================================================== */
 
