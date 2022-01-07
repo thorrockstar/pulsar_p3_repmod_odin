@@ -6905,13 +6905,13 @@ void main(void)
 
           #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-            /* Set RC0/1/2/3/4/5/6/7 to output and RC2(AN11) as input. */
+            /* Set RC0/1/3/4/5/6/7 to output and RC2(AN11) as input. */
 
             TRISC = 0x04;
 
           #else
 
-            /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
+            /* Set RC0/1/4/5/6/7 to output and RC3 and RC2(AN11) as input. */
 
             TRISC = 0x0C;
 
