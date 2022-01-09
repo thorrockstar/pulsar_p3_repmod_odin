@@ -73,7 +73,7 @@ If you order your PCB at some manufacturer, go for the 1mm material thickness, n
 Energy Consumption
 ==================
 
-The watch currently draws about 8 µA (0.008 mA) of current, if the display is not lit up. Assuming your silver oxide batteries would have 160mAh, the battery life time would be about a year, depending how often you use the display. You may use Alkaline batteries but I suggest to use Silver Oxide batteries having 1.55V and a larger capacity.
+The watch currently draws about 7 µA (0.007 mA) of current, if the display is not lit up. Assuming your silver oxide batteries would have 160mAh, the battery life time would be a year, depending how often you use the display. You may use Alkaline batteries but I suggest to use Silver Oxide batteries having 1.55V and a larger capacity.
 
 Setting the Time & Date of the Replacement Module
 =================================================
