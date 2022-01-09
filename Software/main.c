@@ -583,12 +583,14 @@ inline void Configure_Inputs_Outputs(void)
     ADCON1bits.ADCAL = 0;   // Normal A/D conversion operation
     ADCON1bits.ACQT = 1;    // Acquisition time 7 = 20TAD 2 = 4TAD 1=2TAD
     ADCON1bits.ADCS = 2;    // Clock conversion bits 6= FOSC/64 2=FOSC/32
+    
+    // ANCON1
     ANCON1bits.VBGEN = 1;   // Turn on the Bandgap
 
     // ADCON0
     ADCON0bits.VCFG0 = 0;   // Vref+ = AVdd 3V battery
     ADCON0bits.VCFG1 = 0;   // Vref- = AVss 0V battery
-    ADCON0bits.CHS = 11;    // Select ADC channel -> AD11
+    ADCON0bits.CHS = 11;    // Select ADC channel -> AN11
     ADCON0bits.ADON = 1;    // Turn on ADC
 
 #else // Light sensor not used. Anyway free the analogue inputs for digital use.
@@ -4822,7 +4824,7 @@ void Display_Digits(void)
 
             /* Measure the voltage across the resistor. */
 
-            CTMUCONHbits.CTMUEN = 1;    // Enable the CTMU
+            CTMUCONHbits.CTMUEN = 1;    // Enable Charge Time Measurement Unit
             CTMUCONLbits.EDG1STAT = 0;  // Set Edge status bits to zero
             CTMUCONLbits.EDG2STAT = 0;
 
@@ -7085,10 +7087,13 @@ void main(void)
             // Peripheral Interrupt Enable bit
             INTCONbits.PEIE = 1;   // Enables all unmasked peripheral interrupts
 
-            /* Turn ADC (analog-to-digital converter) off */
+            /* Turn the ADC (Analog-to-Digital Converter) and the Charge Time
+             * Measurement Unit off again to save power - about 6uA. */
 
+            CTMUCONHbits.CTMUEN = 0;// Disable the Charge Time Measurement Unit
             ADCON0bits.ADON = 0;    // Turn off ADC
-
+            ANCON1bits.VBGEN = 0;   // Turn off the Bandgap to save power.
+            
             /* Enter sleep mode. This might fail, for example if inputs are
              * still high, that are used to wake up the controller via
              * rising edge. */
