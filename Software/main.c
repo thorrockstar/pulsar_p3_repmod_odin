@@ -1758,6 +1758,9 @@ unsigned char DebounceButtons(void)
                         break;
                     }
 
+                    /* Check if the long-press time has expired.
+                     * If yes, recharge the timer again. */
+                    
                     if ((itimer - (*ptimer + (ltime))) >= 0)
                     {
                         *ptimer = itimer;
@@ -1995,7 +1998,8 @@ unsigned char DebounceButtons(void)
 
                     if ((itimer - (*ptimer + T0_DEBOUNCE)) >= 0)
                     {
-                        /* Indicate that this button is using the timer. */
+                        /* Indicate that this button is using the timer
+                         * not anymore. */
 
                         *pusage &= ~(1 << ibtns);
 
