@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE eagle SYSTEM "eagle.dtd">
+<eagle version="6.6.0">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.0005" altunitdist="inch" altunit="inch"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<description>Vintage Litronix LED Display for Pulsar P3 watches.</description>
+<packages>
+<package name="PULSAR_P3_LED_DISPLAY">
+<description>Pulsar P4 Display made by Litronix in '74.</description>
+<smd name="P$9_KATHODE_10_MIN" x="7.9375" y="4.92125" dx="1.27" dy="1.778" layer="1"/>
+<smd name="P$10_KATHODE_1_HOUR" x="4.18465" y="4.92125" dx="1.778" dy="1.27" layer="1" rot="R90"/>
+<smd name="P$11_KATHODE_10_HOUR" x="0.15875" y="4.6101" dx="1.778" dy="1.27" layer="1" rot="R180"/>
+<smd name="P$8_KATHODE_1_MIN" x="11.668125" y="4.92125" dx="1.27" dy="1.778" layer="1"/>
+<smd name="P$7_ANODE_G" x="6.0325" y="4.92125" dx="1.27" dy="1.778" layer="1"/>
+<smd name="P$6_ANODE_F" x="0.15875" y="2.689225" dx="1.27" dy="1.778" layer="1" rot="R90"/>
+<smd name="P$5_ANODE_E" x="15.39875" y="0.70485" dx="1.27" dy="1.778" layer="1" rot="R90"/>
+<smd name="P$4_ANODE_C_LOW_DOT" x="15.39875" y="2.689225" dx="1.27" dy="1.778" layer="1" rot="R270"/>
+<smd name="P$3_ANODE_D_10HC" x="0.15875" y="0.70485" dx="1.27" dy="1.778" layer="1" rot="R90"/>
+<smd name="P$2_ANODE_B_TOP_DOT" x="15.39875" y="4.6101" dx="1.27" dy="1.778" layer="1" rot="R270"/>
+<smd name="P$1_ANODE_A_10HB" x="9.8425" y="4.92125" dx="1.27" dy="1.778" layer="1"/>
+<rectangle x1="0" y1="0" x2="15.875" y2="5.3975" layer="21"/>
+</package>
+</packages>
+<symbols>
+<symbol name="P1AA_(BH10)">
+<description>p1aa_(bh10), p2ab_(td), p3ad_(ch10), p4ac_(ld), p5ae, p6af, p7ag, p8cm1, p9cm10, p10ch1, p11ch10</description>
+<pin name="P$1_P1AA_(BH10)" x="-22.86" y="22.86" length="middle"/>
+<pin name="P$2_P2AB_(TD)" x="-22.86" y="17.78" length="middle"/>
+<pin name="P$3_P3AD_(CH10)" x="-22.86" y="12.7" length="middle"/>
+<pin name="P$4_P4AC_(LD)" x="-22.86" y="7.62" length="middle"/>
+<pin name="P$5_P5AE" x="-22.86" y="2.54" length="middle"/>
+<pin name="P$6_P6AF" x="-22.86" y="-2.54" length="middle"/>
+<pin name="P$7_P7AG" x="-22.86" y="-7.62" length="middle"/>
+<pin name="P$8_P8CM1" x="-22.86" y="-12.7" length="middle"/>
+<pin name="P$9_P9CM10" x="-22.86" y="-17.78" length="middle"/>
+<pin name="P$10_P10CH1" x="-22.86" y="-22.86" length="middle"/>
+<pin name="P$11_P11CH10" x="-22.86" y="-27.94" length="middle"/>
+<wire x1="-27.94" y1="25.4" x2="5.08" y2="25.4" width="0.254" layer="94"/>
+<wire x1="5.08" y1="25.4" x2="5.08" y2="-30.48" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-30.48" x2="-27.94" y2="-30.48" width="0.254" layer="94"/>
+<wire x1="-27.94" y1="-30.48" x2="-27.94" y2="25.4" width="0.254" layer="94"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="PULSAR_P4_DISPLAY">
+<description>Vintage Pulsar P4 Display made by Litronix.</description>
+<gates>
+<gate name="G$1" symbol="P1AA_(BH10)" x="45.72" y="2.54"/>
+</gates>
+<devices>
+<device name="PULSAR_P4_LED_DISPLAY" package="PULSAR_P3_LED_DISPLAY">
+<connects>
+<connect gate="G$1" pin="P$10_P10CH1" pad="P$10_KATHODE_1_HOUR"/>
+<connect gate="G$1" pin="P$11_P11CH10" pad="P$11_KATHODE_10_HOUR"/>
+<connect gate="G$1" pin="P$1_P1AA_(BH10)" pad="P$1_ANODE_A_10HB"/>
+<connect gate="G$1" pin="P$2_P2AB_(TD)" pad="P$2_ANODE_B_TOP_DOT"/>
+<connect gate="G$1" pin="P$3_P3AD_(CH10)" pad="P$3_ANODE_D_10HC"/>
+<connect gate="G$1" pin="P$4_P4AC_(LD)" pad="P$4_ANODE_C_LOW_DOT"/>
+<connect gate="G$1" pin="P$5_P5AE" pad="P$5_ANODE_E"/>
+<connect gate="G$1" pin="P$6_P6AF" pad="P$6_ANODE_F"/>
+<connect gate="G$1" pin="P$7_P7AG" pad="P$7_ANODE_G"/>
+<connect gate="G$1" pin="P$8_P8CM1" pad="P$8_KATHODE_1_MIN"/>
+<connect gate="G$1" pin="P$9_P9CM10" pad="P$9_KATHODE_10_MIN"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>
