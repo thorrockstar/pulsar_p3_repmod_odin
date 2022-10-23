@@ -9861,13 +9861,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
-<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="100/130"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
+<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
+<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="82/130"/>
 <part name="R14" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="R15" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
@@ -9916,7 +9916,7 @@ You may want to remove the 12pF capacitors in that case as well.</text>
 Created by Roy Schneider 2020.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Loki Mod</text>
-<text x="-77.978" y="-11.43" size="1.778" layer="94">Use 100 Ohm for ALS314A common
+<text x="-77.978" y="-11.43" size="1.778" layer="94">Use 82 Ohm for ALS314A common
 cathode and 130 Ohm for AL304G
 with common anode.</text>
 <text x="39.37" y="-32.258" size="1.778" layer="94" rot="R90">Use 100 Ohm for ALS314A common
