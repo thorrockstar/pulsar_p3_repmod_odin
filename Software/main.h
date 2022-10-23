@@ -64,19 +64,6 @@
 #define APP_TABLE_WATCH                            5 // VFD watch project.
 
 /**
- * Common cathode/anode value definitions. */
-
-#define APP_WATCH_COMMON_CATHODE    0   // Value for common cathode.
-#define APP_WATCH_COMMON_ANODE      1   // Value for common anode.
-
-/**
- * Define the possible types of buttons and their operation mode. */
-
-#define APP_WATCH_GENERIC_4_BUTTON  0   // Breadboard
-#define APP_WATCH_PULSAR_MAGNET_SET 1   // P3 magnet set
-#define APP_WATCH_PULSAR_AUTO_SET   2   // P4 auto set
-
-/**
  * ========================================================================
  * Choose the watch module type, that shall be build, right here.
  * ========================================================================
@@ -92,6 +79,19 @@
  * in daylight. */
 
 /* ======================================================================== */
+
+/**
+ * Common cathode/anode value definitions. */
+
+#define APP_WATCH_COMMON_CATHODE    0   // Value for common cathode.
+#define APP_WATCH_COMMON_ANODE      1   // Value for common anode.
+
+/**
+ * Define the possible types of buttons and their operation mode. */
+
+#define APP_WATCH_GENERIC_4_BUTTON  0   // Breadboard
+#define APP_WATCH_PULSAR_MAGNET_SET 1   // P3 magnet set
+#define APP_WATCH_PULSAR_AUTO_SET   2   // P4 auto set
 
 /**
  * Define to turn on display dimming via a LDR and the alarm feature.
