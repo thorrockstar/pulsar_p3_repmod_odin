@@ -8,10 +8,15 @@ The PCB layout is made in a way, allowing it to be opened and edited with the fr
 The free trial version of the CAD-Soft Eagle software can be found on CAD-Softs's own FTP server:
 ftp://ftp.cadsoft.de/eagle/program/6.6/
 
-Module Types
-============
+P3 Module Types
+===============
 
-This project contains two different boards. The **Odin** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. You can also compile the firmware binary for using ALS314A single digit displays with common cathodes instead. But these are much dimmer and I recommend to use AL304G with common anodes for better readability. If using the brighter AL304G displays use resistors with about 130 Ohms (AL304G). For the dimmer ALS314A digits with common cathodes use 100 Ohms instead (ALS314A). The original display on the 'Odin' board features 82 Ohms resistors. See the comments in the schematics.
+This project contains two different boards. The **Odin** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. You can also compile the firmware binary for using ALS314A single digit displays with common cathodes instead. But these are much dimmer and I recommend to use AL304G with common anodes for better readability. If using the brighter AL304G displays use resistors with about 130 Ohms (AL304G). For the dimmer ALS314A digits with common cathodes use 82 Ohms instead (ALS314A). The original display on the 'Odin' board features 82 Ohms resistors. See the comments in the schematics.
+
+P4 Module Variant
+=================
+
+There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. Be aware, that you will need to **modify the plastic carrier** for the **P4 version**. You will be in need to make the open space wider to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on all four sides of the open space and create a 45 degree angle there.
 
 License Agreement
 =================
