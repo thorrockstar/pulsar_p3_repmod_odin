@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        02.01.2022
+ *  Last Change:        12.11.2022
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -2471,6 +2471,12 @@ void PressPB0(void)
 
     if (istate == DISP_STATE_BLANK)
     {
+        /* Restart the time, the display will stay lit up. */
+
+        g_ucRollOver = 1;
+
+        /* Show the time. */
+
         g_uDispState = DISP_STATE_TIME;
     }
     else
@@ -3208,6 +3214,12 @@ void PressPB1(void)
 
     if (*pb == DISP_STATE_BLANK)
     {
+        /* Restart the time, the display will stay lit up. */
+
+        g_ucRollOver = 1;
+
+        /* Show the date. */
+
         *pb = DISP_STATE_DATE;
     }
 
@@ -6684,8 +6696,8 @@ void main(void)
 
                             /* Grant more time on a wrist flick event. */
                                 
-                            g_WristFlick ? 500 : 375;
-                
+                            g_WristFlick ? 525 : 375;
+
                 if (++g_ucRollOver >= ulimit) // Rounds per second.
                 {
             #else
