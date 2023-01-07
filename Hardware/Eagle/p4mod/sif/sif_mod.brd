@@ -1535,8 +1535,8 @@ design rules under a new name.</description>
 <element name="VDD2" library="testpad" package="TP08SQ" value="TPTP08SQ" x="2.34269375" y="0.836640625">
 <attribute name="TP_SIGNAL_NAME" value="" x="2.34269375" y="0.836640625" size="1.778" layer="27" display="off"/>
 </element>
-<element name="VDD3" library="testpad" package="TP08SQ" value="TPTP08SQ" x="19.94685625" y="0.745434375">
-<attribute name="TP_SIGNAL_NAME" value="" x="19.94685625" y="0.745434375" size="1.778" layer="27" display="off"/>
+<element name="VDD3" library="testpad" package="TP08SQ" value="TPTP08SQ" x="19.754278125" y="0.745434375">
+<attribute name="TP_SIGNAL_NAME" value="" x="19.754278125" y="0.745434375" size="1.778" layer="27" display="off"/>
 </element>
 <element name="VDD1" library="testpad" package="TP08SQ" value="TPTP08SQ" x="2.554646875" y="10.4011125">
 <attribute name="TP_SIGNAL_NAME" value="" x="2.554646875" y="10.4011125" size="1.778" layer="27" display="off"/>
@@ -1657,7 +1657,7 @@ design rules under a new name.</description>
 <wire x1="18.6182" y1="1.8143125" x2="19.07124375" y2="1.045578125" width="0.254" layer="16"/>
 <wire x1="18.6182" y1="1.8143125" x2="18.55316875" y2="1.88485625" width="0.1524" layer="16"/>
 <via x="20.148546875" y="1.526584375" extent="1-16" drill="0.3048"/>
-<wire x1="20.148546875" y1="1.526584375" x2="19.94685625" y2="0.745434375" width="0.254" layer="1"/>
+<wire x1="20.148546875" y1="1.526584375" x2="19.754278125" y2="0.745434375" width="0.254" layer="1"/>
 <wire x1="2.92190625" y1="8.65561875" x2="3.82825625" y2="8.65421875" width="0.2032" layer="1"/>
 <wire x1="3.82825625" y1="8.65421875" x2="4.256571875" y2="7.87175" width="0.2032" layer="16"/>
 <wire x1="4.256571875" y1="7.87175" x2="5.489228125" y2="7.87175" width="0.2032" layer="16"/>

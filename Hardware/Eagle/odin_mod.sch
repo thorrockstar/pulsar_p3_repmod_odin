@@ -9219,7 +9219,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="LIGHTIN" library="wirepad" deviceset="SMD2" device="" value="1"/>
 <part name="LIGHTOUT" library="wirepad" deviceset="SMD2" device="" value="1"/>
 <part name="TRIM" library="wirepad" deviceset="SMD2" device="" value="1"/>
-<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="47k"/>
+<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="68k"/>
 <part name="SUPPLY4" library="supply2" deviceset="GND" device=""/>
 </parts>
 <sheets>
@@ -9236,7 +9236,7 @@ This is public domain.</text>
 <text x="-20.32" y="27.94" size="1.778" layer="94">If using a photo diode,
 instead of the vintage
 LDR, use 6,8 k instead
-of 47 k. Connect the
+of 68 k. Connect the
 anode to LIGHTOUT.</text>
 <text x="-120.904" y="87.122" size="1.778" layer="94">Do not use
 less than

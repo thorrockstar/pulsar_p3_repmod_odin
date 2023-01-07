@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2020-22 Roy Schneider
+ *  Copyright (c) 2020-23 Roy Schneider
  *
  *  main.c
  *
@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        12.11.2022
+ *  Last Change:        07.01.2023
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -386,7 +386,7 @@ unsigned char g_ucMplexDigits = 0;
 unsigned char  g_ucDimmingCnt = 0;
 unsigned char  g_ucDimmingRef = 0;
 unsigned char  g_ucDimming = 0;
-unsigned short g_ucLightSensor = 0;
+unsigned char  g_ucLightSensor = 0;
 
 #endif // #if APP_LIGHT_SENSOR_USAGE==1
 
@@ -4869,10 +4869,9 @@ void Display_Digits(void)
 
         #endif
 
-            /* Calculate the average value between this readout
-             * and the very last. */
+            /* Store the readout for showing it on the display. */
 
-            g_ucLightSensor = uv;
+            g_ucLightSensor = (unsigned char)(uv >> 6); // div by 64
 
             /* Calculate brightness factor from readout. */
 
@@ -4889,34 +4888,35 @@ void Display_Digits(void)
                 else
                 {
                     uv = 15 - (uv >> 6);
+
+                    /* Stop multiplexing, */
+
+                    ucPlex = 255;
                 }
 
               #else
 
                 /* Normal daylight */
 
-                if (uv > 128)
+                if (uv >= 64)
                 {
                     uv = 0;     // Keep maximum brightness.
                 }
                 else
                 {
                     uv = 1;     // Used dimmed brightness.
+
+                    /* Stop multiplexing, */
+
+                    ucPlex = 255;
                 }
 
               #endif
 
                 g_ucDimming = (unsigned char)uv;
                 g_ucDimmingRef = (unsigned char)uv;
-
-                if (uv > 0)
-                {
-                    /* Stop multiplexing, */
-
-                    ucPlex = 255;
-                }
             }
-            else
+            else // If the resitor would be missing.
             {
                 g_ucDimming = 0;
                 g_ucDimmingRef = 0;
@@ -5111,7 +5111,7 @@ void Display_Digits(void)
               #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
                 case DISP_STATE_LIGHT_SENSOR:
-                    g_ucRightVal = (unsigned char)(g_ucLightSensor / 100);
+                    g_ucRightVal = g_ucLightSensor;
                     g_ucLeftVal = 255;
                 break;
 
@@ -5328,6 +5328,21 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
+                  #if APP_BUZZER_ALARM_USAGE==1
+
+                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                    TRISC = 0x08;
+
+                  #else
+
+                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                     * as input. */
+
+                    TRISC = 0x0C;
+
+                  #endif
+
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
                     /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
@@ -5341,21 +5356,6 @@ void Display_Digits(void)
                     TRISB = 0x53;
 
                   #endif
-
-            #if APP_BUZZER_ALARM_USAGE==1
-
-                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
-
-                    TRISC = 0x08;
-
-            #else
-
-                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
-                     * as input. */
-
-                    TRISC = 0x0C;
-
-            #endif
 
                     /* Turn all segment outputs off. */
 
@@ -5480,11 +5480,6 @@ void Display_Digits(void)
 
                     LED_1H = 1;
 
-             #else
-                    /* Turn the common cathode on. */
-
-                    LED_1H = 0;
-
              #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
@@ -5500,6 +5495,14 @@ void Display_Digits(void)
                     TRISB = 0x51;
 
                   #endif
+
+             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+
+                    /* Turn the common cathode on. */
+
+                    LED_1H = 0;
+
+             #endif
 
          #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
@@ -5523,7 +5526,7 @@ void Display_Digits(void)
 
          #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
                 }
-                else if (ucPlex == 3)
+                else //if (ucPlex == 3)
                 {
            #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
                (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
@@ -5531,6 +5534,21 @@ void Display_Digits(void)
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of
                      * them. */
+
+                  #if APP_BUZZER_ALARM_USAGE==1
+
+                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                    TRISC = 0x08;
+
+                  #else
+
+                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                     * as input. */
+
+                    TRISC = 0x0C;
+
+                  #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -5545,21 +5563,6 @@ void Display_Digits(void)
                     TRISB = 0x53;
 
                   #endif
-
-             #if APP_BUZZER_ALARM_USAGE==1
-
-                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
-
-                    TRISC = 0x08;
-
-             #else
-
-                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
-                     * as input. */
-
-                    TRISC = 0x0C;
-
-             #endif
 
                     /* Turn all segment outputs off. */
 
@@ -5658,6 +5661,21 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
+                  #if APP_BUZZER_ALARM_USAGE==1
+
+                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
+
+                    TRISC = 0x08;
+
+                  #else
+
+                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                     * as input. */
+
+                    TRISC = 0x0C;
+
+                  #endif
+
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
                     /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
@@ -5671,21 +5689,6 @@ void Display_Digits(void)
                     TRISB = 0x53;
 
                   #endif
-
-             #if APP_BUZZER_ALARM_USAGE==1
-
-                    /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
-
-                    TRISC = 0x08;
-
-             #else
-
-                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
-                     * as input. */
-
-                    TRISC = 0x0C;
-
-             #endif
 
                     /* Turn all segment outputs off. */
 
@@ -5813,25 +5816,30 @@ void Display_Digits(void)
                         /* Turn the common anode on. */
 
                         LED_10H = 1;
+
+               #endif
+
+               #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
+
+                        /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
+
+                        TRISB = 0x12;
+
                #else
+
+                        /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
+
+                        TRISB = 0x13;
+
+               #endif
+
+               #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+
                         /* Turn the common cathode on. */
 
                         LED_10H = 0;
+
                #endif
-
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                    /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
-
-                    TRISB = 0x12;
-
-                  #else
-
-                    /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
-
-                    TRISB = 0x13;
-
-                  #endif
 
              #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
@@ -6098,11 +6106,6 @@ void Display_Digits(void)
 
                     LED_1M = 1;
 
-             #else
-                    /* Turn the common cathode on. */
-
-                    LED_1M = 0;
-
              #endif
 
              #if APP_BUZZER_ALARM_USAGE==1
@@ -6116,6 +6119,14 @@ void Display_Digits(void)
                     /* Set RC0/1/3/4/5..7 to output and RC2(AN11) input. */
 
                     TRISC = 0x04;
+
+             #endif
+
+             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+
+                    /* Turn the common cathode on. */
+
+                    LED_1M = 0;
 
              #endif
 
@@ -6142,7 +6153,7 @@ void Display_Digits(void)
          #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                 }
-                else if (ucPlex == 1)
+                else //if (ucPlex == 1)
                 {
                     /* Ten minute digit */
 
@@ -6346,11 +6357,7 @@ void Display_Digits(void)
                         /* Turn the common anode on. */
 
                         LED_10M = 1;
-                 #else
 
-                        /* Turn the common cathode on. */
-
-                        LED_10M = 0;
                  #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
@@ -6366,6 +6373,14 @@ void Display_Digits(void)
                         TRISB = 0x43;
 
                   #endif
+
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+
+                        /* Turn the common cathode on. */
+
+                        LED_10M = 0;
+                        
+                 #endif
 
              #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
@@ -6838,7 +6853,7 @@ void main(void)
 
                 g_ucDimming--;
                 
-                udivider = 2;
+                udivider = 3;
             }
             else
                 
@@ -6846,6 +6861,8 @@ void main(void)
                 
             if (udivider == 3)
             {
+                /* Cycle through the 4 digits. */
+
                 Display_Digits();
                 
                 udivider = 1;
@@ -6855,7 +6872,7 @@ void main(void)
                 udivider++;
             }
         }
-        else
+        else // if (g_ucStayAwake)
         {
             /* If using the Pulsar Autoset button mode, there
              * are two button press counters for the TIME and DATE
