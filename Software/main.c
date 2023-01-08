@@ -4679,6 +4679,8 @@ void ReleasePB4(void)
 
 void Display_Digits(void)
 {
+    unsigned char ub, uc;
+
     /* Read current digit to show
      * from the multiplexer. */
 
@@ -5324,6 +5326,58 @@ void Display_Digits(void)
                         ucTemp = *(pb + (g_mod10[ucTemp]));
                     }
 
+                    ub = 0;
+                    uc = 0;
+                    
+                    // segment a
+                    if (ucTemp & 1)
+                    {
+                        uc |= LED_AA_B_MASK;   // LED_AA_B
+                    }
+
+                    // segment b
+                    if (ucTemp & 2)
+                    {
+                        uc |= LED_AB_TD_MASK;   // LED_AB_TD
+                    }
+
+                    // segment c
+                    if (ucTemp & 4)
+                    {
+                        uc |= LED_AC_LD_MASK;   // LED_AC_LD
+                    }
+
+                    // segment d
+                    if (ucTemp & 8)
+                    {
+                        ub |= LED_AD_C_MASK;    // LED_AD_C
+                    }
+
+                    // segment e
+                    if (ucTemp & 16)
+                    {
+                        uc |= LED_AE_MASK;  // LED_AE
+                    }
+
+                    // segment f
+                    if (ucTemp & 32)
+                    {
+                        ub |= LED_AF_MASK;   // LED_AF
+                    }
+
+                    // segment g
+                    if (ucTemp & 64)
+                    {
+                        ub |= LED_AG_MASK;    // LED_AG
+                    }
+
+                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    ub = ~ub;
+                    uc = ~uc;
+                    
+                  #endif // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of
                      * them. */
@@ -5370,6 +5424,9 @@ void Display_Digits(void)
 
                #endif
 
+                    PORTC &= uc;
+                    PORTB &= ub;
+
              #else
                     PORTC &= 0;
                     PORTB &= 1;
@@ -5380,77 +5437,10 @@ void Display_Digits(void)
 
                #endif
 
-             #endif
+                    PORTC |= uc;
+                    PORTB |= ub;
 
-                    // segment a
-                    if (ucTemp & 1)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AA_B = 0;
-             #else
-                        LED_AA_B = 1;
              #endif
-                    }
-
-                    // segment b
-                    if (ucTemp & 2)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AB_TD = 0;
-             #else
-                        LED_AB_TD = 1;
-             #endif
-                    }
-
-                    // segment c
-                    if (ucTemp & 4)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AC_LD = 0;
-             #else
-                        LED_AC_LD = 1;
-             #endif
-                    }
-
-                    // segment d
-                    if (ucTemp & 8)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AD_C = 0;
-             #else
-                        LED_AD_C = 1;
-             #endif
-                    }
-
-                    // segment e
-                    if (ucTemp & 16)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AE = 0;
-             #else
-                        LED_AE = 1;
-             #endif
-                    }
-
-                    // segment f
-                    if (ucTemp & 32)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AF = 0;
-             #else
-                        LED_AF = 1;
-             #endif
-                    }
-
-                    // segment g
-                    if (ucTemp & 64)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AG = 0;
-             #else
-                        LED_AG = 1;
-             #endif
-                    }
 
          #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -5584,10 +5574,6 @@ void Display_Digits(void)
                     LED_AB_TD = (g_ucDots & 1) ? 1 : 0;
                     LED_AC_LD = (g_ucDots & 2) ? 1 : 0;
 
-                    /* Turn the common cathode on. */
-
-                    LED_10H = 0;
-
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
                     /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
@@ -5601,6 +5587,10 @@ void Display_Digits(void)
                     TRISB = 0x13;
 
                   #endif
+
+                    /* Turn the common cathode on. */
+
+                    LED_10H = 0;
 
            #else // Not a 12h system watch.
 
@@ -5656,6 +5646,58 @@ void Display_Digits(void)
                     ucTemp = *(pb + ucTemp);
 
              #endif
+                    
+                    ub = 0;
+                    uc = 0;
+                    
+                    // segment a
+                    if (ucTemp & 1)
+                    {
+                        uc |= LED_AA_B_MASK;   // LED_AA_B
+                    }
+
+                    // segment b
+                    if (ucTemp & 2)
+                    {
+                        uc |= LED_AB_TD_MASK;   // LED_AB_TD
+                    }
+
+                    // segment c
+                    if (ucTemp & 4)
+                    {
+                        uc |= LED_AC_LD_MASK;   // LED_AC_LD
+                    }
+
+                    // segment d
+                    if (ucTemp & 8)
+                    {
+                        ub |= LED_AD_C_MASK;    // LED_AD_C
+                    }
+
+                    // segment e
+                    if (ucTemp & 16)
+                    {
+                        uc |= LED_AE_MASK;  // LED_AE
+                    }
+
+                    // segment f
+                    if (ucTemp & 32)
+                    {
+                        ub |= LED_AF_MASK;   // LED_AF
+                    }
+
+                    // segment g
+                    if (ucTemp & 64)
+                    {
+                        ub |= LED_AG_MASK;    // LED_AG
+                    }
+
+                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    ub = ~ub;
+                    uc = ~uc;
+                    
+                  #endif // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of
@@ -5720,74 +5762,18 @@ void Display_Digits(void)
                     if (ucTemp)
                     {
              #endif
-                        // segment a
-                        if (ucTemp & 1)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AA_B = 0;
-             #else
-                            LED_AA_B = 1;
-             #endif
-                        }
-                        // segment b
-                        if (ucTemp & 2)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AB_TD = 0;
-             #else
-                            LED_AB_TD = 1;
-             #endif
-                        }
 
-                        // segment c
-                        if (ucTemp & 4)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AC_LD = 0;
-             #else
-                            LED_AC_LD = 1;
-             #endif
-                        }
+                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                        // segment d
-                        if (ucTemp & 8)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AD_C = 0;
-             #else
-                            LED_AD_C = 1;
-             #endif
-                        }
+                        PORTC &= uc;
+                        PORTB &= ub;
 
-                        // segment e
-                        if (ucTemp & 16)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AE = 0;
-             #else
-                            LED_AE = 1;
-             #endif
-                        }
+                 #else
 
-                        // segment f
-                        if (ucTemp & 32)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AF = 0;
-             #else
-                            LED_AF = 1;
-             #endif
-                        }
+                        PORTC |= uc;
+                        PORTB |= ub;
 
-                        // segment g
-                        if (ucTemp & 64)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AG = 0;
-             #else
-                            LED_AG = 1;
-             #endif
-                        }
+                #endif
 
              #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -5918,6 +5904,7 @@ void Display_Digits(void)
                #endif
 
              #else
+
                 PORTC &= 0;
                 PORTB &= 1;
 
@@ -5950,6 +5937,58 @@ void Display_Digits(void)
                     {
                         ucTemp = *(pb + (g_mod10[ucTemp]));
                     }
+
+                    ub = 0;
+                    uc = 0;
+                    
+                    // segment a
+                    if (ucTemp & 1)
+                    {
+                        uc |= LED_AA_B_MASK;   // LED_AA_B
+                    }
+
+                    // segment b
+                    if (ucTemp & 2)
+                    {
+                        uc |= LED_AB_TD_MASK;   // LED_AB_TD
+                    }
+
+                    // segment c
+                    if (ucTemp & 4)
+                    {
+                        uc |= LED_AC_LD_MASK;   // LED_AC_LD
+                    }
+
+                    // segment d
+                    if (ucTemp & 8)
+                    {
+                        ub |= LED_AD_C_MASK;    // LED_AD_C
+                    }
+
+                    // segment e
+                    if (ucTemp & 16)
+                    {
+                        uc |= LED_AE_MASK;  // LED_AE
+                    }
+
+                    // segment f
+                    if (ucTemp & 32)
+                    {
+                        ub |= LED_AF_MASK;   // LED_AF
+                    }
+
+                    // segment g
+                    if (ucTemp & 64)
+                    {
+                        ub |= LED_AG_MASK;    // LED_AG
+                    }
+
+                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    ub = ~ub;
+                    uc = ~uc;
+                    
+                  #endif // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of
@@ -5996,7 +6035,11 @@ void Display_Digits(void)
 
                #endif
 
+                    PORTC &= uc;
+                    PORTB &= ub;
+
              #else
+
                     PORTC &= 0;
                     PORTB &= 1;
 
@@ -6006,77 +6049,10 @@ void Display_Digits(void)
 
                #endif
 
-             #endif
+                    PORTC |= uc;
+                    PORTB |= ub;
 
-                    // segment a
-                    if (ucTemp & 1)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AA_B = 0;
-             #else
-                        LED_AA_B = 1;
              #endif
-                    }
-
-                    // segment b
-                    if (ucTemp & 2)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AB_TD = 0;
-             #else
-                        LED_AB_TD = 1;
-             #endif
-                    }
-
-                    // segment c
-                    if (ucTemp & 4)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AC_LD = 0;
-             #else
-                        LED_AC_LD = 1;
-             #endif
-                    }
-
-                    // segment d
-                    if (ucTemp & 8)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AD_C = 0;
-             #else
-                        LED_AD_C = 1;
-             #endif
-                    }
-
-                    // segment e
-                    if (ucTemp & 16)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AE = 0;
-             #else
-                        LED_AE = 1;
-             #endif
-                    }
-
-                    // segment f
-                    if (ucTemp & 32)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AF = 0;
-             #else
-                        LED_AF = 1;
-             #endif
-                    }
-
-                    // segment g
-                    if (ucTemp & 64)
-                    {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                        LED_AG = 0;
-             #else
-                        LED_AG = 1;
-             #endif
-                    }
 
          #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6200,6 +6176,58 @@ void Display_Digits(void)
              #endif
                     }
 
+                    ub = 0;
+                    uc = 0;
+                    
+                    // segment a
+                    if (ucTemp & 1)
+                    {
+                        uc |= LED_AA_B_MASK;   // LED_AA_B
+                    }
+
+                    // segment b
+                    if (ucTemp & 2)
+                    {
+                        uc |= LED_AB_TD_MASK;   // LED_AB_TD
+                    }
+
+                    // segment c
+                    if (ucTemp & 4)
+                    {
+                        uc |= LED_AC_LD_MASK;   // LED_AC_LD
+                    }
+
+                    // segment d
+                    if (ucTemp & 8)
+                    {
+                        ub |= LED_AD_C_MASK;    // LED_AD_C
+                    }
+
+                    // segment e
+                    if (ucTemp & 16)
+                    {
+                        uc |= LED_AE_MASK;  // LED_AE
+                    }
+
+                    // segment f
+                    if (ucTemp & 32)
+                    {
+                        ub |= LED_AF_MASK;   // LED_AF
+                    }
+
+                    // segment g
+                    if (ucTemp & 64)
+                    {
+                        ub |= LED_AG_MASK;    // LED_AG
+                    }
+
+                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    ub = ~ub;
+                    uc = ~uc;
+                    
+                  #endif // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                     /* Turn all common pins off by setting the outputs to tri-state
                      * high impedance by making inputs out of them. */
 
@@ -6260,75 +6288,18 @@ void Display_Digits(void)
                     if (ucTemp)
                     {
              #endif
-                        // segment a
-                        if (ucTemp & 1)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AA_B = 0;
-             #else
-                            LED_AA_B = 1;
-             #endif
-                        }
 
-                        // segment b
-                        if (ucTemp & 2)
-                        {
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AB_TD = 0;
-             #else
-                            LED_AB_TD = 1;
-             #endif
-                        }
 
-                        // segment c
-                        if (ucTemp & 4)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AC_LD = 0;
+                    PORTC &= uc;
+                    PORTB &= ub;
+                    
              #else
-                            LED_AC_LD = 1;
-             #endif
-                        }
 
-                        // segment d
-                        if (ucTemp & 8)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AD_C = 0;
-             #else
-                            LED_AD_C = 1;
-             #endif
-                        }
+                    PORTC |= uc;
+                    PORTB |= ub;
 
-                        // segment e
-                        if (ucTemp & 16)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AE = 0;
-             #else
-                            LED_AE = 1;
              #endif
-                        }
-
-                        // segment f
-                        if (ucTemp & 32)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AF = 0;
-             #else
-                            LED_AF = 1;
-             #endif
-                        }
-
-                        // segment g
-                        if (ucTemp & 64)
-                        {
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-                            LED_AG = 0;
-             #else
-                            LED_AG = 1;
-             #endif
-                        }
 
              #if APP_DATE_SPECIAL_DOT_USAGE==1
 

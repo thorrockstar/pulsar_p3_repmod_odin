@@ -402,12 +402,25 @@ typedef void(*ButtonHandlerType)(void);
 
 // Anodes/Segments
 #define LED_AA_B        PORTCbits.RC4
+#define LED_AA_B_MASK   16
+
 #define LED_AB_TD       PORTCbits.RC5
+#define LED_AB_TD_MASK  32
+
 #define LED_AC_LD       PORTCbits.RC6
+#define LED_AC_LD_MASK  64
+
 #define LED_AD_C        PORTBbits.RB3
+#define LED_AD_C_MASK   8
+
 #define LED_AE          PORTCbits.RC7
+#define LED_AE_MASK     128
+
 #define LED_AF          PORTBbits.RB5
+#define LED_AF_MASK     32
+
 #define LED_AG          PORTBbits.RB2
+#define LED_AG_MASK     4
 
 // Cathods/Multiplexing
 #define LED_1M          PORTCbits.RC3
