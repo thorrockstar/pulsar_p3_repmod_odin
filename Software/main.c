@@ -775,7 +775,7 @@ inline void Configure_Real_Time_Clock(void)
 
         RTCCFG |= 3;
 
-        RTCVALL = g_decimal_bcd[22]; // Year 2022
+        RTCVALL = g_decimal_bcd[23]; // Year 2023
 
         ucRTCInval = RTCVALH; // Dummy for decrement
 
