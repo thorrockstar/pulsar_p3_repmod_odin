@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        07.01.2023
+ *  Last Change:        06.11.2023
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -106,6 +106,7 @@
  */
 
 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+    (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
     (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
 const unsigned char g_24_to_12_hours[] = { /* AM */12, 1, 2, 3, 4, 5, 6, \
@@ -783,6 +784,7 @@ inline void Configure_Real_Time_Clock(void)
         RTCVALH = 1; // Month
 
 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+    (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
     (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
         
         RTCVALL = 0; // Hour (midnight))
@@ -2106,6 +2108,7 @@ void PressPB0(void)
         unsigned char ucValue;
 
      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+         (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
         ucExtra = 1;
@@ -2538,6 +2541,7 @@ void HoldPB0(void)
         unsigned char ucValue;
 
      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+         (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
         ucExtra = 1;
@@ -3224,6 +3228,7 @@ void PressPB1(void)
     }
 
   #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+      (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
       (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
     else if (*pb == DISP_STATE_TIME)
@@ -3829,6 +3834,7 @@ void HoldPB2(void)
         RTCCFGbits.RTCEN = 0;
 
       #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
           (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
         ucExtra = 1;
@@ -5031,6 +5037,7 @@ void Display_Digits(void)
                     /* 24h -> 12h system */
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
                     g_ucLeftVal = g_24_to_12_hours[g_ucLeftVal];
@@ -5049,6 +5056,7 @@ void Display_Digits(void)
                     }
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
                     g_ucDots = 3; // Show both dots.
@@ -5151,6 +5159,7 @@ void Display_Digits(void)
                     /* 24h -> 12h system */
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
                     /* Hours to indicate AM/PM dot. */
@@ -5195,6 +5204,7 @@ void Display_Digits(void)
                     }
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
                     g_ucLeftVal = 255;    // Show year with two digits.
@@ -5490,15 +5500,23 @@ void Display_Digits(void)
 
                     /* Turn the common cathode on. */
 
+                  #if APP_CATHODE_DRIVER_NMOS
+                    LED_1H = 1;
+                  #else
                     LED_1H = 0;
+                  #endif
 
              #endif
 
          #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                    /* Turn the common cathode on. */
+                /* Turn the common cathode on. */
 
+                  #if APP_CATHODE_DRIVER_NMOS
+                    LED_10M = 1;
+                  #else
                     LED_10M = 0;
+                  #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -5519,6 +5537,7 @@ void Display_Digits(void)
                 else //if (ucPlex == 3)
                 {
            #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD) || \
+               (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
                (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
 
                     /* Turn all common pins off by setting the outputs
@@ -5590,7 +5609,11 @@ void Display_Digits(void)
 
                     /* Turn the common cathode on. */
 
+                  #if APP_CATHODE_DRIVER_NMOS
+                    LED_10H = 1;
+                  #else
                     LED_10H = 0;
+                  #endif
 
            #else // Not a 12h system watch.
 
@@ -5823,7 +5846,11 @@ void Display_Digits(void)
 
                         /* Turn the common cathode on. */
 
+                      #if APP_CATHODE_DRIVER_NMOS
+                        LED_10H = 1;
+                      #else
                         LED_10H = 0;
+                      #endif
 
                #endif
 
@@ -5831,21 +5858,25 @@ void Display_Digits(void)
 
                         /* Turn the common cathode on. */
 
+                      #if APP_CATHODE_DRIVER_NMOS
+                        LED_1M = 1;
+                      #else
                         LED_1M = 0;
+                      #endif
 
-                    #if APP_BUZZER_ALARM_USAGE==1
+                      #if APP_BUZZER_ALARM_USAGE==1
 
                         /* Set RC0..7 to outputs. */
 
                         TRISC = 0x00;
 
-                    #else
+                      #else
 
                         /* Set RC0/1/3/4/5..7 output and RC2(AN11) as input. */
 
                         TRISC = 0x04;
 
-                    #endif
+                      #endif
 
              #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
@@ -6100,9 +6131,13 @@ void Display_Digits(void)
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
 
-                    /* Turn the common cathode on. */
+                /* Turn the common cathode on. */
 
+                  #if APP_CATHODE_DRIVER_NMOS
+                    LED_1M = 1;
+                  #else
                     LED_1M = 0;
+                  #endif
 
              #endif
 
@@ -6110,7 +6145,11 @@ void Display_Digits(void)
 
                     /* Turn the common cathode on. */
 
+                  #if APP_CATHODE_DRIVER_NMOS
+                    LED_10H = 1;
+                  #else
                     LED_10H = 0;
+                  #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -6349,7 +6388,11 @@ void Display_Digits(void)
 
                         /* Turn the common cathode on. */
 
+                      #if APP_CATHODE_DRIVER_NMOS
+                        LED_10M = 1;
+                      #else
                         LED_10M = 0;
+                      #endif
                         
                  #endif
 
@@ -6357,7 +6400,11 @@ void Display_Digits(void)
 
                         /* Turn the common cathode on. */
 
-                        LED_1H = 0;
+                  #if APP_CATHODE_DRIVER_NMOS
+                    LED_1H = 1;
+                  #else
+                    LED_1H = 0;
+                  #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
