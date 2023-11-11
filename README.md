@@ -11,12 +11,12 @@ ftp://ftp.cadsoft.de/eagle/program/6.6/
 P3 Module Types
 ===============
 
-This project contains two different boards. The **Odin** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. You can also compile the firmware binary for using ALS314A single digit displays with common cathodes instead. But these are much dimmer and I recommend to use AL304G with common anodes for better readability. If using the brighter AL304G displays use resistors with about 130 Ohms (AL304G). For the dimmer ALS314A digits with common cathodes use 82 Ohms instead (ALS314A). The original display on the 'Odin' board features 82 Ohms resistors. See the comments in the schematics.
+This project contains two different boards. The **Odin** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. See the comments in the schematics.
 
 P4 Module Variant
 =================
 
-There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. Be aware, that you will need to **modify the plastic carrier** for the **P4 version**. You will be in need to make the open space wider to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on all four sides of the open space and create a 45 degree angle there.
+There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. So, double check the orientaion of the chip, when soldering, as the PCB view is shown from the top layer. Be aware that this module will **not be able to light up the P4 display at full brightness** as it lacks n-mos transistors for the common cathodes. The display will be about 75 % of the original brightness. Be aware, that you will need to **modify the plastic carrier**. You will be in need to make the open space wider to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on all four sides of the open space and create a 45 degree angle there.
 
 License Agreement
 =================
@@ -39,15 +39,11 @@ This project features a MicroChip PIC18F24J11 MCU. The software can be compiled 
 **Module 'Odin' featuring the original display and light sensor.**
 
 ![Module Image](p3_odin.png)
-![PCB Image](pulsar_pcb.png)
-![Module Image](p3_odin_second.png)
 
 In the main header file, select the right type of watch module. You find also ready compiled binaries for the 'Odin' and 'Loki' module.
 
 **Module 'Loki' featuring four replacement single digit displays and no light sensor.**
 
-![Module Image](p3_loki.png)
-![PCB Image](pulsar_loki.png)
 ![PCB Image](p3_loki_second.png)
 
 Important
