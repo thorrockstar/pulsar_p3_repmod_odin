@@ -6,19 +6,19 @@ This project bundles my source code, binary, schematics and PCB layout files for
 The PCB layout is made in a way, allowing it to be opened and edited with the free Eagle version. I prefer the older Eagle 6.6 release, that still was made by CADSoft.
 
 The free trial version of the CAD-Soft Eagle software can be found on CAD-Softs's own FTP server:
-ftp://ftp.cadsoft.de/eagle/program/6.6/
+http://eagle.autodesk.com/eagle/software-versions/10
 
 P3 Module Types
 ===============
 
 This project contains two different boards. The **Odin Mark II** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. See the comments in the schematics.
 
-**Note:** Some of the photos show older variants of the boards. So don't get confused.
+**Note:** Some of the photos show **older** variants of the boards. So don't get confused. The current Odin Mark II features **4 extra transistors** for driving the common cathodes.
 
 P4 Module Variant
 =================
 
-There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. So, double check the orientaion of the chip, when soldering, as the PCB view is shown from the top layer. Be aware that this module will **not be able to light up the P4 display at full brightness** as it lacks n-mos transistors for the common cathodes. The display will be about 75 % of the original brightness. Be aware, that you will need to **modify the plastic carrier**. You will be in need to make the open space wider to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on all four sides of the open space and create a 45 degree angle there.
+There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. So, double check the orientation of the chip, when soldering, as the PCB is shown from the top layer in the pictures. Be aware that this module will **not be able to light up the P4 display at full brightness** as it lacks n-mos transistors for the common cathodes. The display will be about 75 % of the original brightness. Be aware, that you will need to **modify the plastic carrier**. You will be in need to make the open space behind the PCB wider, to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on all four sides of the open space and create a 45 degree angle there.
 
 License Agreement
 =================
@@ -41,12 +41,17 @@ This project features a MicroChip PIC18F24J11 MCU. The software can be compiled 
 **Module 'Odin' featuring the original display and light sensor.**
 
 ![Module Image](p3_odin.png)
+(Older Odin 1)
+![Module Image](p3_odin_mkii.png)
+(Newer Odin Mark II)
 
 In the main header file, select the right type of watch module. You find also ready compiled binaries for the 'Odin' and 'Loki' module.
 
 **Module 'Loki' featuring four replacement single digit displays and no light sensor.**
 
 ![PCB Image](p3_loki_second.png)
+
+![PCB Image](p3_loki_pcb.png)
 
 Important
 ==========
