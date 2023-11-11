@@ -9299,7 +9299,7 @@ https://www.mouser.de/datasheet/2/196/Infineon_IRLML0030_DataSheet_v01_01_EN-316
 <part name="LIGHTIN" library="wirepad" deviceset="SMD2" device="" value="1"/>
 <part name="LIGHTOUT" library="wirepad" deviceset="SMD2" device="" value="1"/>
 <part name="TRIM" library="wirepad" deviceset="SMD2" device="" value="1"/>
-<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="68k"/>
+<part name="R9" library="resistor" deviceset="R-EU_" device="R0402" value="47k"/>
 <part name="SUPPLY4" library="supply2" deviceset="GND" device=""/>
 <part name="Q1" library="irlml0030" deviceset="IRLML0030" device=""/>
 <part name="Q2" library="irlml0030" deviceset="IRLML0030" device=""/>
@@ -9329,11 +9329,11 @@ You may want to remove the 12pF capacitors in that case as well.</text>
 Created by Roy Schneider 2023.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Odin Mk II</text>
-<text x="-20.32" y="27.94" size="1.778" layer="94">If using a photo diode,
-instead of the vintage
-LDR, use 6,8 k instead
-of 68 k. Connect the
-anode to LIGHTOUT.</text>
+<text x="-45.72" y="27.94" size="1.778" layer="94">If using a photo diode, instead of the vintage
+LDR, use 6,8 k instead of 47 k. Connect the
+anode to LIGHTOUT. Actually some LDR give
+you different output. So you might change
+the resistor value down to 10 k.</text>
 <text x="-120.904" y="87.122" size="1.778" layer="94">Do not use
 less than
 10µF here!</text>
