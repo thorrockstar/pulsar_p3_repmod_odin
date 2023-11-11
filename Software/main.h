@@ -8,7 +8,7 @@
  *  Project:            Pulsar Replacement module 'Odin & Loki' and 'Sif & Hel'.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        06.11.2023
+ *  Last Change:        11.11.2023
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -51,8 +51,9 @@
  */
 
 // P3 - Original Litronix P2/P3 display.
-#define APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD             0 // Pulsar P3 Odin module.
-#define APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD     1 // Pulsar P3 Odin Mark II module with driver transistors.
+#define APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD     0 // Pulsar P3 Odin Mark II module with driver transistors.
+// First prototype replacement module.
+#define APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD              1 // First legacy replacement module.
 // P3 - USSR made ALS314/AL304G displays.
 #define APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD             2 // Pulsar P3 Loki module.
 // P4 - USSR made ALS314/AL304G displays.
@@ -70,7 +71,7 @@
  * ========================================================================
  */
  
-#define APP_WATCH_TYPE_BUILD    APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD
+#define APP_WATCH_TYPE_BUILD    APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD
 
 /* Note:
  * 
@@ -105,19 +106,7 @@
  * 
  * To put it into a nutshell. You can't combine those together. */
 
-#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD)
-  // P3 - Odin (original display, common cathode, no driver nmos))
-  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
-  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_PULSAR_MAGNET_SET
-  #define APP_LIGHT_SENSOR_USAGE                     1
-  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
-  #define APP_BUZZER_ALARM_USAGE                     0
-  #define APP_DATE_SPECIAL_DOT_USAGE                 0
-  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
-  #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    0
-
-#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD)
+#if (APP_WATCH_TYPE_BUILD == APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD)
   // P3 - Odin (original display, common cathode, using driver transistors))
   #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
   #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_PULSAR_MAGNET_SET
@@ -128,6 +117,18 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    1
+
+#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD)
+  // Legacy Prototype (original display, common cathode, no driver n-mos))
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_PULSAR_MAGNET_SET
+  #define APP_LIGHT_SENSOR_USAGE                     1
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
+  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 0
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
+  #define APP_WRIST_FLICK_USAGE                      0
+  #define APP_CATHODE_DRIVER_NMOS                    0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD)
   // P3 - Loki (replacement display with common anode or cathode - double check)
@@ -291,9 +292,9 @@ typedef void(*ButtonHandlerType)(void);
 /**
 * Button port definitions */
 
-#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MOD)
+#if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD)
 
-// Pulsar P2/3 with original display
+// Pulsar P2/3 with original display and common cathode driver transistors
 
     // TIME
     #define PB0_PORT_BITS   PORTAbits
@@ -308,9 +309,9 @@ typedef void(*ButtonHandlerType)(void);
     #define PB3_PORT_BITS   PORTAbits
     #define PB3_PIN         RA0
 
-#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD)
+#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD)
 
-// Pulsar P2/3 with original display and common cathode driver transistors
+// Legacy Prototype (original display, common cathode, no driver n-mos))
 
     // TIME
     #define PB0_PORT_BITS   PORTAbits
