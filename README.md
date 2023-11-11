@@ -11,7 +11,9 @@ ftp://ftp.cadsoft.de/eagle/program/6.6/
 P3 Module Types
 ===============
 
-This project contains two different boards. The **Odin** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. See the comments in the schematics.
+This project contains two different boards. The **Odin Mark II** board, that can be used, if the **original Litronix** dotty LED display could be rescued. The **Loki** board can be used if the original display is broken and shall be replaced with four USSR made **AL304G replacement** single digit displays with common anodes. See the comments in the schematics.
+
+**Note:** Some of the photos show older variants of the boards. So don't get confused.
 
 P4 Module Variant
 =================
