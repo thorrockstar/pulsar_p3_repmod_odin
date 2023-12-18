@@ -15,6 +15,8 @@ This project contains two different boards. The **Odin Mark II** board, that can
 
 **Note:** Some of the photos show **older** variants of the boards. So don't get confused. The current Odin Mark II features **4 extra transistors** for driving the common cathodes.
 
+**Important Note:** As the new PCB's have traces and vias/pads on the back side, make sure you put some black isolation tape on top of the plastic carrier *before* placing the new PCB onto it. Otherwise the battery connection wires may short your PCB!
+
 P4 Module Variant
 =================
 
