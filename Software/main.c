@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        11.11.2023
+ *  Last Change:        12.12.2023
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -107,7 +107,8 @@
 
 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
     (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-    (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+    (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+    (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
 const unsigned char g_24_to_12_hours[] = { /* AM */12, 1, 2, 3, 4, 5, 6, \
                                                     7, 8, 9, 10, 11, \
@@ -785,8 +786,9 @@ inline void Configure_Real_Time_Clock(void)
 
 #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
     (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-    (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
-        
+    (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+    (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
+
         RTCVALL = 0; // Hour (midnight))
 
 #else
@@ -1413,6 +1415,8 @@ unsigned char DebounceButtons(void)
                 preleased = &ReleasePB0;
             break;
 
+#if !APP_ONE_TIME_BUTTON_OPERATION
+
             // PB1 - DATE
             case DEBOUNCE_INDEX_BUTTON_DATE: // 1
                 pstate = &g_ucPB1DATEState;
@@ -1422,6 +1426,8 @@ unsigned char DebounceButtons(void)
                 phold = &HoldPB1;
                 preleased = &ReleasePB1;
             break;
+
+#endif // #if !APP_ONE_TIME_BUTTON_OPERATION
 
 #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
 
@@ -2109,7 +2115,8 @@ void PressPB0(void)
 
      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-         (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+         (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+         (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
         ucExtra = 1;
 
@@ -2491,6 +2498,15 @@ void PressPB0(void)
 
       #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_MAGNET_SET
 
+        #if APP_ONE_TIME_BUTTON_OPERATION
+      
+        if (istate == DISP_STATE_TIME)
+        {
+            g_uDispState = DISP_STATE_DATE;
+        }
+
+        #else // #if APP_ONE_TIME_BUTTON_OPERATION
+
         if ((istate == DISP_STATE_DATE) || (istate == DISP_STATE_SET_MONTH))
         {
             g_uDispState = DISP_STATE_SET_DAY;
@@ -2499,6 +2515,8 @@ void PressPB0(void)
         {
             g_uDispState = DISP_STATE_SET_YEAR                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ;
         }
+
+        #endif // #else #if APP_ONE_TIME_BUTTON_OPERATION
 
       #endif
     }
@@ -2542,7 +2560,8 @@ void HoldPB0(void)
 
      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-         (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+         (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+         (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
         ucExtra = 1;
 
@@ -2867,6 +2886,27 @@ void HoldPB0(void)
     if ((g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
+      #if APP_ONE_TIME_BUTTON_OPERATION
+      
+        if (istate == DISP_STATE_TIME)
+        {
+            g_uDispState = DISP_STATE_SECONDS;
+        }
+        else if (istate == DISP_STATE_DATE)
+        {
+            g_uDispState = DISP_STATE_WEEKDAY;
+        }
+        else if (istate == DISP_STATE_WEEKDAY)
+        {
+            g_uDispState = DISP_STATE_YEAR;
+        }
+        else if (istate == DISP_STATE_YEAR)
+        {
+            g_uDispState = DISP_STATE_SET_CALIBRA;
+        }
+
+      #else // #if APP_ONE_TIME_BUTTON_OPERATION
+
         if (istate == DISP_STATE_TIME)
         {
             g_uDispState = DISP_STATE_SECONDS;
@@ -2876,6 +2916,8 @@ void HoldPB0(void)
         {
             g_uDispState = DISP_STATE_SET_CALIBRA;
         }
+
+      #endif // #else #if APP_ONE_TIME_BUTTON_OPERATION
     }
 }
 
@@ -2914,6 +2956,8 @@ void ReleasePB0(void)
         }
     }
 }
+
+#if !APP_ONE_TIME_BUTTON_OPERATION
 
 /**
  * Called when button 1 DATE has been pressed.
@@ -3229,7 +3273,8 @@ void PressPB1(void)
 
   #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
       (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-      (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+      (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+      (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
     else if (*pb == DISP_STATE_TIME)
     {
@@ -3632,6 +3677,8 @@ void ReleasePB1(void)
   #endif
 }
 
+#endif // #if !APP_ONE_TIME_BUTTON_OPERATION
+
 #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
 
 /**
@@ -3675,6 +3722,15 @@ void PressPB2(void)
 
           #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_MAGNET_SET
 
+           #if APP_ONE_TIME_BUTTON_OPERATION
+
+            if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
+            {
+                *pb = DISP_STATE_SET_MONTH;
+            }
+
+           #else // #if APP_ONE_TIME_BUTTON_OPERATION
+
             if (g_ucPB1DATEState >= PB_STATE_SHORT_PRESS)
             {
                 if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
@@ -3686,6 +3742,8 @@ void PressPB2(void)
                     *pb = DISP_STATE_SET_MONTH;
                 }
             }
+
+            #endif // #else #if APP_ONE_TIME_BUTTON_OPERATION
 
           #else
 
@@ -3835,7 +3893,8 @@ void HoldPB2(void)
 
       #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
           (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+          (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
         ucExtra = 1;
 
@@ -4142,6 +4201,26 @@ void PressPB3(void)
         {
           #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_MAGNET_SET
 
+            #if APP_ONE_TIME_BUTTON_OPERATION
+
+            if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
+            {
+                if (ust == DISP_STATE_DATE)
+                {
+                    *pb = DISP_STATE_SET_DAY;
+                }
+                else if (ust == DISP_STATE_YEAR)
+                {
+                    *pb = DISP_STATE_SET_YEAR;
+                }
+                else if (ust == DISP_STATE_WEEKDAY)
+                {
+                    *pb = DISP_STATE_SET_WEEKDAY;
+                }
+            }
+
+           #else // #if APP_ONE_TIME_BUTTON_OPERATION
+
             if (((ust == DISP_STATE_DATE) || (ust == DISP_STATE_YEAR) || \
                  (ust == DISP_STATE_WEEKDAY) || (ust == DISP_STATE_SET_DAY)))
             {
@@ -4158,7 +4237,9 @@ void PressPB3(void)
                 }
             }
 
-          #else
+            #endif // #else #if APP_ONE_TIME_BUTTON_OPERATION
+
+          #else // #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_MAGNET_SET
 
             if ((ust == DISP_STATE_DATE) || (ust == DISP_STATE_SET_MONTH))
             {
@@ -4404,6 +4485,123 @@ void HoldPB3(void)
 
         Lock_RTCC();
     }
+
+  #if APP_ONE_TIME_BUTTON_OPERATION
+
+    else if (ust == DISP_STATE_SET_DAY)
+    {
+        /* Unlock write access to the RTC and disable the clock. */
+
+        Unlock_RTCC();
+
+        /* Enable writing to the RTC */
+
+        RTCCFGbits.RTCWREN = 1;
+
+        /* Stop RTC operation. */
+
+        RTCCFGbits.RTCEN = 0;
+
+      #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
+          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
+          (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+          (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
+
+
+        unsigned char ucExtra = 1;
+
+        /* On every second cycle change betwen AM and PM and otherwise
+         * forward the day. */
+
+        RTCCFGbits.RTCPTR0 = 1;
+        RTCCFGbits.RTCPTR1 = 0;
+
+        ucTemp = RTCVALL;
+        ucValue = g_bcd_decimal[ucTemp];
+
+        if (ucValue < 12)
+        {
+            /* AM -> PM */
+
+            ucValue += 12;
+
+            ucTemp = g_decimal_bcd[ucValue];
+            RTCVALL = ucTemp;
+
+            /* Do not forward the day. */
+
+            ucExtra = 0;
+        }
+        else
+        {
+            /* PM -> AM */
+
+            ucValue -= 12;
+
+            ucTemp = g_decimal_bcd[ucValue];
+            RTCVALL = ucTemp;
+        }
+
+        if (ucExtra)
+
+      #endif
+
+        {
+            /* Forward the day of month. */
+
+            RTCCFGbits.RTCPTR0 = 0;
+            RTCCFGbits.RTCPTR1 = 1;
+            //while(RTCCFGbits.RTCSYNC);
+
+            ucTemp = RTCVALL; // day
+            ucValue = 1 + g_bcd_decimal[ucTemp];
+
+            ucTemp = RTCVALH; // month
+            ucExtra = g_bcd_decimal[ucTemp];
+
+            if (ucExtra == 2) // February, always assume it to be a leap year.
+            {
+                /* Assume february to have 29 days to support leap years. */
+
+                if (ucValue >= 30) // 29 days (leap year)
+                {
+                    ucValue = 1;
+                }
+            }
+            else if ((ucExtra == 1) || (ucExtra == 3) || (ucExtra == 5) || \
+                     (ucExtra == 7) || (ucExtra == 8) || (ucExtra == 10) || \
+                     (ucExtra == 12))
+            {
+                if (ucValue >= 32) // 31 days
+                {
+                    ucValue = 1;
+                }
+            }
+            else
+            {
+                if (ucValue >= 31) // 30 days
+                {
+                    ucValue = 1;
+                }
+            }
+
+            RTCCFGbits.RTCPTR0 = 0;
+            RTCCFGbits.RTCPTR1 = 1;
+
+            ucTemp = g_decimal_bcd[ucValue];
+            RTCVALL = ucTemp;
+        }
+
+        /* Enable the RTC operation again.*/
+
+        RTCCFGbits.RTCEN = 1;
+
+        /* Lock writing to the RTCC. */
+
+        Lock_RTCC();
+    }
+    
+  #endif // #if APP_ONE_TIME_BUTTON_OPERATION
 
   #if APP_BUZZER_ALARM_USAGE==1
 
@@ -5038,7 +5236,8 @@ void Display_Digits(void)
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
                     g_ucLeftVal = g_24_to_12_hours[g_ucLeftVal];
 
@@ -5057,7 +5256,8 @@ void Display_Digits(void)
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
                     g_ucDots = 3; // Show both dots.
 
@@ -5160,7 +5360,8 @@ void Display_Digits(void)
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
                     /* Hours to indicate AM/PM dot. */
 
@@ -5205,7 +5406,8 @@ void Display_Digits(void)
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
                     g_ucLeftVal = 255;    // Show year with two digits.
 
@@ -5538,7 +5740,8 @@ void Display_Digits(void)
                 {
            #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
                (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+               (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of

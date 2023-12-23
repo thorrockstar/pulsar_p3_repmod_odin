@@ -20,7 +20,7 @@ This project contains two different boards. The **Odin Mark II** board, that can
 P4 Module Variant
 =================
 
-There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. So, double check the orientation of the chip, when soldering, as the PCB is shown from the top layer in the pictures. Be aware that this module will **not be able to light up the P4 display at full brightness** as it lacks n-mos transistors for the common cathodes. The display will be about 75 % of the original brightness. Be aware, that you will need to **modify the plastic carrier**. You will be in need to make the open space behind the PCB wider, to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on all four sides of the open space and create a 45 degree angle there.
+There is a sub-folder called 'p4mod', that contains a module called **Sif**. This one can be used for P4 Executive watches. It has the micro controller on the back side. So, double check the orientation of the chip, when soldering, as the PCB is shown from the top layer in the pictures and you need to turn the PCB over when soldering. Be aware, that you will need to **modify the plastic carrier**. You will be in need to make the open space behind the PCB wider, to be able to place the PCB flush on the P4 plastic carrier. I usually do that by cutting the edges on the top and bottom of the inner opening in order to create a 45 degree angle there.
 
 License Agreement
 =================

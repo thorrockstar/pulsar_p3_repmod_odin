@@ -9483,37 +9483,48 @@ less than
 <segment>
 <pinref part="Q1" gate="G$1" pin="S"/>
 <pinref part="SUPPLY11" gate="GND" pin="GND"/>
+<junction x="-38.1" y="-45.72"/>
 </segment>
 <segment>
 <pinref part="Q2" gate="G$1" pin="S"/>
 <pinref part="SUPPLY12" gate="GND" pin="GND"/>
 <wire x1="-22.86" y1="-58.42" x2="-22.86" y2="-55.88" width="0.1524" layer="91"/>
+<junction x="-22.86" y="-55.88"/>
+<junction x="-22.86" y="-58.42"/>
 </segment>
 <segment>
 <pinref part="Q3" gate="G$1" pin="S"/>
 <pinref part="SUPPLY13" gate="GND" pin="GND"/>
 <wire x1="-7.62" y1="-68.58" x2="-7.62" y2="-71.12" width="0.1524" layer="91"/>
+<junction x="-7.62" y="-68.58"/>
+<junction x="-7.62" y="-71.12"/>
 </segment>
 <segment>
 <pinref part="Q4" gate="G$1" pin="S"/>
 <pinref part="SUPPLY14" gate="GND" pin="GND"/>
 <wire x1="10.16" y1="-83.82" x2="10.16" y2="-81.28" width="0.1524" layer="91"/>
+<junction x="10.16" y="-81.28"/>
+<junction x="10.16" y="-83.82"/>
 </segment>
 <segment>
 <pinref part="R13" gate="G$1" pin="2"/>
 <pinref part="SUPPLY15" gate="GND" pin="GND"/>
+<junction x="-73.66" y="-48.26"/>
 </segment>
 <segment>
 <pinref part="R10" gate="G$1" pin="2"/>
 <pinref part="SUPPLY16" gate="GND" pin="GND"/>
+<junction x="-73.66" y="-104.14"/>
 </segment>
 <segment>
 <pinref part="R11" gate="G$1" pin="2"/>
 <pinref part="SUPPLY17" gate="GND" pin="GND"/>
+<junction x="-73.66" y="-86.36"/>
 </segment>
 <segment>
 <pinref part="R12" gate="G$1" pin="2"/>
 <pinref part="SUPPLY18" gate="GND" pin="GND"/>
+<junction x="-73.66" y="-66.04"/>
 </segment>
 </net>
 <net name="MCLR" class="0">
@@ -9721,6 +9732,8 @@ less than
 <wire x1="-73.66" y1="-55.88" x2="-45.72" y2="-55.88" width="0.1524" layer="91"/>
 <wire x1="-45.72" y1="-55.88" x2="-45.72" y2="-53.34" width="0.1524" layer="91"/>
 <junction x="-45.72" y="-53.34"/>
+<junction x="-27.94" y="-53.34"/>
+<junction x="-73.66" y="-55.88"/>
 </segment>
 </net>
 <net name="RC3/LED_M4" class="0">
@@ -9738,6 +9751,8 @@ less than
 <wire x1="-73.66" y1="-38.1" x2="-45.72" y2="-38.1" width="0.1524" layer="91"/>
 <wire x1="-45.72" y1="-38.1" x2="-45.72" y2="-43.18" width="0.1524" layer="91"/>
 <junction x="-45.72" y="-43.18"/>
+<junction x="-43.18" y="-43.18"/>
+<junction x="-73.66" y="-38.1"/>
 </segment>
 </net>
 <net name="RC4/LED_M3" class="0">
@@ -9821,6 +9836,7 @@ less than
 <wire x1="-73.66" y1="-93.98" x2="-45.72" y2="-93.98" width="0.1524" layer="91"/>
 <wire x1="-45.72" y1="-93.98" x2="-45.72" y2="-78.74" width="0.1524" layer="91"/>
 <junction x="-45.72" y="-78.74"/>
+<junction x="-73.66" y="-93.98"/>
 </segment>
 <segment>
 <wire x1="-119.38" y1="17.78" x2="-106.68" y2="17.78" width="0.1524" layer="91"/>
@@ -9895,6 +9911,8 @@ less than
 <wire x1="-73.66" y1="-73.66" x2="-45.72" y2="-73.66" width="0.1524" layer="91"/>
 <wire x1="-45.72" y1="-73.66" x2="-45.72" y2="-66.04" width="0.1524" layer="91"/>
 <junction x="-45.72" y="-66.04"/>
+<junction x="-12.7" y="-66.04"/>
+<junction x="-73.66" y="-76.2"/>
 </segment>
 </net>
 <net name="RA1/SW3" class="0">
@@ -9970,6 +9988,7 @@ less than
 <junction x="22.86" y="-40.64"/>
 <pinref part="Q4" gate="G$1" pin="D"/>
 <wire x1="10.16" y1="-71.12" x2="10.16" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="10.16" y="-71.12"/>
 </segment>
 </net>
 <net name="N$12" class="0">
@@ -9980,6 +9999,7 @@ less than
 <pinref part="Q3" gate="G$1" pin="D"/>
 <wire x1="-7.62" y1="-58.42" x2="7.62" y2="-58.42" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="-58.42" x2="7.62" y2="-35.56" width="0.1524" layer="91"/>
+<junction x="-7.62" y="-58.42"/>
 </segment>
 </net>
 <net name="N$13" class="0">
@@ -9990,6 +10010,7 @@ less than
 <pinref part="Q2" gate="G$1" pin="D"/>
 <wire x1="-22.86" y1="-45.72" x2="5.08" y2="-45.72" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="-45.72" x2="5.08" y2="-30.48" width="0.1524" layer="91"/>
+<junction x="-22.86" y="-45.72"/>
 </segment>
 </net>
 <net name="N$14" class="0">
@@ -10000,6 +10021,7 @@ less than
 <wire x1="2.54" y1="-25.4" x2="2.54" y2="-35.56" width="0.1524" layer="91"/>
 <pinref part="Q1" gate="G$1" pin="D"/>
 <wire x1="2.54" y1="-35.56" x2="-38.1" y2="-35.56" width="0.1524" layer="91"/>
+<junction x="-38.1" y="-35.56"/>
 </segment>
 </net>
 </nets>

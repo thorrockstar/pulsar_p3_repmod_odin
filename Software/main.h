@@ -8,7 +8,7 @@
  *  Project:            Pulsar Replacement module 'Odin & Loki' and 'Sif & Hel'.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        11.11.2023
+ *  Last Change:        12.12.2023
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -52,18 +52,20 @@
 
 // P3 - Original Litronix P2/P3 display.
 #define APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD     0 // Pulsar P3 Odin Mark II module with driver transistors.
-// First prototype replacement module.
-#define APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD              1 // First legacy replacement module.
-// P3 - USSR made ALS314/AL304G displays.
+// P3 - First prototype replacement module.
+#define APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD              1 // First legacy prototype P3 module.
+// P3 - USSR made ALS314/AL304G replacement displays.
 #define APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD             2 // Pulsar P3 Loki module.
-// P4 - USSR made ALS314/AL304G displays.
+// P4 - USSR made ALS314/AL304G replacement displays.
 #define APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD              3 // Pulsar P4 Hel module.
+// P4 - First prototype replacement module.
+#define APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD          4 // First legacy prototype P4 module.
 // P4 - Original Litronix P4 display.
-#define APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD              4 // Pulsar P4 Sif module.
+#define APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD      5 // Pulsar P4 Sif Mark II module with driver transistors.
 // Litronix/Siemens bubble display bread board.
-#define APP_PROTOTYPE_BREAD_BOARD                          5 // Just my breadboard.
+#define APP_PROTOTYPE_BREAD_BOARD                          6 // Just my breadboard.
 // VFD tube project clock.
-#define APP_TABLE_WATCH                                    6 // VFD watch project.
+#define APP_TABLE_WATCH                                    7 // VFD watch project.
 
 /**
  * ========================================================================
@@ -117,6 +119,7 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    1
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD)
   // Legacy Prototype (original display, common cathode, no driver n-mos))
@@ -129,6 +132,7 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD)
   // P3 - Loki (replacement display with common anode or cathode - double check)
@@ -141,6 +145,7 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            1
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
   // P4 - Hel (replacement display with common anode or cathode - double check)
@@ -153,8 +158,9 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
-#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD)
   // P4 - Sif (original display, common cathode)
   #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
   #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_PULSAR_AUTO_SET
@@ -165,6 +171,20 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
+
+#elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
+  // P4 - Sif (original display, common cathode)
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
+  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_PULSAR_AUTO_SET
+  #define APP_LIGHT_SENSOR_USAGE                     0
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
+  #define APP_BUZZER_ALARM_USAGE                     0
+  #define APP_DATE_SPECIAL_DOT_USAGE                 0
+  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
+  #define APP_WRIST_FLICK_USAGE                      1
+  #define APP_CATHODE_DRIVER_NMOS                    1
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
   // VFD table watch
@@ -177,6 +197,7 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
   // Bread board
@@ -189,6 +210,7 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #else
   // Generic
@@ -201,6 +223,7 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
   #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #endif
 
@@ -311,7 +334,7 @@ typedef void(*ButtonHandlerType)(void);
 
 #elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD)
 
-// Legacy Prototype (original display, common cathode, no driver n-mos))
+// Legacy Prototype (original display, common cathode, no driver n-mos)
 
     // TIME
     #define PB0_PORT_BITS   PORTAbits
@@ -363,9 +386,29 @@ typedef void(*ButtonHandlerType)(void);
     #define PB4_PORT_BITS   PORTCbits
     #define PB4_PIN         RC2
 
-#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MOD)
+#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD)
 
-// Pulsar P4 with original display
+// Legacy Prototype (original display, common cathode, no driver n-mos)
+
+    // TIME
+    #define PB0_PORT_BITS   PORTAbits
+    #define PB0_PIN         RA5
+    // DATE
+    #define PB1_PORT_BITS   PORTAbits
+    #define PB1_PIN         RA1
+    // HOUR
+    #define PB2_PORT_BITS   PORTBbits
+    #define PB2_PIN         RB0
+    // MIN
+    #define PB3_PORT_BITS   PORTAbits
+    #define PB3_PIN         RA0
+    // WRIST
+    #define PB4_PORT_BITS   PORTCbits
+    #define PB4_PIN         RC2
+
+#elif (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
+
+// Pulsar P4 with original display and common cathode driver transistors
 
     // TIME
     #define PB0_PORT_BITS   PORTAbits
@@ -560,9 +603,13 @@ void PressPB0(void);
 void HoldPB0(void);
 void ReleasePB0(void);
 
+#if !APP_ONE_TIME_BUTTON_OPERATION
+
 void PressPB1(void);
 void HoldPB1(void);
 void ReleasePB1(void);
+
+#endif // #if !APP_ONE_TIME_BUTTON_OPERATION
 
 #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
 
