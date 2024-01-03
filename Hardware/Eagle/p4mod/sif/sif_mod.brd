@@ -2615,8 +2615,8 @@ design rules under a new name.</description>
 <element name="OSO" library="testpad" package="TP08SQ" value="TPTP08SQ" x="10.16" y="1.397">
 <attribute name="TP_SIGNAL_NAME" value="" x="10.16" y="1.397" size="1.778" layer="27" display="off"/>
 </element>
-<element name="FLICK" library="testpad" package="TP08SQ" value="TPTP08SQ" x="18.48399375" y="1.397">
-<attribute name="TP_SIGNAL_NAME" value="" x="18.48399375" y="1.397" size="1.778" layer="27" display="off"/>
+<element name="FLICK" library="testpad" package="TP08SQ" value="TPTP08SQ" x="19.3141125" y="1.397">
+<attribute name="TP_SIGNAL_NAME" value="" x="19.3141125" y="1.397" size="1.778" layer="27" display="off"/>
 </element>
 <element name="TIME" library="testpad" package="TP08SQ" value="TPTP08SQ" x="12.1666" y="1.397">
 <attribute name="TP_SIGNAL_NAME" value="" x="12.1666" y="1.397" size="1.778" layer="27" display="off"/>
@@ -2632,8 +2632,8 @@ design rules under a new name.</description>
 <element name="VDD2" library="testpad" package="TP08SQ" value="TPTP08SQ" x="2.5390625" y="1.708484375">
 <attribute name="TP_SIGNAL_NAME" value="" x="2.5390625" y="1.708484375" size="1.778" layer="27" display="off"/>
 </element>
-<element name="VDD3" library="testpad" package="TP08SQ" value="TPTP08SQ" x="16.511784375" y="1.397">
-<attribute name="TP_SIGNAL_NAME" value="" x="16.511784375" y="1.397" size="1.778" layer="27" display="off"/>
+<element name="VDD3" library="testpad" package="TP08SQ" value="TPTP08SQ" x="18.268871875" y="1.397">
+<attribute name="TP_SIGNAL_NAME" value="" x="18.268871875" y="1.397" size="1.778" layer="27" display="off"/>
 </element>
 <element name="VDD4" library="testpad" package="TP08SQ" value="TPTP08SQ" x="3.633571875" y="9.779">
 <attribute name="TP_SIGNAL_NAME" value="" x="3.633571875" y="9.779" size="1.778" layer="27" display="off"/>
@@ -2802,9 +2802,9 @@ design rules under a new name.</description>
 <contactref element="VDD4" pad="TP"/>
 <wire x1="17.932009375" y1="2.19503125" x2="18.36290625" y2="3.559665625" width="0.1778" layer="16"/>
 <wire x1="17.409721875" y1="1.7935875" x2="17.932009375" y2="2.19503125" width="0.1778" layer="16"/>
-<wire x1="16.5354" y1="1.397" x2="17.409721875" y2="1.7935875" width="0.2032" layer="1"/>
+<wire x1="17.8912625" y1="1.68776875" x2="17.409721875" y2="1.7935875" width="0.2032" layer="1"/>
 <wire x1="18.36290625" y1="3.559665625" x2="18.35831875" y2="3.7188" width="0.1778" layer="16"/>
-<wire x1="16.5354" y1="1.397" x2="16.511784375" y2="1.397" width="0.1524" layer="1"/>
+<wire x1="17.8912625" y1="1.68776875" x2="18.268871875" y2="1.397" width="0.2032" layer="1"/>
 <wire x1="3.937" y1="9.0056125" x2="3.937" y2="7.3152" width="0.2032" layer="16"/>
 <wire x1="3.6576" y1="9.2202" x2="3.937" y2="9.0056125" width="0.2032" layer="1"/>
 <wire x1="3.6576" y1="9.779" x2="3.6576" y2="9.2202" width="0.2032" layer="1"/>
@@ -3253,12 +3253,11 @@ design rules under a new name.</description>
 <wire x1="8.128" y1="5.0292" x2="7.2644" y2="5.0292" width="0.2032" layer="16"/>
 <wire x1="8.128" y1="5.0292" x2="8.12929375" y2="5.0471375" width="0.1524" layer="16"/>
 <via x="6.477" y="4.2418" extent="1-16" drill="0.254"/>
-<wire x1="17.6022" y1="0.5334" x2="18.4658" y2="1.397" width="0.1524" layer="1"/>
-<wire x1="18.4658" y1="1.397" x2="18.48399375" y2="1.397" width="0.1524" layer="1"/>
+<wire x1="17.6022" y1="0.519978125" x2="18.8531875" y2="0.519978125" width="0.1778" layer="1"/>
+<wire x1="18.8531875" y1="0.519978125" x2="19.3141125" y2="1.397" width="0.1778" layer="1"/>
 <wire x1="6.477" y1="4.2418" x2="6.477" y2="1.154878125" width="0.1778" layer="1"/>
 <wire x1="6.477" y1="1.154878125" x2="7.1119" y2="0.519978125" width="0.1778" layer="1"/>
-<wire x1="7.1119" y1="0.519978125" x2="17.588778125" y2="0.519978125" width="0.1778" layer="1"/>
-<wire x1="17.588778125" y1="0.519978125" x2="17.6022" y2="0.5334" width="0.1778" layer="1"/>
+<wire x1="7.1119" y1="0.519978125" x2="17.6022" y2="0.519978125" width="0.1778" layer="1"/>
 </signal>
 <signal name="N$2">
 <contactref element="R8" pad="2"/>
