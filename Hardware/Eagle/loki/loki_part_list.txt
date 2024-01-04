@@ -1,0 +1,29 @@
+Partlist Loki Pulsar P3 replacement module with replacement displays
+
+4x Displays AL304G (common anode)
+1x BUZZER   Piezo disc 18 mm (about 200 Ohm)
+
+CEFC     10 uF             C0603
+C2       100 nF            CO603
+
+C4       12 pF             CO603 or C0402
+C5       12 pF             CO603 or C0402
+
+R1       10K               R0402
+R10      470               R0402
+
+R14      4.7k              R0402
+R15      4.7k              R0402
+R16      4.7k              R0402
+R17      4.7k              R0402
+
+R2       130               R0402
+R3       130               R0402
+R4       130               R0402
+R5       130               R0402
+R6       130               R0402
+R7       130               R0402
+R8       130               R0402
+R9       130               R0402
+
+MCU      PIC18F24J11-I/ML QFN
