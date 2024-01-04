@@ -1,0 +1,35 @@
+Partlist Odin Mark II Pulsar P3 replacement module
+
+C4       12 pF             C0603 or C0402
+C5       12 pF             C0603 or C0402
+
+CEFC     10 uF             C0603
+C2       100 nF            C0603
+
+Q1       IRLML0030         SOT-23
+Q2       IRLML0030         SOT-23
+Q3       IRLML0030         SOT-23
+Q4       IRLML0030         SOT-23
+
+R1       10K               R0402
+
+R9       47k               R0402
+R10      47k               R0402
+R11      47k               R0402
+R12      47k               R0402
+R13      47k               R0402
+
+R14      4.7k              R0402
+R15      4.7k              R0402
+R16      4.7k              R0402
+R17      4.7k              R0402
+
+R2       82                R0402
+R3       82                R0402
+R4       82                R0402
+R5       82                R0402
+R6       82                R0402
+R7       82                R0402
+R8       82                R0402
+
+MCU      PIC18F24J11-I/ML QFN
