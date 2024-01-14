@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2020-23 Roy Schneider
+ *  Copyright (c) 2020-24 Roy Schneider
  *
  *  main.c
  *
@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        12.12.2023
+ *  Last Change:        14.01.2024
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -126,6 +126,8 @@ const unsigned char g_24_to_AMPM[] = { /* AM */ 1, 1, 1, 1, 1, 1, 1, \
 
 #endif // Odin and Sif modules
 
+#if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
 /**
  * 7-segment numerical encoding table
  */
@@ -182,6 +184,8 @@ const unsigned char g_weekday_7segment[16] =
     MAKE_7SEG(0,0,0,0,0,0,0),   // [blank]
     MAKE_7SEG(0,0,0,0,0,0,1),   // -
 };
+
+#endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
 /**
  * BCD to decimal decoding table.
@@ -399,11 +403,15 @@ unsigned char  g_ucLightSensor = 0;
 unsigned char g_ucLeftVal = 255;
 unsigned char g_ucRightVal = 255;
 
+#if APP_BUZZER_ALARM_USAGE
+
 /**
  * Alarm piezo base period value. */
 
 const unsigned char g_ualarm_period = 20 + 64;
 const unsigned char g_ualarm_duty_cycle = 10 + 32;
+
+#endif // #if APP_BUZZER_ALARM_USAGE
 
 /**
  * Table to the 7-segment digits, can be set to numerical or character table. */
@@ -536,19 +544,19 @@ inline void Configure_Inputs_Outputs(void)
     
   #endif
 
-#if APP_BUZZER_ALARM_USAGE==1
+  #if APP_BUZZER_ALARM_USAGE==1
 
     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
     TRISC = 0x08;
 
-#else
+  #else
 
     /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
     TRISC = 0x0C;
 
-#endif
+  #endif
 
     /* Set unused port pins to drive low. */
 
@@ -562,7 +570,7 @@ inline void Configure_Inputs_Outputs(void)
     PORTAbits.RA3 = 0;
     PORTAbits.RA7 = 0;
 
-#if APP_LIGHT_SENSOR_USAGE==1
+  #if APP_LIGHT_SENSOR_USAGE==1
 
     /* ANCON0 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
@@ -595,7 +603,7 @@ inline void Configure_Inputs_Outputs(void)
     ADCON0bits.CHS = 11;    // Select ADC channel -> AN11
     ADCON0bits.ADON = 1;    // Turn on ADC
 
-#else // Light sensor not used. Anyway free the analogue inputs for digital use.
+  #else // Light sensor not used. Anyway free the analogue inputs for digital use.
 
     /* ANCON0 - A/D PORT CONFIGURATION REGISTER
      * Analog Port Configuration bits (AN<7:0>)
@@ -617,7 +625,7 @@ inline void Configure_Inputs_Outputs(void)
 
     ADCON0bits.ADON = 0;    // Turn off ADC
 
-#endif
+  #endif
 
   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -633,9 +641,12 @@ inline void Configure_Inputs_Outputs(void)
     
   #endif
 
-    /* Configure the output as PWM output channel A. */
+    /* Configure the output as PWM output channel A.
+     * This can be used for the alarm buzzer of LOKI/HEL modules or
+     * the high voltage upstepper for a Nixi table clock. */
 
-#if APP_BUZZER_ALARM_USAGE==1
+  #if (APP_BUZZER_ALARM_USAGE==1) || \
+      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
     /* Write Magic */
 
@@ -654,7 +665,7 @@ inline void Configure_Inputs_Outputs(void)
 
     IOLOCK = 1;
 
-#endif
+  #endif // Using APP_BUZZER_ALARM_USAGE or being a APP_TABLE_WATCH.
 }
 
 /**
@@ -1072,14 +1083,14 @@ inline void Configure_Timer_4(void)
   #endif
 }
 
+#if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
+
 /**
  * Enter deep sleep mode. This function will not return as the controller
  * will have entered sleep mode, before returning.
  *
  * Once the system wakes up, it will restart the program an the main entry point.
  */
-
-#if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
 
 inline void enterSleep(void)
 {
@@ -1242,15 +1253,15 @@ inline void enterSleep(void)
     }
 }
 
-#endif
+#endif // #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
+
+#if APP_BUZZER_ALARM_USAGE==1
 
 /**
  * This function will turn the alarm buzzer on again.
  *
  * @param duration  Duration in ticks.
  */
-
-#if APP_BUZZER_ALARM_USAGE==1
 
 void Turn_Buzzer_On(unsigned short duration)
 {
@@ -1360,7 +1371,49 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
     CCP1CONbits.CCP1M = 0xC;
 }
 
-#endif
+#endif // #if APP_BUZZER_ALARM_USAGE==1
+
+#if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+
+/**
+ * This function will turn the PWM output used for the voltage up-stepper on.
+ *
+ * @param duration  Duration in ticks.
+ */
+
+void Turn_Up_Stepper_PWM_On(void)
+{
+    /* Single output: PxA, PxB, PxC and PxD controlled by steering. */
+
+    CCP1CONbits.P1M1 = 0;
+    CCP1CONbits.P1M0 = 0;
+
+    /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+     * Having a timer 4 pre-scaler of 16 and using this equation
+     * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
+     * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
+
+    PR4bits.PR4 = 20 + 64;; // We are using timer 4 for the PWM!
+
+    /* Set duty cycle.
+     * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
+     * Having a timer 4 pre-scaler of 16 and using this equation
+     * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
+     * and turning that around to DC = (1/1700/2)/16/0,0000001 */
+
+    CCP1CONbits.DC1B = 0;    // Lower 2 bit
+    CCPR1Lbits.CCPR1L = 10 + 32;  // Upper 8 Bit
+
+    /* Turn timer 4 as PWM source. */
+
+    T4CONbits.TMR4ON = 1;
+
+    /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
+
+    CCP1CONbits.CCP1M = 0xC;
+}
+
+#endif // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
 /**
  * This function will read and debounce the push buttons.
@@ -1415,7 +1468,7 @@ unsigned char DebounceButtons(void)
                 preleased = &ReleasePB0;
             break;
 
-#if !APP_ONE_TIME_BUTTON_OPERATION
+          #if !APP_ONE_TIME_BUTTON_OPERATION
 
             // PB1 - DATE
             case DEBOUNCE_INDEX_BUTTON_DATE: // 1
@@ -1427,9 +1480,9 @@ unsigned char DebounceButtons(void)
                 preleased = &ReleasePB1;
             break;
 
-#endif // #if !APP_ONE_TIME_BUTTON_OPERATION
+          #endif // #if !APP_ONE_TIME_BUTTON_OPERATION
 
-#if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
+          #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
 
             // PB2 - HOUR
             case DEBOUNCE_INDEX_BUTTON_HOUR: // 2
@@ -1451,9 +1504,9 @@ unsigned char DebounceButtons(void)
                 preleased = &ReleasePB3;
             break;
 
-#endif // #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
+          #endif // #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_PULSAR_AUTO_SET
 
-#if APP_WRIST_FLICK_USAGE==1
+          #if APP_WRIST_FLICK_USAGE==1
             
             // PB4 - WRIST FLICK
             case DEBOUNCE_INDEX_BUTTON_FLICK: // 4
@@ -1464,8 +1517,8 @@ unsigned char DebounceButtons(void)
                 phold = NULL;
                 preleased = &ReleasePB4;
             break;
-            
-#endif // #if APP_WRIST_FLICK_USAGE==1
+
+          #endif // #if APP_WRIST_FLICK_USAGE==1
 
             default:
                 pstate = NULL;
@@ -2485,14 +2538,28 @@ void PressPB0(void)
 
         g_ucRollOver = 1;
 
-        /* Show the time. */
+      #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH) && \
+          (APP_ONE_TIME_BUTTON_OPERATION==1)
+
+        /* Table watch with one button for time/date
+         * 
+         * Show the date. */
+
+        g_uDispState = DISP_STATE_DATE;
+
+      #else
+
+        /* On any wrist watch model or the breadboard, show the time. */
 
         g_uDispState = DISP_STATE_TIME;
+
+      #endif
+
     }
     else
     {
         /* Pressing the TIME button will usually show the time.
-         * But reagrding how Pulsar P2/P3 and early P4 works,
+         * But reagrding how Pulsar P2/P3 and early P4 worked,
          * the time button can be pressed together with the DATE button,
          * when setting the day of month. */
 
@@ -2500,6 +2567,10 @@ void PressPB0(void)
 
         #if APP_ONE_TIME_BUTTON_OPERATION
       
+        /* If we have a Pulsar with only one button and you press the time
+         * button two times in a row, show the DATE. This is not original
+         * but a nice feature anyway. */
+        
         if (istate == DISP_STATE_TIME)
         {
             g_uDispState = DISP_STATE_DATE;
@@ -2886,6 +2957,12 @@ void HoldPB0(void)
     if ((g_ucPB2HOURState == PB_STATE_IDLE) && \
         (g_ucPB3MINTState == PB_STATE_IDLE))
     {
+        /* If we have to deal with a Pulsar, that only has the TIME button,
+         * pressing it twice will show the DATE. That might not be original
+         * but is a nice feature anyway. Anyhow if holding the TIME button
+         * pressed, once it shows the date, it will continue with the weekday
+         * and the year. */
+
       #if APP_ONE_TIME_BUTTON_OPERATION
       
         if (istate == DISP_STATE_TIME)
@@ -4321,7 +4398,7 @@ void HoldPB3(void)
 
         RTCVALL = 0; // Zero the second when forwarding the minute.
 
-  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_GENERIC_4_BUTTON
+  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_GENERIC_BUTTON
 
         /* Enable the RTC operation again.*/
 
@@ -4486,7 +4563,8 @@ void HoldPB3(void)
         Lock_RTCC();
     }
 
-  #if APP_ONE_TIME_BUTTON_OPERATION
+  #if (APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_BUTTON) && \
+      (APP_ONE_TIME_BUTTON_OPERATION)
 
     else if (ust == DISP_STATE_SET_DAY)
     {
@@ -4502,13 +4580,14 @@ void HoldPB3(void)
 
         RTCCFGbits.RTCEN = 0;
 
+        unsigned char ucExtra;
+
       #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
           (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
           (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
           (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
-
-        unsigned char ucExtra = 1;
+        ucExtra = 1;
 
         /* On every second cycle change betwen AM and PM and otherwise
          * forward the day. */
@@ -4544,7 +4623,7 @@ void HoldPB3(void)
 
         if (ucExtra)
 
-      #endif
+      #endif // Not a 12h display but a 24h display.
 
         {
             /* Forward the day of month. */
@@ -4601,7 +4680,7 @@ void HoldPB3(void)
         Lock_RTCC();
     }
     
-  #endif // #if APP_ONE_TIME_BUTTON_OPERATION
+  #endif // Not APP_WATCH_GENERIC_BUTTON and APP_ONE_TIME_BUTTON_OPERATION.
 
   #if APP_BUZZER_ALARM_USAGE==1
 
@@ -4660,7 +4739,7 @@ void HoldPB3(void)
 
   #endif
 
-  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_GENERIC_4_BUTTON
+  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_GENERIC_BUTTON
 
     else if (ust == DISP_STATE_SET_DAY)
     {
@@ -5494,6 +5573,12 @@ void Display_Digits(void)
 
             /* Depending on what to show, select the right digit table. */
 
+          #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+
+            g_pDigits = g_decimal_bcd;
+
+          #else // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+
             g_pDigits = ((ustate == DISP_STATE_WEEKDAY) || \
                          (ustate == DISP_STATE_SET_WEEKDAY) ||
 
@@ -5507,6 +5592,9 @@ void Display_Digits(void)
                                    \
                                    g_weekday_7segment : \
                                    g_numerical_7segment;
+            
+          #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+
         } // if (!ucPlex)
 
         /* Pointer to the 7-segment numerical conversion table. */
@@ -5565,6 +5653,8 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
+                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -5582,6 +5672,8 @@ void Display_Digits(void)
                     {
                         ub |= LED_AG_MASK;    // LED_AG
                     }
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -5684,25 +5776,26 @@ void Display_Digits(void)
 
              #endif
 
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
+             #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
                     /* Set RB4/6 to input, keep RB0/1/2/3/5/7 as output. */
 
                     TRISB = 0x50;
 
-                  #else
+             #else
 
                     /* Set RB0/4/6 to input, keep RB1/2/3/5/7 as output. */
 
                     TRISB = 0x51;
 
-                  #endif
+             #endif
 
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
+                 (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
 
                     /* Turn the common cathode on. */
 
-                  #if APP_CATHODE_DRIVER_NMOS
+                  #if APP_COMMON_DRIVER_POSITIVE
                     LED_1H = 1;
                   #else
                     LED_1H = 0;
@@ -5714,7 +5807,7 @@ void Display_Digits(void)
 
                 /* Turn the common cathode on. */
 
-                  #if APP_CATHODE_DRIVER_NMOS
+                  #if APP_COMMON_DRIVER_POSITIVE
                     LED_10M = 1;
                   #else
                     LED_10M = 0;
@@ -5738,10 +5831,10 @@ void Display_Digits(void)
                 }
                 else //if (ucPlex == 3)
                 {
-           #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
-               (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
+         #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
+             (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
+             (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
+             (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
 
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of
@@ -5812,17 +5905,18 @@ void Display_Digits(void)
 
                     /* Turn the common cathode on. */
 
-                  #if APP_CATHODE_DRIVER_NMOS
+                  #if APP_COMMON_DRIVER_POSITIVE
                     LED_10H = 1;
                   #else
                     LED_10H = 0;
                   #endif
 
-           #else // Not a 12h system watch.
+         #else // Not a 12h system watch.
 
                     /* Ten hour digit */
 
-             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
+                 (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                     if (ucTemp < 10)
                     {
@@ -5868,7 +5962,7 @@ void Display_Digits(void)
 
              #else // Not a Pulsar or table watch.
 
-                    ucTemp = g_div10[g_ucLeftVal];
+                    ucTemp = g_div10[ucTemp];
                     ucTemp = *(pb + ucTemp);
 
              #endif
@@ -5900,6 +5994,8 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
+                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -5917,6 +6013,8 @@ void Display_Digits(void)
                     {
                         ub |= LED_AG_MASK;    // LED_AG
                     }
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6045,11 +6143,11 @@ void Display_Digits(void)
 
                #endif
 
-               #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
-
+               #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
+                   (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
                         /* Turn the common cathode on. */
 
-                      #if APP_CATHODE_DRIVER_NMOS
+                      #if APP_COMMON_DRIVER_POSITIVE
                         LED_10H = 1;
                       #else
                         LED_10H = 0;
@@ -6061,7 +6159,7 @@ void Display_Digits(void)
 
                         /* Turn the common cathode on. */
 
-                      #if APP_CATHODE_DRIVER_NMOS
+                      #if APP_COMMON_DRIVER_POSITIVE
                         LED_1M = 1;
                       #else
                         LED_1M = 0;
@@ -6163,11 +6261,16 @@ void Display_Digits(void)
 
                 if (!ucPlex)
                 {
+                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     if (pb == g_weekday_7segment)
                     {
                         ucTemp = *(pb + (ucTemp << 1) + 1);
                     }
                     else
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     {
                         ucTemp = *(pb + (g_mod10[ucTemp]));
                     }
@@ -6199,6 +6302,8 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
+                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -6216,6 +6321,8 @@ void Display_Digits(void)
                     {
                         ub |= LED_AG_MASK;    // LED_AG
                     }
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6332,11 +6439,12 @@ void Display_Digits(void)
 
              #endif
 
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
+                 (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
 
                 /* Turn the common cathode on. */
 
-                  #if APP_CATHODE_DRIVER_NMOS
+                  #if APP_COMMON_DRIVER_POSITIVE
                     LED_1M = 1;
                   #else
                     LED_1M = 0;
@@ -6348,7 +6456,7 @@ void Display_Digits(void)
 
                     /* Turn the common cathode on. */
 
-                  #if APP_CATHODE_DRIVER_NMOS
+                  #if APP_COMMON_DRIVER_POSITIVE
                     LED_10H = 1;
                   #else
                     LED_10H = 0;
@@ -6375,15 +6483,20 @@ void Display_Digits(void)
                 {
                     /* Ten minute digit */
 
+                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+                    
                     if (pb == g_weekday_7segment)
                     {
                         ucTemp = *(pb + (ucTemp << 1));
                     }
                     else
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     {
 
-             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
+                 (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
                         if (ucTemp < 10)
                         {
                             switch(g_uDispStateBackup)
@@ -6445,6 +6558,8 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
+                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -6462,6 +6577,8 @@ void Display_Digits(void)
                     {
                         ub |= LED_AG_MASK;    // LED_AG
                     }
+
+                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6533,13 +6650,13 @@ void Display_Digits(void)
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                    PORTC &= uc;
-                    PORTB &= ub;
+                        PORTC &= uc;
+                        PORTB &= ub;
                     
              #else
 
-                    PORTC |= uc;
-                    PORTB |= ub;
+                       PORTC |= uc;
+                       PORTB |= ub;
 
              #endif
 
@@ -6587,11 +6704,12 @@ void Display_Digits(void)
 
                   #endif
 
-                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
+                     (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
 
                         /* Turn the common cathode on. */
 
-                      #if APP_CATHODE_DRIVER_NMOS
+                      #if APP_COMMON_DRIVER_POSITIVE
                         LED_10M = 1;
                       #else
                         LED_10M = 0;
@@ -6603,10 +6721,10 @@ void Display_Digits(void)
 
                         /* Turn the common cathode on. */
 
-                  #if APP_CATHODE_DRIVER_NMOS
-                    LED_1H = 1;
+                  #if APP_COMMON_DRIVER_POSITIVE
+                        LED_1H = 1;
                   #else
-                    LED_1H = 0;
+                        LED_1H = 0;
                   #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
@@ -6752,7 +6870,7 @@ void main(void)
     {
         /* Turn the 'stay awake' timer off again. */
 
-  #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_4_BUTTON
+  #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_BUTTON
 
         // Magnet set or Auto-set Pulsar wrist watch.
         
@@ -6764,21 +6882,27 @@ void main(void)
 
         g_uDispState = DISP_STATE_TIME;
         
-#if APP_BUZZER_ALARM_USAGE==1
+  #if APP_BUZZER_ALARM_USAGE==1
 
         /* Turn the alarm buzzer on. */
 
         Turn_Buzzer_On(448/*duration*/);
 
-#endif // #if APP_BUZZER_ALARM_USAGE==1
+  #endif // #if APP_BUZZER_ALARM_USAGE==1
 
-  #else // #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_4_BUTTON
+  #else // #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_BUTTON
 
         /* Set the display state to blank. */
 
         g_uDispState = DISP_STATE_BLANK;
 
-  #endif
+    #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+
+        Turn_Up_Stepper_PWM_On();
+
+    #endif // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+
+  #endif // #else #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_BUTTON
     }
     
     /* Enable global interrupts. */

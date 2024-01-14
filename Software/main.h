@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2020-22 Roy Schneider
+ *  Copyright (c) 2020-24 Roy Schneider
  *
  *  main.h
  *
@@ -8,7 +8,7 @@
  *  Project:            Pulsar Replacement module 'Odin & Loki' and 'Sif & Hel'.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        12.12.2023
+ *  Last Change:        14.01.2024
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -89,11 +89,12 @@
 
 #define APP_WATCH_COMMON_CATHODE    0   // Value for common cathode.
 #define APP_WATCH_COMMON_ANODE      1   // Value for common anode.
+#define APP_WATCH_COMMON_OPTO       2   // Value for common opto-couplers.
 
 /**
  * Define the possible types of buttons and their operation mode. */
 
-#define APP_WATCH_GENERIC_4_BUTTON  0   // Breadboard
+#define APP_WATCH_GENERIC_BUTTON    0   // Table Watch and Breadboard
 #define APP_WATCH_PULSAR_MAGNET_SET 1   // P3 magnet set
 #define APP_WATCH_PULSAR_AUTO_SET   2   // P4 auto set
 
@@ -118,7 +119,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    1
+  #define APP_COMMON_DRIVER_POSITIVE                 1
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD)
@@ -131,7 +132,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_COMMON_DRIVER_POSITIVE                 0
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD)
@@ -144,7 +145,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            1
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_COMMON_DRIVER_POSITIVE                 0
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
@@ -157,7 +158,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 1
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
-  #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_COMMON_DRIVER_POSITIVE                 0
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD)
@@ -170,7 +171,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
-  #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_COMMON_DRIVER_POSITIVE                 0
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD)
@@ -183,33 +184,33 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
-  #define APP_CATHODE_DRIVER_NMOS                    1
+  #define APP_COMMON_DRIVER_POSITIVE                 1
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
   // VFD table watch
-  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
-  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_GENERIC_4_BUTTON
-  #define APP_LIGHT_SENSOR_USAGE                     1
-  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
+  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_OPTO
+  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_GENERIC_BUTTON
+  #define APP_LIGHT_SENSOR_USAGE                     0
+  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
   #define APP_BUZZER_ALARM_USAGE                     0
-  #define APP_DATE_SPECIAL_DOT_USAGE                 1
+  #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    0
-  #define APP_ONE_TIME_BUTTON_OPERATION              0
+  #define APP_COMMON_DRIVER_POSITIVE                 1 // For usual n-mos.
+  #define APP_ONE_TIME_BUTTON_OPERATION              1 // for 3-button mode.
 
 #elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
   // Bread board
   #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
-  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_GENERIC_4_BUTTON
+  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_GENERIC_BUTTON
   #define APP_LIGHT_SENSOR_USAGE                     1
   #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    1
   #define APP_BUZZER_ALARM_USAGE                     0
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_COMMON_DRIVER_POSITIVE                 0
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #else
@@ -222,7 +223,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_CATHODE_DRIVER_NMOS                    0
+  #define APP_COMMON_DRIVER_POSITIVE                 0
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #endif
