@@ -5807,8 +5807,7 @@ void Display_Digits(void)
 
                     /* Ten hour digit */
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
-                 (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                     if (ucTemp < 10)
                     {
@@ -5852,7 +5851,7 @@ void Display_Digits(void)
                         ucTemp = *(pb + ucTemp);
                     }
 
-             #else // A table watch or the breadboard.
+             #else
 
                     ucTemp = g_div10[ucTemp];
                     ucTemp = *(pb + ucTemp);
@@ -6377,8 +6376,7 @@ void Display_Digits(void)
                     else
                     {
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
-                 (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                         if (ucTemp < 10)
                         {
@@ -6406,7 +6404,7 @@ void Display_Digits(void)
                             ucTemp = *(pb + ucTemp);
                         }
 
-             #else // Not a Pulsar or table watch.
+             #else
 
                         ucTemp = g_div10[ucTemp];
                         ucTemp = *(pb + ucTemp);

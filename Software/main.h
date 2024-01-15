@@ -119,7 +119,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_COMMON_DRIVER_POSITIVE                 1
+  #define APP_COMMON_DRIVER_POSITIVE                 1 // For NMOS driving.
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD)
@@ -184,7 +184,7 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
-  #define APP_COMMON_DRIVER_POSITIVE                 1
+  #define APP_COMMON_DRIVER_POSITIVE                 1 // For NMOS driving.
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
@@ -197,8 +197,8 @@
   #define APP_DATE_SPECIAL_DOT_USAGE                 0
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_COMMON_DRIVER_POSITIVE                 1 // For usual n-mos.
-  #define APP_ONE_TIME_BUTTON_OPERATION              1 // for 3-button mode.
+  #define APP_COMMON_DRIVER_POSITIVE                 1 // For opto-driving.
+  #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
   // Bread board
