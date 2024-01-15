@@ -544,7 +544,8 @@ inline void Configure_Inputs_Outputs(void)
     
   #endif
 
-  #if APP_BUZZER_ALARM_USAGE==1
+  #if (APP_BUZZER_ALARM_USAGE==1) || \
+      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -1075,7 +1076,8 @@ inline void Configure_Timer_4(void)
 
     /* ECCP1 and ECCP2 both use Timer3 (capture/compare) and Timer4 (PWM) */
 
-  #if APP_BUZZER_ALARM_USAGE==1
+  #if (APP_BUZZER_ALARM_USAGE==1) || \
+      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
     TCLKCONbits.T3CCP1 = 0;
     TCLKCONbits.T3CCP2 = 1;
@@ -5013,19 +5015,9 @@ void Display_Digits(void)
 
               #endif
 
-            #if APP_BUZZER_ALARM_USAGE==1
-
-                /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
-
-                TRISC = 0x08; // RC2 is an output (piezo)
-
-            #else
-
                 /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                 TRISC = 0x0C; // RC2 is an input (light sensor))
-
-            #endif
 
                 /* Turn all segment outputs off. */
 
@@ -5076,19 +5068,9 @@ void Display_Digits(void)
 
           #endif
 
-        #if APP_BUZZER_ALARM_USAGE==1
-
-            /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
-
-            TRISC = 0x08;
-
-        #else
-
             /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
             TRISC = 0x0C;
-
-        #endif
 
             /* Turn all segment outputs off. */
 
@@ -5117,11 +5099,7 @@ void Display_Digits(void)
 
             /* Turn on RA6 to power up the light sensor. */
 
-        #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
-
             PWR_LGTH_SENSOR = 1;
-
-        #endif
 
             /* Measure the voltage across the resistor. */
 
@@ -5148,11 +5126,7 @@ void Display_Digits(void)
 
             /* Turn off RA6 to power down the light sensor. */
 
-        #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
-
             PWR_LGTH_SENSOR = 0;
-
-        #endif
 
             /* Store the readout for showing it on the display. */
 
@@ -5686,7 +5660,8 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
-                  #if APP_BUZZER_ALARM_USAGE==1
+                  #if (APP_BUZZER_ALARM_USAGE==1) || \
+                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -5728,10 +5703,13 @@ void Display_Digits(void)
 
                #endif
 
+                    /* Turn used segments outputs on again. */
+
                     PORTC &= uc;
                     PORTB &= ub;
 
-             #else
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                     PORTC &= 0;
                     PORTB &= 1;
 
@@ -5741,10 +5719,12 @@ void Display_Digits(void)
 
                #endif
 
+                    /* Turn used segments outputs on again. */
+
                     PORTC |= uc;
                     PORTB |= ub;
 
-             #endif
+             #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
          #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -5929,10 +5909,10 @@ void Display_Digits(void)
                             case DISP_STATE_SET_MONTH:
                             case DISP_STATE_SET_DAY:
 
-                          #if APP_WATCH_ANY_PULSAR_MODEL == APP_WATCH_PULSAR_AUTO_SET
+                    #if APP_WATCH_ANY_PULSAR_MODEL == APP_WATCH_PULSAR_AUTO_SET
                             case DISP_STATE_AUTOSET_TIME:
                             case DISP_STATE_AUTOSET_DATE:
-                          #endif
+                    #endif
 
                                 ucTemp = 0; // blank
                                 break;
@@ -5960,7 +5940,7 @@ void Display_Digits(void)
                         ucTemp = *(pb + ucTemp);
                     }
 
-             #else // Not a Pulsar or table watch.
+             #else // A table watch or the breadboard.
 
                     ucTemp = g_div10[ucTemp];
                     ucTemp = *(pb + ucTemp);
@@ -6027,7 +6007,8 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
-                  #if APP_BUZZER_ALARM_USAGE==1
+                  #if (APP_BUZZER_ALARM_USAGE==1) || \
+                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -6069,7 +6050,8 @@ void Display_Digits(void)
 
                #endif
 
-             #else
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                     PORTC &= 0;
                     PORTB &= 1;
 
@@ -6079,13 +6061,15 @@ void Display_Digits(void)
 
                #endif
 
-             #endif
+             #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
              #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
                  (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
                     if (ucTemp)
                     {
              #endif
+
+                        /* Turn used segments outputs on again. */
 
                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6103,17 +6087,17 @@ void Display_Digits(void)
 
                 #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                       if (g_ucDots & 4)
-                       {
-                           LED_DATE_DOT = 0;
-                       }
+                        if (g_ucDots & 4)
+                        {
+                            LED_DATE_DOT = 0;
+                        }
 
                 #else
 
-                       if (g_ucDots & 4)
-                       {
-                           LED_DATE_DOT = 1;
-                       }
+                        if (g_ucDots & 4)
+                        {
+                            LED_DATE_DOT = 1;
+                        }
 
                 #endif
 
@@ -6145,6 +6129,7 @@ void Display_Digits(void)
 
                #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
                    (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
+
                         /* Turn the common cathode on. */
 
                       #if APP_COMMON_DRIVER_POSITIVE
@@ -6208,19 +6193,20 @@ void Display_Digits(void)
 
               #endif
 
-            #if APP_BUZZER_ALARM_USAGE==1
+              #if (APP_BUZZER_ALARM_USAGE==1) || \
+                  (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
                TRISC = 0x08;
 
-            #else
+              #else
 
                /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                TRISC = 0x0C;
 
-            #endif
+              #endif
 
                /* Turn all segment outputs off. */
 
@@ -6349,19 +6335,20 @@ void Display_Digits(void)
 
                   #endif
 
-                #if APP_BUZZER_ALARM_USAGE==1
+                  #if (APP_BUZZER_ALARM_USAGE==1) || \
+                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
                     TRISC = 0x08;
 
-                #else
+                  #else
 
                     /* Set RC0/1/4/5..7 to output and RC3/2(AN11) input. */
 
                     TRISC = 0x0C;
 
-                #endif
+                  #endif
 
                     /* Turn all segment outputs off. */
 
@@ -6376,10 +6363,12 @@ void Display_Digits(void)
 
                #endif
 
+                    /* Turn used segments outputs on again. */
+
                     PORTC &= uc;
                     PORTB &= ub;
 
-             #else
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                     PORTC &= 0;
                     PORTB &= 1;
@@ -6390,10 +6379,12 @@ void Display_Digits(void)
 
                #endif
 
+                    /* Turn used segments outputs on again. */
+
                     PORTC |= uc;
                     PORTB |= ub;
 
-             #endif
+             #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
          #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6425,7 +6416,8 @@ void Display_Digits(void)
 
              #endif
 
-             #if APP_BUZZER_ALARM_USAGE==1
+             #if (APP_BUZZER_ALARM_USAGE==1) || \
+                 (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     /* Set RC0..7 to outputs. */
 
@@ -6497,6 +6489,7 @@ void Display_Digits(void)
 
              #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
                  (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+
                         if (ucTemp < 10)
                         {
                             switch(g_uDispStateBackup)
@@ -6604,19 +6597,20 @@ void Display_Digits(void)
 
                   #endif
 
-                #if APP_BUZZER_ALARM_USAGE==1
+                  #if (APP_BUZZER_ALARM_USAGE==1) || \
+                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
                     TRISC = 0x08;
 
-                #else
+                  #else
 
                     /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11) as input. */
 
                     TRISC = 0x0C;
 
-                #endif
+                  #endif
 
                     /* Turn all segment outputs off. */
 
@@ -6631,7 +6625,8 @@ void Display_Digits(void)
 
                #endif
 
-             #else
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
                     PORTC &= 0;
                     PORTB &= 1;
 
@@ -6641,12 +6636,13 @@ void Display_Digits(void)
 
                #endif
 
-             #endif
+             #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
              #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
                     if (ucTemp)
                     {
              #endif
+                        /* Turn used segments outputs on again. */
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6767,7 +6763,8 @@ void Display_Digits(void)
 
               #endif
 
-                #if APP_BUZZER_ALARM_USAGE==1
+                #if (APP_BUZZER_ALARM_USAGE==1) || \
+                    (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
