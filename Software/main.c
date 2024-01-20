@@ -1795,6 +1795,14 @@ unsigned char DebounceButtons(void)
                                 ltime = T0_REPEAT_QUICK;
                             }
                      #endif
+                     #if APP_ONE_TIME_BUTTON_OPERATION
+                            if ((g_uDispState == DISP_STATE_DATE) || \
+                                (g_uDispState == DISP_STATE_WEEKDAY) || \
+                                (g_uDispState == DISP_STATE_YEAR))
+                            {
+                                ltime = T0_HOLD;
+                            }
+                     #endif
                         break;
 
                         case 1: // DATE
@@ -2575,6 +2583,12 @@ void PressPB0(void)
         
         if (istate == DISP_STATE_TIME)
         {
+            /* Restart the time, the display will stay lit up. */
+        
+            g_ucRollOver = 1;
+
+            /* Alter from showing the time to date. */
+
             g_uDispState = DISP_STATE_DATE;
         }
 
@@ -4284,7 +4298,7 @@ void PressPB3(void)
 
             if (g_ucPB0TIMEState >= PB_STATE_SHORT_PRESS)
             {
-                if (ust == DISP_STATE_DATE)
+                if ((ust == DISP_STATE_DATE) || (ust == DISP_STATE_SET_MONTH))
                 {
                     *pb = DISP_STATE_SET_DAY;
                 }
