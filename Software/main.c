@@ -126,8 +126,6 @@ const unsigned char g_24_to_AMPM[] = { /* AM */ 1, 1, 1, 1, 1, 1, 1, \
 
 #endif // Odin and Sif modules
 
-#if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
 /**
  * 7-segment numerical encoding table
  */
@@ -184,8 +182,6 @@ const unsigned char g_weekday_7segment[16] =
     MAKE_7SEG(0,0,0,0,0,0,0),   // [blank]
     MAKE_7SEG(0,0,0,0,0,0,1),   // -
 };
-
-#endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
 /**
  * BCD to decimal decoding table.
@@ -544,8 +540,7 @@ inline void Configure_Inputs_Outputs(void)
     
   #endif
 
-  #if (APP_BUZZER_ALARM_USAGE==1) || \
-      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+  #if (APP_BUZZER_ALARM_USAGE==1)
 
     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -646,8 +641,7 @@ inline void Configure_Inputs_Outputs(void)
      * This can be used for the alarm buzzer of LOKI/HEL modules or
      * the high voltage upstepper for a Nixi table clock. */
 
-  #if (APP_BUZZER_ALARM_USAGE==1) || \
-      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+  #if (APP_BUZZER_ALARM_USAGE==1)
 
     /* Write Magic */
 
@@ -666,7 +660,7 @@ inline void Configure_Inputs_Outputs(void)
 
     IOLOCK = 1;
 
-  #endif // Using APP_BUZZER_ALARM_USAGE or being a APP_TABLE_WATCH.
+  #endif
 }
 
 /**
@@ -1076,8 +1070,7 @@ inline void Configure_Timer_4(void)
 
     /* ECCP1 and ECCP2 both use Timer3 (capture/compare) and Timer4 (PWM) */
 
-  #if (APP_BUZZER_ALARM_USAGE==1) || \
-      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+  #if (APP_BUZZER_ALARM_USAGE==1)
 
     TCLKCONbits.T3CCP1 = 0;
     TCLKCONbits.T3CCP2 = 1;
@@ -1374,48 +1367,6 @@ inline void Turn_Buzzer_Fancy(unsigned char ufancy)
 }
 
 #endif // #if APP_BUZZER_ALARM_USAGE==1
-
-#if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
-
-/**
- * This function will turn the PWM output used for the voltage up-stepper on.
- *
- * @param duration  Duration in ticks.
- */
-
-void Turn_Up_Stepper_PWM_On(void)
-{
-    /* Single output: PxA, PxB, PxC and PxD controlled by steering. */
-
-    CCP1CONbits.P1M1 = 0;
-    CCP1CONbits.P1M0 = 0;
-
-    /* Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-     * Having a timer 4 pre-scaler of 16 and using this equation
-     * pwm period = (PR4+1)*4*TOSC*(TMR4 Prescaler) and turning
-     * that around to PR4 = ((1/1700)/4/16/0,0000001)-1 */
-
-    PR4bits.PR4 = 20 + 64;; // We are using timer 4 for the PWM!
-
-    /* Set duty cycle.
-     * Assuming 40Mhz/4 as FOSC makes 0,0000001s as TOSC.
-     * Having a timer 4 pre-scaler of 16 and using this equation
-     * duty cycle = (CCPRXL:CCPXCON<5:4>))*TOSC*(TMR4 Prescaler)
-     * and turning that around to DC = (1/1700/2)/16/0,0000001 */
-
-    CCP1CONbits.DC1B = 0;    // Lower 2 bit
-    CCPR1Lbits.CCPR1L = 10 + 32;  // Upper 8 Bit
-
-    /* Turn timer 4 as PWM source. */
-
-    T4CONbits.TMR4ON = 1;
-
-    /* Activate PWM mode PxA and PxC active-high; PxB and PxD active-high */
-
-    CCP1CONbits.CCP1M = 0xC;
-}
-
-#endif // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
 /**
  * This function will read and debounce the push buttons.
@@ -5113,7 +5064,11 @@ void Display_Digits(void)
 
             /* Turn on RA6 to power up the light sensor. */
 
+        #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
+
             PWR_LGTH_SENSOR = 1;
+            
+        #endif
 
             /* Measure the voltage across the resistor. */
 
@@ -5140,7 +5095,11 @@ void Display_Digits(void)
 
             /* Turn off RA6 to power down the light sensor. */
 
+        #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
+
             PWR_LGTH_SENSOR = 0;
+
+        #endif
 
             /* Store the readout for showing it on the display. */
 
@@ -5245,38 +5204,7 @@ void Display_Digits(void)
 
                 case DISP_STATE_BLANK:
 
-                    /* Hours */
-                    RTCCFGbits.RTCPTR0 = 1;
-                    RTCCFGbits.RTCPTR1 = 0;
-                    //while(RTCCFGbits.RTCSYNC);
-
-                    ucTemp = RTCVALL;   // read minutes
-                    g_ucLeftVal = g_bcd_decimal[ucTemp];
-
-                    if (g_ucLeftVal > 23)
-                    {
-                        g_ucLeftVal = 0;
-                    }
-
-                    /* Minutes */
-
-                    ucTemp = RTCVALH;   // dummy to decrement
-                    ucTemp = RTCVALH;   // read hours
-                    g_ucRightVal = g_bcd_decimal[ucTemp];
-
-                    if (g_ucRightVal > 59)
-                    {
-                        g_ucRightVal = 0;
-                    }
-
-                    break;
-
-              #else // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
-
-                case DISP_STATE_BLANK:
-                break;
-
-              #endif // #else #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
+              #endif // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                 case DISP_STATE_TIME:
                 case DISP_STATE_SET_HOURS:
@@ -5538,11 +5466,8 @@ void Display_Digits(void)
 
                     /* Alarm on/off */
 
-                  #if APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD
-
-                    g_ucDots = ALRMCFGbits.ALRMEN ? 2 : 0;
-
-                  #elif APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
+                  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
+                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
                     g_ucDots = ALRMCFGbits.ALRMEN ? 2 : 0;
 
@@ -5561,12 +5486,6 @@ void Display_Digits(void)
 
             /* Depending on what to show, select the right digit table. */
 
-          #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
-
-            g_pDigits = g_decimal_bcd;
-
-          #else // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
-
             g_pDigits = ((ustate == DISP_STATE_WEEKDAY) || \
                          (ustate == DISP_STATE_SET_WEEKDAY) ||
 
@@ -5580,8 +5499,6 @@ void Display_Digits(void)
                                    \
                                    g_weekday_7segment : \
                                    g_numerical_7segment;
-            
-          #endif // #else #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
         } // if (!ucPlex)
 
@@ -5641,8 +5558,6 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
-                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -5661,8 +5576,6 @@ void Display_Digits(void)
                         ub |= LED_AG_MASK;    // LED_AG
                     }
 
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                     ub = ~ub;
@@ -5674,8 +5587,7 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
-                  #if (APP_BUZZER_ALARM_USAGE==1) || \
-                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -5909,8 +5821,7 @@ void Display_Digits(void)
 
                     /* Ten hour digit */
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
-                 (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                     if (ucTemp < 10)
                     {
@@ -5954,7 +5865,7 @@ void Display_Digits(void)
                         ucTemp = *(pb + ucTemp);
                     }
 
-             #else // A table watch or the breadboard.
+             #else
 
                     ucTemp = g_div10[ucTemp];
                     ucTemp = *(pb + ucTemp);
@@ -5988,8 +5899,6 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
-                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -6008,8 +5917,6 @@ void Display_Digits(void)
                         ub |= LED_AG_MASK;    // LED_AG
                     }
 
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                     ub = ~ub;
@@ -6021,8 +5928,7 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
-                  #if (APP_BUZZER_ALARM_USAGE==1) || \
-                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -6207,8 +6113,7 @@ void Display_Digits(void)
 
               #endif
 
-              #if (APP_BUZZER_ALARM_USAGE==1) || \
-                  (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+              #if (APP_BUZZER_ALARM_USAGE==1)
 
                /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -6261,16 +6166,11 @@ void Display_Digits(void)
 
                 if (!ucPlex)
                 {
-                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     if (pb == g_weekday_7segment)
                     {
                         ucTemp = *(pb + (ucTemp << 1) + 1);
                     }
                     else
-
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     {
                         ucTemp = *(pb + (g_mod10[ucTemp]));
                     }
@@ -6302,8 +6202,6 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
-                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -6321,8 +6219,6 @@ void Display_Digits(void)
                     {
                         ub |= LED_AG_MASK;    // LED_AG
                     }
-
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6349,8 +6245,7 @@ void Display_Digits(void)
 
                   #endif
 
-                  #if (APP_BUZZER_ALARM_USAGE==1) || \
-                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -6430,8 +6325,7 @@ void Display_Digits(void)
 
              #endif
 
-             #if (APP_BUZZER_ALARM_USAGE==1) || \
-                 (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+             #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0..7 to outputs. */
 
@@ -6489,20 +6383,14 @@ void Display_Digits(void)
                 {
                     /* Ten minute digit */
 
-                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-                    
                     if (pb == g_weekday_7segment)
                     {
                         ucTemp = *(pb + (ucTemp << 1));
                     }
                     else
-
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     {
 
-             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD) && \
-                 (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
+             #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                         if (ucTemp < 10)
                         {
@@ -6530,7 +6418,7 @@ void Display_Digits(void)
                             ucTemp = *(pb + ucTemp);
                         }
 
-             #else // Not a Pulsar or table watch.
+             #else
 
                         ucTemp = g_div10[ucTemp];
                         ucTemp = *(pb + ucTemp);
@@ -6565,8 +6453,6 @@ void Display_Digits(void)
                         ub |= LED_AD_C_MASK;    // LED_AD_C
                     }
 
-                  #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
-
                     // segment e
                     if (ucTemp & 16)
                     {
@@ -6584,8 +6470,6 @@ void Display_Digits(void)
                     {
                         ub |= LED_AG_MASK;    // LED_AG
                     }
-
-                  #endif // #if (APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH)
 
                   #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
@@ -6611,8 +6495,7 @@ void Display_Digits(void)
 
                   #endif
 
-                  #if (APP_BUZZER_ALARM_USAGE==1) || \
-                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -6777,8 +6660,7 @@ void Display_Digits(void)
 
               #endif
 
-                #if (APP_BUZZER_ALARM_USAGE==1) || \
-                    (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
 
@@ -6906,12 +6788,6 @@ void main(void)
         /* Set the display state to blank. */
 
         g_uDispState = DISP_STATE_BLANK;
-
-    #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
-
-        Turn_Up_Stepper_PWM_On();
-
-    #endif // #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
 
   #endif // #else #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_BUTTON
     }
