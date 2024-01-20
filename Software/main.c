@@ -5696,8 +5696,7 @@ void Display_Digits(void)
 
              #endif
 
-             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
-                 (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
+             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
 
                     /* Turn the common cathode on. */
 
@@ -6047,8 +6046,7 @@ void Display_Digits(void)
 
                #endif
 
-               #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
-                   (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
+               #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
 
                         /* Turn the common cathode on. */
 
@@ -6339,8 +6337,7 @@ void Display_Digits(void)
 
              #endif
 
-             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
-                 (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
+             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
 
                 /* Turn the common cathode on. */
 
@@ -6597,8 +6594,7 @@ void Display_Digits(void)
 
                   #endif
 
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE) || \
-                     (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_OPTO)
+                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
 
                         /* Turn the common cathode on. */
 
