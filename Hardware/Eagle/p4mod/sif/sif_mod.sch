@@ -9953,13 +9953,13 @@ Source: AVX .. aphvc.pdf</description>
 <part name="CEFC" library="rcl" deviceset="C-EU" device="C0603" value="10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R3" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R4" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R5" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R6" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R7" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R8" library="resistor_mod" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R2" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R3" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R4" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R5" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R6" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R7" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R8" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
 <part name="FRAME1" library="frames" deviceset="A4-SMALL-DOCFIELD" device="" value="Pulsar P4 Replacement Module"/>
 <part name="C4" library="resistor_mod" deviceset="C-EU" device="C0402K" value="12 pF"/>
 <part name="SUPPLY7" library="supply2" deviceset="GND" device=""/>
