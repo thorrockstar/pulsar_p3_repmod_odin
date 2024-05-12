@@ -9260,13 +9260,13 @@ https://www.mouser.de/datasheet/2/196/Infineon_IRLML0030_DataSheet_v01_01_EN-316
 <part name="CEFC" library="resistor" deviceset="C-EU" device="C0603" value="10 uF"/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
-<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="82"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R5" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
+<part name="R8" library="resistor" deviceset="R-EU_" device="R0402" value="75"/>
 <part name="R14" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="R15" library="resistor" deviceset="R-EU_" device="R0402" value="4.7k"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
@@ -9329,11 +9329,11 @@ You may want to remove the 12pF capacitors in that case as well.</text>
 Created by Roy Schneider 2023.
 This is public domain.</text>
 <text x="-22.86" y="-110.49" size="2.54" layer="94" font="vector">Pulsar P3 Odin Mk II</text>
-<text x="-45.72" y="27.94" size="1.778" layer="94">If using a photo diode, instead of the vintage
+<text x="-50.038" y="28.956" size="1.778" layer="94">If using a photo diode, instead of the vintage
 LDR, use 6,8 k instead of 47 k. Connect the
-anode to LIGHTOUT. Actually some LDR give
-you different output. So you might change
-the resistor value down to 10 k.</text>
+anode to LIGHTOUT. Actually some LDRs give
+you different outputs. So, you might lower
+the resistor value down from 47k to 10 k.</text>
 <text x="-120.904" y="87.122" size="1.778" layer="94">Do not use
 less than
 10µF here!</text>
