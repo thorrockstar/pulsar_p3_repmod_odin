@@ -1,21 +1,21 @@
 /**
- *  Copyright (c) 2020-24 Roy Schneider
+ *  Copyright (c) 2020-25 Roy Schneider
  *
  *  main.c
  *
  *  Implementation of the Pulsar P3/P4 internal watch logic.
  *
- *  Project:            Pulsar P3 (3013) Replacement modules 'Odin' & 'Loki'.
+ *  Project:            Pulsar P3 (3013/50) Replacement modules 'Odin' & 'Loki'.
  *                      Pulsar P4 (403) Replacement modules 'Sif' & 'Hel'.
+ *                      Pulsar P4 (401) Replacement modules 'Sif' for Ladies.
  *                      The 'Odin' & 'Sif' modules are featuring the original
  *                      Litronix made (dotty) display, while the 'Loki' & 'Hel'
- *                      modules are featuring an USSR made ALS314A or AL304G
- *                      display.
+ *                      modules are featuring an USSR made AL304G display.
  *                      The 'Loki' and 'Hel' modules are used in the case the
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        14.01.2024
+ *  Last Change:        26.04.2025
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -783,7 +783,7 @@ inline void Configure_Real_Time_Clock(void)
 
         RTCCFG |= 3;
 
-        RTCVALL = g_decimal_bcd[24]; // Year 2024
+        RTCVALL = g_decimal_bcd[25]; // Default year 2025
 
         ucRTCInval = RTCVALH; // Dummy for decrement
 
@@ -5531,8 +5531,8 @@ void Display_Digits(void)
                         ucTemp = *(pb + (g_mod10[ucTemp]));
                     }
 
-                    ub = 0;
-                    uc = 0;
+                    ub = 0;    // Hold the bits for the B port.
+                    uc = 0;    // Hold the bits for the C port.
                     
                     // segment a
                     if (ucTemp & 1)
@@ -5871,8 +5871,8 @@ void Display_Digits(void)
 
              #endif
                     
-                    ub = 0;
-                    uc = 0;
+                    ub = 0;    // Hold the bits for the B port.
+                    uc = 0;    // Hold the bits for the C port.
                     
                     // segment a
                     if (ucTemp & 1)
@@ -6173,8 +6173,8 @@ void Display_Digits(void)
                         ucTemp = *(pb + (g_mod10[ucTemp]));
                     }
 
-                    ub = 0;
-                    uc = 0;
+                    ub = 0;    // Hold the bits for the B port.
+                    uc = 0;    // Hold the bits for the C port.
                     
                     // segment a
                     if (ucTemp & 1)
@@ -6423,8 +6423,8 @@ void Display_Digits(void)
              #endif
                     }
 
-                    ub = 0;
-                    uc = 0;
+                    ub = 0;    // Hold the bits for the B port.
+                    uc = 0;    // Hold the bits for the C port.
                     
                     // segment a
                     if (ucTemp & 1)
