@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        26.04.2025
+ *  Last Change:        04.05.2025
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -1078,8 +1078,6 @@ inline void Configure_Timer_4(void)
   #endif
 }
 
-#if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
-
 /**
  * Enter deep sleep mode. This function will not return as the controller
  * will have entered sleep mode, before returning.
@@ -1247,8 +1245,6 @@ inline void enterSleep(void)
         Sleep();
     }
 }
-
-#endif // #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
 
 #if APP_BUZZER_ALARM_USAGE==1
 
@@ -2499,23 +2495,9 @@ void PressPB0(void)
 
         g_ucRollOver = 1;
 
-      #if (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH) && \
-          (APP_ONE_TIME_BUTTON_OPERATION==1)
-
-        /* Table watch with one button for time/date
-         * 
-         * Show the date. */
-
-        g_uDispState = DISP_STATE_DATE;
-
-      #else
-
-        /* On any wrist watch model or the breadboard, show the time. */
+        /* Show the time. */
 
         g_uDispState = DISP_STATE_TIME;
-
-      #endif
-
     }
     else
     {
@@ -5064,11 +5046,7 @@ void Display_Digits(void)
 
             /* Turn on RA6 to power up the light sensor. */
 
-        #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
-
             PWR_LGTH_SENSOR = 1;
-            
-        #endif
 
             /* Measure the voltage across the resistor. */
 
@@ -5095,11 +5073,7 @@ void Display_Digits(void)
 
             /* Turn off RA6 to power down the light sensor. */
 
-        #if APP_WATCH_TYPE_BUILD!=APP_TABLE_WATCH
-
             PWR_LGTH_SENSOR = 0;
-
-        #endif
 
             /* Store the readout for showing it on the display. */
 
@@ -5199,12 +5173,6 @@ void Display_Digits(void)
             {
                 /* If being the table watch, show the
                  * time instead of blanking the watch. */
-
-              #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
-
-                case DISP_STATE_BLANK:
-
-              #endif // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
                 case DISP_STATE_TIME:
                 case DISP_STATE_SET_HOURS:
@@ -5466,8 +5434,7 @@ void Display_Digits(void)
 
                     /* Alarm on/off */
 
-                  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
-                      (APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH)
+                  #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD)
 
                     g_ucDots = ALRMCFGbits.ALRMEN ? 2 : 0;
 
@@ -7039,38 +7006,6 @@ void main(void)
 
         /* Output the display. */
 
-     #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
-
-      #if APP_LIGHT_SENSOR_USAGE==1
-
-        if (g_ucDimming)
-        {
-            /* Skip multiplexing, keep display off. */
-
-            g_ucDimming--;
-
-            udivider = 3;
-        }
-        else
-
-      #endif
-
-        if (!(udivider & 3))
-        {
-            Display_Digits();
-        }
-
-        udivider++;
-
-        if (!g_ucStayAwake)
-        {
-            /* Set blank mode. */
-
-            g_uDispState = DISP_STATE_BLANK;
-        }
-
-     #else // #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
-
         if (g_ucStayAwake)
         {
           #if APP_LIGHT_SENSOR_USAGE==1
@@ -7384,8 +7319,6 @@ void main(void)
            Init_Inputs_Outputs_Ports();
            Configure_Inputs_Outputs();
         }
-
-     #endif // #else #if APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
 
     } // while (1)
 }

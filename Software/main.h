@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2020-24 Roy Schneider
+ *  Copyright (c) 2020-25 Roy Schneider
  *
  *  main.h
  *
@@ -8,7 +8,7 @@
  *  Project:            Pulsar Replacement module 'Odin & Loki' and 'Sif & Hel'.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        14.01.2024
+ *  Last Change:        04.05.2025
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -64,8 +64,6 @@
 #define APP_PULSAR_P4_WRIST_WATCH_12H_SIF_MARK_II_MOD      5 // Pulsar P4 Sif Mark II module with driver transistors.
 // Litronix/Siemens bubble display bread board.
 #define APP_PROTOTYPE_BREAD_BOARD                          6 // Just my breadboard.
-// VFD tube project clock.
-#define APP_TABLE_WATCH                                    7 // VFD watch project.
 
 /**
  * ========================================================================
@@ -185,19 +183,6 @@
   #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
   #define APP_WRIST_FLICK_USAGE                      1
   #define APP_COMMON_DRIVER_POSITIVE                 1 // For NMOS driving.
-  #define APP_ONE_TIME_BUTTON_OPERATION              0
-
-#elif (APP_WATCH_TYPE_BUILD == APP_TABLE_WATCH)
-  // VFD table watch
-  #define APP_WATCH_COMMON_PIN_USING                 APP_WATCH_COMMON_CATHODE
-  #define APP_WATCH_ANY_PULSAR_MODEL                 APP_WATCH_GENERIC_BUTTON
-  #define APP_LIGHT_SENSOR_USAGE                     0
-  #define APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE    0
-  #define APP_BUZZER_ALARM_USAGE                     0
-  #define APP_DATE_SPECIAL_DOT_USAGE                 0
-  #define APP_ALARM_SPECIAL_DOT_ANIMATION            0
-  #define APP_WRIST_FLICK_USAGE                      0
-  #define APP_COMMON_DRIVER_POSITIVE                 1 // For opto-driving.
   #define APP_ONE_TIME_BUTTON_OPERATION              0
 
 #elif (APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD)
@@ -426,23 +411,6 @@ typedef void(*ButtonHandlerType)(void);
     // WRIST
     #define PB4_PORT_BITS   PORTCbits
     #define PB4_PIN         RC2
-
-#elif APP_WATCH_TYPE_BUILD==APP_TABLE_WATCH
-
-// VFD table watch
-
-    // TIME
-    #define PB0_PORT_BITS   PORTAbits
-    #define PB0_PIN         RA0
-    // DATE
-    #define PB1_PORT_BITS   PORTBbits
-    #define PB1_PIN         RB0
-    // HOUR
-    #define PB2_PORT_BITS   PORTAbits
-    #define PB2_PIN         RA1
-    // MIN
-    #define PB3_PORT_BITS   PORTAbits
-    #define PB3_PIN         RA5
 
 #elif APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD
 
