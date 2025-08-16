@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        04.05.2025
+ *  Last Change:        16.08.2025
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -326,9 +326,11 @@ unsigned char g_dot_banner_index = 0;
 unsigned char g_ucStayAwake;
 
 /**
- * Global counter for the timer used to keep the display lit. */
+ * Global counters for the timer used to keep the display lit. */
 
 unsigned short g_ucRollOver;
+unsigned short g_ucOverallTimeoutLow;
+unsigned short g_ucOverallTimeoutHigh;
 
 /**
  * Global button state variables. */
@@ -453,6 +455,70 @@ DisplayStateType g_uDispStateBackup;
 unsigned short g_ucAlarm;
 
 #endif
+
+/**
+ * Set the overall timeout to prevent the battery from draining
+ * if a button is pressed and left unattended for too long. */
+
+inline void Set_Overall_Timeout(void)
+{
+    g_ucOverallTimeoutLow  = 0xFFFF;
+    g_ucOverallTimeoutHigh = 0x0004;
+}
+
+/**
+ * Cancel the overall timeout to prevent the battery from draining
+ * if a button is pressed and left unattended for too long. */
+
+inline void Clear_Overall_Timeout(void)
+{
+    g_ucOverallTimeoutLow  = 0;
+    g_ucOverallTimeoutHigh = 0;
+}
+
+/**
+ * Handle the overall timeout to prevent the battery from draining
+ * if a button is pressed and left unattended for too long. */
+
+inline void Handle_Overall_Timeout(void)
+{
+    unsigned short *pu = &g_ucOverallTimeoutLow;
+
+    if (*pu > 0)
+    {
+        (*pu)--;
+
+        if (!*pu)
+        {
+            *pu = 0xFFFF;
+
+            /* If the Low-counter wrapped over, decrement the high counter. */
+
+            pu = &g_ucOverallTimeoutHigh;
+            
+            if (*pu > 0)
+            {
+                (*pu)--;
+
+                if (!*pu)
+                {
+                    /* Clear overall timeout. */
+
+                    Clear_Overall_Timeout();
+
+                    /* We can not send the watch to sleep-mode
+                     * as long as one of the buttons (inputs)
+                     * is high, that is used to wake-up the
+                     * watch again. So the only thing we can do
+                     * is to blank the display, when a button is
+                     * pressed unattended long. */
+
+                    g_uDispState = DISP_STATE_BLANK;
+                }
+            }
+        }
+    }
+}
 
 /**
  * Unlock the RTC. This is time critical, so we use
@@ -2917,6 +2983,11 @@ void HoldPB0(void)
         if (istate == DISP_STATE_TIME)
         {
             g_uDispState = DISP_STATE_SECONDS;
+
+            /* Set the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Set_Overall_Timeout();
         }
         else if (istate == DISP_STATE_DATE)
         {
@@ -2929,6 +3000,11 @@ void HoldPB0(void)
         else if (istate == DISP_STATE_YEAR)
         {
             g_uDispState = DISP_STATE_SET_CALIBRA;
+
+            /* Set the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Set_Overall_Timeout();
         }
 
       #else // #if APP_ONE_TIME_BUTTON_OPERATION
@@ -2936,11 +3012,21 @@ void HoldPB0(void)
         if (istate == DISP_STATE_TIME)
         {
             g_uDispState = DISP_STATE_SECONDS;
+
+            /* Set the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Set_Overall_Timeout();
         }
         else if ((istate == DISP_STATE_YEAR) || \
                  (istate == DISP_STATE_LIGHT_SENSOR))
         {
             g_uDispState = DISP_STATE_SET_CALIBRA;
+
+            /* Set the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Set_Overall_Timeout();
         }
 
       #endif // #else #if APP_ONE_TIME_BUTTON_OPERATION
@@ -2980,6 +3066,14 @@ void ReleasePB0(void)
 
             g_ucTimer2Usage = 0;
         }
+    }
+
+    /* Clear the overall timeout to prevent the battery from draining
+     * if a button is pressed and left unattended for too long. */
+
+    if (g_ucPB1DATEState == PB_STATE_IDLE)
+    {
+        Clear_Overall_Timeout();
     }
 }
 
@@ -3317,6 +3411,11 @@ void PressPB1(void)
         /* Show Alarm Time */
 
         *pb = DISP_STATE_ALARM;
+
+        /* Set the overall timeout to prevent the battery from draining
+         * if a button is pressed and left unattended for too long. */
+
+        Set_Overall_Timeout();
     }
     else if (*pb == DISP_STATE_TOGGLE_ALARM)
     {
@@ -3663,16 +3762,30 @@ void HoldPB1(void)
         else if (istate == DISP_STATE_WEEKDAY)
         {
             g_uDispState = DISP_STATE_YEAR;
+
+        #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==0
+
+            /* Set the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Set_Overall_Timeout();
+
+        #endif
         }
 
-  #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
+      #if APP_LIGHT_SENSOR_USAGE_DEBUG_SHOW_VALUE==1
 
         else if (istate == DISP_STATE_YEAR)
         {
             g_uDispState = DISP_STATE_LIGHT_SENSOR;
+
+            /* Set the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Set_Overall_Timeout();
         }
 
-  #endif
+      #endif
     }
 }
 
@@ -3701,6 +3814,14 @@ void ReleasePB1(void)
     }
 
   #endif
+
+    /* Clear the overall timeout to prevent the battery from draining
+     * if a button is pressed and left unattended for too long. */
+
+    if (g_ucPB0TIMEState == PB_STATE_IDLE)
+    {
+        Clear_Overall_Timeout();
+    }
 }
 
 #endif // #if !APP_ONE_TIME_BUTTON_OPERATION
@@ -3806,6 +3927,11 @@ void PressPB2(void)
     /* Quick forward the value */
 
     HoldPB2();
+
+    /* Cancel the overall timeout to prevent the battery from draining
+     * if a button is pressed and left unattended for too long. */
+
+    Clear_Overall_Timeout();
 }
 
 /**
@@ -4291,6 +4417,11 @@ void PressPB3(void)
     /* Quick forward the value */
 
     HoldPB3();
+
+    /* Cancel the overall timeout to prevent the battery from draining
+     * if a button is pressed and left unattended for too long. */
+
+    Clear_Overall_Timeout();
 }
 
 /**
@@ -6755,9 +6886,8 @@ void main(void)
   #endif // #else #if APP_WATCH_ANY_PULSAR_MODEL!=APP_WATCH_GENERIC_BUTTON
     }
     
-    /* Enable global interrupts. */
-
-    /* INTERRUPT CONTROL REGISTER */
+    /* Enable global interrupts.
+     * INTERRUPT CONTROL REGISTER */
 
     // Global Interrupt Enable bit
     INTCONbits.GIE = 1;      // Enables all unmasked interrupts
@@ -6803,6 +6933,13 @@ void main(void)
 
     udivider = 0;
 
+    /* Cancel the overall timeout to prevent the battery from draining
+     * if a button is pressed and left unattended for too long. */
+
+    Clear_Overall_Timeout();
+
+    /* Main watch logic loop. */
+    
     while (1)
     {
         /* Check alarm. */
@@ -6998,6 +7135,11 @@ void main(void)
             }
 
             g_ucStayAwake |= g_ucRollOver ? 1 : 0;
+
+            /* Handle the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Handle_Overall_Timeout();
         }
         else // if (g_ucTimer2Usage)
         {
@@ -7037,6 +7179,11 @@ void main(void)
         }
         else // if (g_ucStayAwake)
         {
+            /* Cancel the overall timeout to prevent the battery from draining
+             * if a button is pressed and left unattended for too long. */
+
+            Clear_Overall_Timeout();
+
             /* If using the Pulsar Autoset button mode, there
              * are two button press counters for the TIME and DATE
              * buttons, that are reset, when the display is turned off. */
