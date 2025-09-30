@@ -15,7 +15,7 @@
  *                      original display is corroded beyond repair.
  *
  *  Programmer:         Roy Schneider
- *  Last Change:        16.08.2025
+ *  Last Change:        07.09.2025
  *
  *  Language:           C
  *  Toolchain:          GCC/GNU-Make
@@ -5214,25 +5214,6 @@ void Display_Digits(void)
 
             if (uv)  // If the resitor would be missing.
             {
-              #if APP_WATCH_TYPE_BUILD==APP_PROTOTYPE_BREAD_BOARD
-
-                /* Normal daylight */
-
-                if (uv > 1000)
-                {
-                    uv = 0;     // Keep maximum brightness.
-                }
-                else
-                {
-                    uv = 15 - (uv >> 6);
-
-                    /* Stop multiplexing, */
-
-                    ucPlex = 255;
-                }
-
-              #else
-
                 /* Normal daylight */
 
                 if (uv >= 64)
@@ -5247,17 +5228,10 @@ void Display_Digits(void)
 
                     ucPlex = 255;
                 }
-
-              #endif
-
-                g_ucDimming = (unsigned char)uv;
-                g_ucDimmingRef = (unsigned char)uv;
             }
-            else // If the resitor would be missing.
-            {
-                g_ucDimming = 0;
-                g_ucDimmingRef = 0;
-            }
+            
+            g_ucDimming = (unsigned char)uv;
+            g_ucDimmingRef = (unsigned char)uv;
         }
     }
     else // if (!ucPlex)
@@ -5700,26 +5674,9 @@ void Display_Digits(void)
 
                   #endif
 
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                    /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
-
-                    TRISB = 0x52;
-
-                  #else
-
-                    /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
-
-                    TRISB = 0x53;
-
-                  #endif
-
                     /* Turn all segment outputs off. */
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    PORTC |= 0xF0;
-                    PORTB |= 0x2C;
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -5727,15 +5684,10 @@ void Display_Digits(void)
 
                #endif
 
-                    /* Turn used segments outputs on again. */
-
-                    PORTC &= uc;
-                    PORTB &= ub;
+                    PORTC |= 0xF0;
+                    PORTB |= 0x2C;
 
              #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    PORTC &= 0;
-                    PORTB &= 1;
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -5743,42 +5695,12 @@ void Display_Digits(void)
 
                #endif
 
-                    /* Turn used segments outputs on again. */
-
-                    PORTC |= uc;
-                    PORTB |= ub;
+                    PORTC &= 0;
+                    PORTB &= 1;
 
              #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-         #if APP_DATE_SPECIAL_DOT_USAGE==1
-
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    if (g_ucDots & 1)
-                    {
-                        LED_DATE_DOT = 0;
-                    }
-
-             #else
-
-                    if (g_ucDots & 1)
-                    {
-                        LED_DATE_DOT = 1;
-                    }
-
-             #endif
-
-         #endif
-
          #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    /* Turn the common anode on. */
-
-                    LED_1H = 1;
-
-             #endif
 
              #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -5794,27 +5716,7 @@ void Display_Digits(void)
 
              #endif
 
-             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
-
-                    /* Turn the common cathode on. */
-
-                  #if APP_COMMON_DRIVER_POSITIVE
-                    LED_1H = 1;
-                  #else
-                    LED_1H = 0;
-                  #endif
-
-             #endif
-
          #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
-                /* Turn the common cathode on. */
-
-                  #if APP_COMMON_DRIVER_POSITIVE
-                    LED_10M = 1;
-                  #else
-                    LED_10M = 0;
-                  #endif
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -5831,9 +5733,70 @@ void Display_Digits(void)
                   #endif
 
          #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    /* Turn used segments outputs on again. */
+
+                    PORTC &= uc;
+                    PORTB &= ub;
+
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    /* Turn used segments outputs on again. */
+
+                    PORTC |= uc;
+                    PORTB |= ub;
+
+             #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+                    
+             #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                    if (g_ucDots & 1)
+                    {
+                      #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+                        LED_DATE_DOT = 0;
+                      #else
+                        LED_DATE_DOT = 1;
+                      #endif
+                    }
+
+             #endif // #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+         #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    /* Turn the common anode on. */
+
+                    LED_1H = 1;
+             #else
+                    /* Turn the common cathode on. */
+
+                  #if APP_COMMON_DRIVER_POSITIVE
+                    LED_1H = 1;
+                  #else
+                    LED_1H = 0;
+                  #endif
+
+             #endif
+
+         #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+                    /* Turn the common cathode on. */
+
+                  #if APP_COMMON_DRIVER_POSITIVE
+                    LED_10M = 1;
+                  #else
+                    LED_10M = 0;
+                  #endif
+
+         #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
                 }
                 else //if (ucPlex == 3)
                 {
+                    /* 10-hour digit */
+                    
          #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_LEGACY_MOD) || \
              (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_12H_ODIN_MARK_II_MOD) || \
              (APP_WATCH_TYPE_BUILD==APP_PULSAR_WRIST_WATCH_12H_SIF_LEGACY_MOD) || \
@@ -5858,39 +5821,10 @@ void Display_Digits(void)
 
                   #endif
 
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                    /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
-
-                    TRISB = 0x52;
-
-                  #else
-
-                    /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
-
-                    TRISB = 0x53;
-
-                  #endif
-
                     /* Turn all segment outputs off. */
 
                     PORTC &= 0;
                     PORTB &= 1;
-
-                    /* Ten hour digit and dots */
-
-                    if ((ucTemp >= 10) && (ucTemp <= 12))
-                    {
-                        LED_AA_B = 1;
-                        LED_AD_C = 1;
-                    }
-
-                    /* In time mode turn both dots on.
-                     * In date mode upper dot is AM
-                     * and lower do is PM.*/
-
-                    LED_AB_TD = (g_ucDots & 1) ? 1 : 0;
-                    LED_AC_LD = (g_ucDots & 2) ? 1 : 0;
 
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
@@ -5906,6 +5840,21 @@ void Display_Digits(void)
 
                   #endif
 
+                    /* Ten hour digit and dots */
+
+                    if ((ucTemp >= 10) && (ucTemp <= 12))
+                    {
+                        LED_AA_B = 1;
+                        LED_AD_C = 1;
+                    }
+
+                    /* In time mode turn both dots on.
+                     * In date mode upper dot is AM
+                     * and lower do is PM.*/
+
+                    LED_AB_TD = (g_ucDots & 1) ? 1 : 0;
+                    LED_AC_LD = (g_ucDots & 2) ? 1 : 0;
+                    
                     /* Turn the common cathode on. */
 
                   #if APP_COMMON_DRIVER_POSITIVE
@@ -5962,12 +5911,12 @@ void Display_Digits(void)
                         ucTemp = *(pb + ucTemp);
                     }
 
-             #else
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                     ucTemp = g_div10[ucTemp];
                     ucTemp = *(pb + ucTemp);
 
-             #endif
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
                     
                     ub = 0;    // Hold the bits for the B port.
                     uc = 0;    // Hold the bits for the C port.
@@ -6021,6 +5970,8 @@ void Display_Digits(void)
                     
                   #endif // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
+                #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
                     /* Turn all common pins off by setting the outputs
                      * to tri-state high impedance by making inputs out of
                      * them. */
@@ -6040,6 +5991,8 @@ void Display_Digits(void)
 
                   #endif
 
+                #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
                     /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
@@ -6054,12 +6007,11 @@ void Display_Digits(void)
 
                   #endif
 
+                #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+                    
                     /* Turn all segment outputs off. */
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    PORTC |= 0xF0;
-                    PORTB |= 0x2C;
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6067,10 +6019,10 @@ void Display_Digits(void)
 
                #endif
 
-             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+                    PORTC |= 0xF0;
+                    PORTB |= 0x2C;
 
-                    PORTC &= 0;
-                    PORTB &= 1;
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6078,13 +6030,50 @@ void Display_Digits(void)
 
                #endif
 
+                    PORTC &= 0;
+                    PORTB &= 1;
+
              #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-             #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
-                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
+             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+               #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
+
+                    /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
+
+                    TRISB = 0x12;
+
+               #else
+
+                    /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
+
+                    TRISB = 0x13;
+
+               #endif
+
+             #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+                    #if APP_BUZZER_ALARM_USAGE==1
+
+                      /* Set RC0..7 to outputs. */
+
+                      TRISC = 0x00;
+
+                    #else
+
+                      /* Set RC0/1/3/4/5..7 output and RC2(AN11) as input. */
+
+                      TRISC = 0x04;
+
+                    #endif
+
+             #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+               #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
+                   (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
                     if (ucTemp)
                     {
-             #endif
+               #endif
 
                         /* Turn used segments outputs on again. */
 
@@ -6100,93 +6089,55 @@ void Display_Digits(void)
 
                 #endif
 
-             #if APP_DATE_SPECIAL_DOT_USAGE==1
-
-                #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+               #if APP_DATE_SPECIAL_DOT_USAGE==1
 
                         if (g_ucDots & 4)
                         {
+                          #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                             LED_DATE_DOT = 0;
-                        }
-
-                #else
-
-                        if (g_ucDots & 4)
-                        {
+                          #else
                             LED_DATE_DOT = 1;
+                          #endif
                         }
 
-                #endif
+               #endif // #if APP_DATE_SPECIAL_DOT_USAGE==1
 
-             #endif
+               #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
+                   (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
+                    }
+               #endif
 
              #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                        /* Turn the common anode on. */
+                    /* Turn the common anode on. */
 
-                        LED_10H = 1;
-
-               #endif
-
-               #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                        /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
-
-                        TRISB = 0x12;
+                    LED_10H = 1;
 
                #else
+                    /* Turn the common cathode on. */
 
-                        /* Set RB0/1/4 input, keep RB2/3/5/6/7 as output. */
-
-                        TRISB = 0x13;
-
-               #endif
-
-               #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
-
-                        /* Turn the common cathode on. */
-
-                      #if APP_COMMON_DRIVER_POSITIVE
-                        LED_10H = 1;
-                      #else
-                        LED_10H = 0;
-                      #endif
+                  #if APP_COMMON_DRIVER_POSITIVE
+                    LED_10H = 1;
+                  #else
+                    LED_10H = 0;
+                  #endif
 
                #endif
 
              #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                        /* Turn the common cathode on. */
+                /* Turn the common cathode on. */
 
-                      #if APP_COMMON_DRIVER_POSITIVE
-                        LED_1M = 1;
-                      #else
-                        LED_1M = 0;
-                      #endif
-
-                      #if APP_BUZZER_ALARM_USAGE==1
-
-                        /* Set RC0..7 to outputs. */
-
-                        TRISC = 0x00;
-
-                      #else
-
-                        /* Set RC0/1/3/4/5..7 output and RC2(AN11) as input. */
-
-                        TRISC = 0x04;
-
-                      #endif
+                  #if APP_COMMON_DRIVER_POSITIVE
+                    LED_1M = 1;
+                  #else
+                    LED_1M = 0;
+                  #endif
 
              #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
-             #if (APP_WATCH_TYPE_BUILD==APP_PULSAR_P3_WRIST_WATCH_24H_LOKI_MOD) || \
-                 (APP_WATCH_TYPE_BUILD==APP_PULSAR_P4_WRIST_WATCH_24H_HEL_MOD)
-                    }
-             #endif
-
+                      
            #endif // A 24 h based watch.
                 }
             }
@@ -6327,6 +6278,8 @@ void Display_Digits(void)
                      * to tri-state high impedance by making inputs out of
                      * them. */
 
+                #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
                   #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
 
                     /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
@@ -6341,6 +6294,8 @@ void Display_Digits(void)
 
                   #endif
 
+                #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
                   #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
@@ -6349,18 +6304,18 @@ void Display_Digits(void)
 
                   #else
 
-                    /* Set RC0/1/4/5..7 to output and RC3/2(AN11) input. */
+                    /* Set RC0/1/4/5..7 to output and RC3 and RC2(AN11)
+                     * as input. */
 
                     TRISC = 0x0C;
 
                   #endif
 
+                #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
                     /* Turn all segment outputs off. */
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    PORTC |= 0xF0;
-                    PORTB |= 0x2C;
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6368,15 +6323,10 @@ void Display_Digits(void)
 
                #endif
 
-                    /* Turn used segments outputs on again. */
-
-                    PORTC &= uc;
-                    PORTB &= ub;
+                    PORTC |= 0xF0;
+                    PORTB |= 0x2C;
 
              #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    PORTC &= 0;
-                    PORTB &= 1;
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6384,42 +6334,12 @@ void Display_Digits(void)
 
                #endif
 
-                    /* Turn used segments outputs on again. */
-
-                    PORTC |= uc;
-                    PORTB |= ub;
+                    PORTC &= 0;
+                    PORTB &= 1;
 
              #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-         #if APP_DATE_SPECIAL_DOT_USAGE==1
-
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    if (g_ucDots & 2)
-                    {
-                        LED_DATE_DOT = 0;
-                    }
-
-             #else
-
-                    if (g_ucDots & 2)
-                    {
-                        LED_DATE_DOT = 1;
-                    }
-
-             #endif
-
-         #endif
-
          #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
-             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
-                    /* Turn the common anodes on. */
-
-                    LED_1M = 1;
-
-             #endif
 
              #if (APP_BUZZER_ALARM_USAGE==1)
 
@@ -6435,8 +6355,61 @@ void Display_Digits(void)
 
              #endif
 
-             #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
+         #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
+                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
+
+                    /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
+
+                    TRISB = 0x12;
+
+                  #else
+
+                    /* Set RB0/1/4 to input, keep RB2/3/5/6/7 as output. */
+
+                    TRISB = 0x13;
+
+                  #endif
+
+         #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+                    /* Turn used segments outputs on again. */
+
+             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    PORTC &= uc;
+                    PORTB &= ub;
+
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    /* Turn used segments outputs on again. */
+
+                    PORTC |= uc;
+                    PORTB |= ub;
+
+             #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+         #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+                    if (g_ucDots & 2)
+                    {
+                      #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+                        LED_DATE_DOT = 0;
+                      #else
+                        LED_DATE_DOT = 1;
+                      #endif
+                    }
+
+         #endif // #if APP_DATE_SPECIAL_DOT_USAGE==1
+
+         #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+             #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+                    /* Turn the common anodes on. */
+
+                    LED_1M = 1;
+             #else
                 /* Turn the common cathode on. */
 
                   #if APP_COMMON_DRIVER_POSITIVE
@@ -6457,22 +6430,7 @@ void Display_Digits(void)
                     LED_10H = 0;
                   #endif
 
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                    /* Set RB1/4 to input, keep RB0/2/3/5/6/7 as output. */
-
-                    TRISB = 0x12;
-
-                  #else
-
-                    /* Set RB0/1/4 to input, keep RB2/3/5/6/7 as output. */
-
-                    TRISB = 0x13;
-
-                  #endif
-
          #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
                 }
                 else //if (ucPlex == 1)
                 {
@@ -6513,12 +6471,12 @@ void Display_Digits(void)
                             ucTemp = *(pb + ucTemp);
                         }
 
-             #else
+             #else // #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
 
                         ucTemp = g_div10[ucTemp];
                         ucTemp = *(pb + ucTemp);
 
-             #endif
+             #endif // #else #if (APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD)
                     }
 
                     ub = 0;    // Hold the bits for the B port.
@@ -6573,23 +6531,6 @@ void Display_Digits(void)
                     
                   #endif // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                    /* Turn all common pins off by setting the outputs to tri-state
-                     * high impedance by making inputs out of them. */
-
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                    /* Set RB1/4/6 to input, keep RB0/2/3/5/7 as output. */
-
-                    TRISB = 0x52;
-
-                  #else
-
-                    /* Set RB0/1/4/6 to input, keep RB2/3/5/7 as output. */
-
-                    TRISB = 0x53;
-
-                  #endif
-
                   #if (APP_BUZZER_ALARM_USAGE==1)
 
                     /* Set RC0/1/2/4/5..7 to output and RC3 as input. */
@@ -6608,19 +6549,16 @@ void Display_Digits(void)
 
              #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                    PORTC |= 0xF0;
-                    PORTB |= 0x2C;
-
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
                     PORTA |= 0x40;
 
                #endif
 
-             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+                    PORTC |= 0xF0;
+                    PORTB |= 0x2C;
 
-                    PORTC &= 0;
-                    PORTB &= 1;
+             #else // #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
                #if APP_DATE_SPECIAL_DOT_USAGE==1
 
@@ -6628,7 +6566,44 @@ void Display_Digits(void)
 
                #endif
 
+                    PORTC &= 0;
+                    PORTB &= 1;
+
              #endif // #else APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
+
+             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
+
+                    /* Set RB1/6 to input, keep RB0/2/3/4/5/7 as output. */
+
+                    TRISB = 0x42;
+
+                  #else
+
+                    /* Set RB0/1/6 to input, keep RB2/3/4/5/7 as output. */
+
+                    TRISB = 0x43;
+
+                  #endif
+
+             #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+
+                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
+
+                    /* Set RB4/6 to input, keep RB0/1/2/3/5/7 as output. */
+
+                    TRISB = 0x50;
+
+                  #else
+
+                    /* Set RB0/4/6 to input, keep RB1/2/3/5/7 as output. */
+
+                    TRISB = 0x51;
+
+                  #endif
+
+             #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
              #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
                     if (ucTemp)
@@ -6650,63 +6625,42 @@ void Display_Digits(void)
 
              #if APP_DATE_SPECIAL_DOT_USAGE==1
 
-                #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
-
                        if (g_ucDots & 8)
                        {
+                         #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
                            LED_DATE_DOT = 0;
-                       }
-
-                #else
-
-                       if (g_ucDots & 8)
-                       {
+                         #else
                            LED_DATE_DOT = 1;
+                         #endif
                        }
-
-                #endif
-
+             #endif
+                        
+             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
+                    }
              #endif
 
              #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
                  #if APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_ANODE
 
-                        /* Turn the common anode on. */
+                    /* Turn the common anode on. */
 
-                        LED_10M = 1;
+                    LED_10M = 1;
 
-                 #endif
+                 #else
+                    /* Turn the common cathode on. */
 
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                        /* Set RB1/6 to input, keep RB0/2/3/4/5/7 as output. */
-
-                        TRISB = 0x42;
-
+                  #if APP_COMMON_DRIVER_POSITIVE
+                    LED_10M = 1;
                   #else
-
-                        /* Set RB0/1/6 to input, keep RB2/3/4/5/7 as output. */
-
-                        TRISB = 0x43;
-
+                    LED_10M = 0;
                   #endif
-
-                 #if (APP_WATCH_COMMON_PIN_USING==APP_WATCH_COMMON_CATHODE)
-
-                        /* Turn the common cathode on. */
-
-                      #if APP_COMMON_DRIVER_POSITIVE
-                        LED_10M = 1;
-                      #else
-                        LED_10M = 0;
-                      #endif
                         
                  #endif
 
              #else // #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
 
-                        /* Turn the common cathode on. */
+                    /* Turn the common cathode on. */
 
                   #if APP_COMMON_DRIVER_POSITIVE
                         LED_1H = 1;
@@ -6714,25 +6668,7 @@ void Display_Digits(void)
                         LED_1H = 0;
                   #endif
 
-                  #if APP_WATCH_ANY_PULSAR_MODEL==APP_WATCH_PULSAR_AUTO_SET
-
-                        /* Set RB4/6 to input, keep RB0/1/2/3/5/7 as output. */
-
-                        TRISB = 0x50;
-
-                  #else
-
-                        /* Set RB0/4/6 to input, keep RB1/2/3/5/7 as output. */
-
-                        TRISB = 0x51;
-
-                  #endif
-
              #endif // #else #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-
-             #if APP_WATCH_TYPE_BUILD!=APP_PROTOTYPE_BREAD_BOARD
-                    }
-             #endif
                 }
             }
             else // if (g_ucRightVal != 255)
@@ -7043,13 +6979,13 @@ void main(void)
 
                             /* Grant more time on a wrist flick event. */
                                 
-                            g_WristFlick ? 525 : 375;
+                            g_WristFlick ? 525 : 450;
 
                 if (++g_ucRollOver >= ulimit) // Rounds per second.
                 {
             #else
 
-                if (++g_ucRollOver >= 375) // Rounds per second.
+                if (++g_ucRollOver >= 450) // Rounds per second.
                 {
                     const DisplayStateType istate = g_uDispState;
 

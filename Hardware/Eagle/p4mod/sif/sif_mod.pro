@@ -2,14 +2,14 @@ EAGLE AutoRouter Statistics:
 
 Job           : D:/Projekte/Privat/Watch/Pulsar_P3_Odin/Hardware/Eagle/p4mod/sif/sif_mod.brd
 
-Start at      : 13:40:43 (23.12.2023)
-End at        : 13:40:44 (23.12.2023)
+Start at      : 20:08:38 (30.09.2025)
+End at        : 20:08:39 (30.09.2025)
 Elapsed time  : 00:00:01
 
 Signals       :    34   RoutingGrid: 1 mil  Layers: 2
 Connections   :    63   predefined:  63 ( 47 Vias )
 
-Router memory :   2444260
+Router memory :   2442048
 
 Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 
