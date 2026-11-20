@@ -849,7 +849,7 @@ inline void Configure_Real_Time_Clock(void)
 
         RTCCFG |= 3;
 
-        RTCVALL = g_decimal_bcd[25]; // Default year 2025
+        RTCVALL = g_decimal_bcd[26]; // Default year 2026
 
         ucRTCInval = RTCVALH; // Dummy for decrement
 
