@@ -9874,8 +9874,8 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="FRAME1" library="frames" deviceset="A4-SMALL-DOCFIELD" device="" value="Pulsar P3 Module"/>
 <part name="SUPPLY1" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY5" library="supply2" deviceset="GND" device=""/>
-<part name="C4" library="resistor" deviceset="C-EU" device="C0603" value="12 pF"/>
-<part name="C5" library="resistor" deviceset="C-EU" device="C0603" value="12 pF"/>
+<part name="C4" library="resistor" deviceset="C-EU" device="C0603" value="20 pF"/>
+<part name="C5" library="resistor" deviceset="C-EU" device="C0603" value="20 pF"/>
 <part name="SUPPLY7" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
 <part name="+3V" library="wirepad" deviceset="SMD2" device="" value="2"/>

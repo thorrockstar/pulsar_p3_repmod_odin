@@ -2580,8 +2580,8 @@ design rules under a new name.</description>
 <element name="R8" library="resistor" package="R0402" value="75/120" x="6.096" y="19.5326" rot="R180"/>
 <element name="R14" library="resistor" package="R0402" value="4.7k" x="4.5974" y="6.1976" rot="R90"/>
 <element name="R15" library="resistor" package="R0402" value="4.7k" x="4.8768" y="9.2202" rot="R180"/>
-<element name="C4" library="resistor" package="C0603" value="12 pF" x="14.1732" y="21.59" rot="R180"/>
-<element name="C5" library="resistor" package="C0603" value="12 pF" x="7.9502" y="21.5646"/>
+<element name="C4" library="resistor" package="C0603" value="20 pF" x="14.1732" y="21.59" rot="R180"/>
+<element name="C5" library="resistor" package="C0603" value="20 pF" x="7.9502" y="21.5646"/>
 <element name="+3V" library="wirepad" package="SMD1,27-2,54" value="2" x="21.0566" y="21.1582"/>
 <element name="0V" library="wirepad" package="SMD1,27-2,54" value="0" x="11.2268" y="0.6858" rot="R90"/>
 <element name="+3V1" library="wirepad" package="SMD1,27-2,54" value="1" x="0.8382" y="21.1582"/>

@@ -9961,7 +9961,7 @@ Source: AVX .. aphvc.pdf</description>
 <part name="R7" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
 <part name="R8" library="resistor_mod" deviceset="R-EU_" device="R0402" value="75"/>
 <part name="FRAME1" library="frames" deviceset="A4-SMALL-DOCFIELD" device="" value="Pulsar P4 Replacement Module"/>
-<part name="C4" library="resistor_mod" deviceset="C-EU" device="C0402K" value="12 pF"/>
+<part name="C4" library="resistor_mod" deviceset="C-EU" device="C0402K" value="20 pF"/>
 <part name="SUPPLY7" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY9" library="supply2" deviceset="GND" device=""/>
 <part name="R16" library="resistor_mod" deviceset="R-EU_" device="R0402" value="4.7k"/>
@@ -9976,7 +9976,7 @@ Source: AVX .. aphvc.pdf</description>
 <part name="TIME" library="testpad" deviceset="TP" device="TP08SQ" value="TPTP08SQ"/>
 <part name="DATE" library="testpad" deviceset="TP" device="TP08SQ" value="TPTP08SQ"/>
 <part name="GND1" library="testpad" deviceset="TP" device="TP08SQ" value="TPTP08SQ"/>
-<part name="C1" library="resistor_mod" deviceset="C-EU" device="C0402K" value="12 pF"/>
+<part name="C1" library="resistor_mod" deviceset="C-EU" device="C0402K" value="20 pF"/>
 <part name="U$2" library="pulsar_p4_display" deviceset="PULSAR_P4_DISPLAY" device="PULSAR_P4_LED_DISPLAY"/>
 <part name="SUPPLY1" library="supply2" deviceset="GND" device=""/>
 <part name="VDD2" library="testpad" deviceset="TP" device="TP08SQ" value="TPTP08SQ"/>

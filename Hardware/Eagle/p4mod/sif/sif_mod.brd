@@ -2597,7 +2597,7 @@ design rules under a new name.</description>
 <element name="R6" library="resistor_mod" package="R0402" value="75" x="17.252953125" y="3.62104375" rot="R90"/>
 <element name="R7" library="resistor_mod" package="R0402" value="75" x="4.9276" y="6.174871875" rot="R270"/>
 <element name="R8" library="resistor_mod" package="R0402" value="75" x="9.549" y="6.708275" rot="R180"/>
-<element name="C4" library="resistor_mod" package="C0402K" value="12 pF" x="4.96871875" y="5.909321875" rot="MR90"/>
+<element name="C4" library="resistor_mod" package="C0402K" value="20 pF" x="4.96871875" y="5.909321875" rot="MR90"/>
 <element name="R16" library="resistor_mod" package="R0402" value="4.7k" x="18.35658125" y="6.402271875" rot="MR270"/>
 <element name="R17" library="resistor_mod" package="R0402" value="4.7k" x="4.0894" y="5.909178125" rot="MR90"/>
 <element name="PGD" library="testpad" package="TP06SQ" value="TPTP06SQ" x="14.11478125" y="2.7468625">
@@ -2627,7 +2627,7 @@ design rules under a new name.</description>
 <element name="GND1" library="testpad" package="TP08SQ" value="TPTP08SQ" x="18.9992" y="9.787525" rot="R180">
 <attribute name="TP_SIGNAL_NAME" value="" x="18.9992" y="9.787525" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C1" library="resistor_mod" package="C0402K" value="12 pF" x="5.04951875" y="3.9624" rot="MR270"/>
+<element name="C1" library="resistor_mod" package="C0402K" value="20 pF" x="5.04951875" y="3.9624" rot="MR270"/>
 <element name="U$2" library="pulsar_p4_display" package="PULSAR_P3_LED_DISPLAY" value="PULSAR_P4_DISPLAYPULSAR_P4_LED_DISPLAY" x="3.21241875" y="3.21965625"/>
 <element name="VDD2" library="testpad" package="TP08SQ" value="TPTP08SQ" x="2.5390625" y="1.708484375">
 <attribute name="TP_SIGNAL_NAME" value="" x="2.5390625" y="1.708484375" size="1.778" layer="27" display="off"/>
